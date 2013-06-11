@@ -22,7 +22,9 @@ class RunkeeperRecord(models.Model):
 
     @property
     def user(self):
-        return healthgraph.User(session=healthgraph.Session(self.token))
+        if not getattr(self, '_user', None):
+            self._user = healthgraph.User(session=healthgraph.Session(self.token))
+        return self._user
 
     def ensureActivities(self):
         if not getattr(self, 'activitiesIter', None):
