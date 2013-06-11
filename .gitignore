@@ -1,0 +1,21 @@
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/*
+.idea/copywrite/*
+.idea/copyright/*
+.idea/uiDesigner.xml
+.idea/dataSources.*
+
+# Compiled Python files
+*.pyc
+
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+._*
+Thumbs.db
+.idea/workspace.xml
+
+local_settings.py
