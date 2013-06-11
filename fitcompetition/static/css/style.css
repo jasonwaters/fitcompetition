@@ -1,7 +1,19 @@
 body {
-    background: #131313 url('/static/img/darknoise.png');
+    background: #f0f0f0 url('/static/img/darknoise.png');
+    padding-top: 60px;
 }
 
+.middle {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.runkeeper-login-button {
+    width: 300px;
+    height: 57px;
+    display: inline-block;
+    padding: 10px;
+}
 
 #countdown {
     background: url("/static/img/countdown.png");
