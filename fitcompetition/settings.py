@@ -115,10 +115,10 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'south',
+    'fitcompetition',
     'grappelli',
     'django.contrib.admin',
-    'fitcompetition',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
