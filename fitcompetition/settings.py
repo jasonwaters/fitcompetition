@@ -3,10 +3,9 @@ import manage
 import os
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Jason Waters', 'jason@myheck.net'),
 )
 
 MANAGERS = ADMINS
@@ -40,7 +39,6 @@ USE_TZ = True
 
 PROJ_ROOT = os.path.dirname(os.path.realpath(manage.__file__))
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
-
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -106,6 +104,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(SITE_ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -115,9 +114,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'fitcompetition',
     'grappelli',
     'django.contrib.admin',
+    # 'django_openid_auth',
     'south',
 )
 
@@ -149,6 +150,32 @@ LOGGING = {
         },
     }
 }
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
+LOGOUT_URL = '/logout/'
+
+OPENID_USE_AS_ADMIN_LOGIN = True
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
+
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'fitcompetition.auth.RunkeeperBackend',
+)
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 PYTHON_FOLDER_NAME = 'python2.7'
 

@@ -11,4 +11,13 @@ urlpatterns = patterns('',
                        # url(r'^fitcompetition/', include('fitcompetition.foo.urls')),
 
                        url(r'^admin/', include(admin.site.urls)),
+
+                       url(r'^runkeeper/login/$', 'django_openid_auth.views.login_begin',
+                           kwargs={'render_failure': 'sales.views.error'}, name='openid-login'),
+
+                       url(r'^runkeeper/login-complete/$', 'django_openid_auth.views.login_complete',
+                           name='openid-complete'),
+
+                       url(r'^login/$', 'fitcompetition.views.login', name='login'),
+                       url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/', }, name='logout'),
 )

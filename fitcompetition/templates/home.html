@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load apptags %}
+
+{% block head_title %}hello{% endblock %}
+
+{% block head_css %}
+    <style type="text/css">
+        body {
+            background: lightyellow;
+            color: #000000;
+        }
+    </style>
+{% endblock %}
+
+{% block head_scripts %}
+{% endblock %}
+
+{% block content %}
+    <ul>
+    {% for record in records %}
+        <li>{{ record.name }}: <strong>{{ record.totalMiles|toMiles }}</strong> Total Miles</li>
+        <ul>
+            {% for activity in record.activities %}
+                <li>{{ activity.start_time }} &mdash; {{ activity.type }} &mdash; {{ activity.total_distance|toMiles }} miles &mdash; {{ activity.duration|duration }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    </ul>
+{% endblock %}

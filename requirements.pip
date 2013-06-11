@@ -1,0 +1,10 @@
+Django==1.5.1
+MySQL-python==1.2.4
+South==0.8.1
+django-grappelli==2.4.5
+healthgraph-api==0.3.0
+
+#change claimed_id of model.UserOpenID
+#claimed_id = models.CharField(max_length=255, unique=True)
+django-openid-auth==0.5
+python-openid==2.2.5
