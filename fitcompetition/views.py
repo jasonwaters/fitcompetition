@@ -1,11 +1,10 @@
+import operator
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-
-
-# @login_required
 from fitcompetition.models import RunkeeperRecord, Goal
+from fitcompetition.util.ListUtil import multikeysort
 import healthgraph
 
 
@@ -14,7 +13,7 @@ def home(request):
     goal = Goal.objects.get(isActive=True)
 
     return render(request, 'home.html', {
-        'records': records,
+        'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),
         'goal': goal
     })
 
