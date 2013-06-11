@@ -5,14 +5,17 @@ from django.shortcuts import render
 
 
 # @login_required
-from fitcompetition.models import RunkeeperRecord
+from fitcompetition.models import RunkeeperRecord, Goal
 import healthgraph
 
 
 def home(request):
     records = RunkeeperRecord.objects.filter()
+    goal = Goal.objects.get(isActive=True)
+
     return render(request, 'home.html', {
-        'records': records
+        'records': records,
+        'goal': goal
     })
 
 

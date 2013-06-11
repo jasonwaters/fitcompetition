@@ -1,9 +1,45 @@
-import datetime
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import BooleanField
 import healthgraph
 
-START = "2013-06-08" #datetime.date(2013, 1, 8)
-END = "2013-07-06" #datetime.date(2013, 7, 6)
+
+class UniqueBooleanField(BooleanField):
+    def pre_save(self, model_instance, add):
+        objects = model_instance.__class__.objects
+        # If True then set all others as False
+        if getattr(model_instance, self.attname):
+            objects.update(**{self.attname: False})
+        # If no true object exists that isnt saved model, save as True
+        elif not objects.exclude(id=model_instance.id).filter(**{self.attname: True}):
+            return True
+        return getattr(model_instance, self.attname)
+
+# To use with South
+from south.modelsinspector import add_introspection_rules
+add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
+
+
+class Goal(models.Model):
+    name = models.CharField(max_length=256)
+    description = models.TextField(blank=True)
+    distance = models.IntegerField()
+
+    startdate = models.DateTimeField(verbose_name='Start Date')
+    enddate = models.DateTimeField(verbose_name='End Date')
+    isActive = UniqueBooleanField(verbose_name="Is Active")
+
+    @property
+    def numDays(self):
+        return (self.enddate - self.startdate).days
+
+    def __unicode__(self):
+        return self.name
+
+    def clean(self):
+        if self.startdate > self.enddate:
+            raise ValidationError("Start Date must be before End Date")
+
 
 
 class RunkeeperRecord(models.Model):
@@ -11,6 +47,9 @@ class RunkeeperRecord(models.Model):
     userID = models.IntegerField()
     code = models.CharField(max_length=255)
     token = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.userID
 
     @property
     def profile(self):
@@ -28,7 +67,12 @@ class RunkeeperRecord(models.Model):
 
     def ensureActivities(self):
         if not getattr(self, 'activitiesIter', None):
-            self.activitiesIter = self.user.get_fitness_activity_iter(date_min=START, date_max=END)
+            try:
+                goal = Goal.objects.get(isActive=True)
+                self.activitiesIter = self.user.get_fitness_activity_iter(date_min=goal.startdate.strftime('%Y-%m-%d'), date_max=goal.enddate.strftime('%Y-%m-%d'))
+            except Goal.DoesNotExist:
+                self.activitiesIter = self.user.get_fitness_activity_iter()
+
             self.activitiesList = []
 
             for _ in range(self.activitiesIter.count()):

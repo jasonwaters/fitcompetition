@@ -4,26 +4,54 @@
 {% block head_title %}hello{% endblock %}
 
 {% block head_css %}
-    <style type="text/css">
-        body {
-            background: lightyellow;
-            color: #000000;
-        }
-    </style>
 {% endblock %}
 
 {% block head_scripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+    </script>
+    }
 {% endblock %}
 
 {% block content %}
-    <ul>
-    {% for record in records %}
-        <li>{{ record.name }}: <strong>{{ record.totalMiles|toMiles }}</strong> Total Miles</li>
-        <ul>
-            {% for activity in record.activities %}
-                <li>{{ activity.start_time }} &mdash; {{ activity.type }} &mdash; {{ activity.total_distance|toMiles }} miles &mdash; {{ activity.duration|duration }}</li>
+    <div id="countdown" class="middle" data-waters="countdown" data-targetdate="{{ goal.enddate|fullDate }}">
+        <div class="inner-countdown">
+            <div class="days">
+                <div class="countdown-value days-value">{{ goal.enddate|deltaDate:"days" }}</div>
+                <div class="countdown-line"></div>
+            </div>
+            <div class="hours">
+                <div class="countdown-value hours-value">{{ goal.enddate|deltaDate:"hours" }}</div>
+                <div class="countdown-line"></div>
+            </div>
+            <div class="minutes">
+                <div class="countdown-value minutes-value">{{ goal.enddate|deltaDate:"mins" }}</div>
+                <div class="countdown-line"></div>
+            </div>
+            <div class="seconds">
+                <div class="countdown-value seconds-value">{{ goal.enddate|deltaDate:"secs" }}</div>
+                <div class="countdown-line"></div>
+            </div>
+        </div>
+    </div>
+    <div class="well">
+        <h3>Leaderboard</h3>
+        <div>Run or Walk {{ goal.distance }} miles in {{ goal.numDays }} days.</div>
+        <div>{{ goal.startdate }} to {{ goal.enddate }}</div>
+        <div class="row-fluid">
+            <ul>
+            {% for record in records %}
+                <li>{{ record.name }}: <strong>{{ record.totalMiles|toMiles }}</strong> Total Miles
+    {#                <ul>#}
+    {#                    {% for activity in record.activities %}#}
+    {#                        <li>{{ activity.start_time }} &mdash; {{ activity.type }} &mdash; {{ activity.total_distance|toMiles }} miles &mdash; {{ activity.duration|duration }}</li>#}
+    {#                    {% endfor %}#}
+    {#                </ul>#}
+                </li>
             {% endfor %}
-        </ul>
-    {% endfor %}
-    </ul>
+            </ul>
+        </div>
+    </div>
 {% endblock %}

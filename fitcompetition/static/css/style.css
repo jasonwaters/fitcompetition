@@ -1,0 +1,45 @@
+body {
+    background: #131313 url('/static/img/darknoise.png');
+}
+
+
+#countdown {
+    background: url("/static/img/countdown.png");
+    width: 613px;
+    height: 276px;
+    margin-top: -10px;
+    margin-left: -30px;
+}
+
+#countdown .inner-countdown {
+    padding-top: 101px;
+    padding-left: 150px;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+}
+
+#countdown .countdown-line {
+    position: relative;
+    height: 1px;
+    width: 57px;
+    background-color: #000000;
+
+    top: 8px;
+}
+
+#countdown .countdown-value {
+    position: relative;
+    top: 20px;
+    text-align: center;
+    font-size: 32px;
+    left: -2px;
+}
+
+.days, .hours, .minutes, .seconds {
+    display: inline-block;
+    width: 59px;
+    height: 57px;
+    margin-right: 21px;
+    border: none;
+}

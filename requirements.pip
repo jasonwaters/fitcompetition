@@ -3,6 +3,7 @@ MySQL-python==1.2.4
 South==0.8.1
 django-grappelli==2.4.5
 healthgraph-api==0.3.0
+pytz==2013b
 
 #change claimed_id of model.UserOpenID
 #claimed_id = models.CharField(max_length=255, unique=True)
