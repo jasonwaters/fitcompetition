@@ -52,17 +52,38 @@ class RunkeeperRecord(models.Model):
         return self.userID
 
     @property
+    def isDead(self):
+        return self.settings is None
+
+    @property
+    def session(self):
+        if not getattr(self, '_session', None):
+            self._session = healthgraph.Session(self.token)
+
+        return self._session
+
+    @property
     def profile(self):
-        return self.user.get_profile()
+        if not getattr(self, '_profile', None):
+            self._profile = self.user.get_profile()
+        return self._profile
 
     @property
     def records(self):
-        return self.user.get_records()
+        if not getattr(self, '_records', None):
+            self._records = self.user.get_records()
+        return self._records
+
+    @property
+    def settings(self):
+        if not getattr(self, '_settings', None):
+            self._settings = self.user.get_settings()
+        return self._settings
 
     @property
     def user(self):
         if not getattr(self, '_user', None):
-            self._user = healthgraph.User(session=healthgraph.Session(self.token))
+            self._user = healthgraph.User(session=self.session)
         return self._user
 
     def ensureActivities(self):
