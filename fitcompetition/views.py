@@ -21,7 +21,7 @@ def home(request):
 def login(request):
     auth = healthgraph.AuthManager(getattr(settings, 'RUNKEEPER_CLIENT_ID', ''),
                                    getattr(settings, 'RUNKEEPER_CLIENT_SECRET', ''),
-                                   '/login')
+                                   'http://%s/login' % request.get_host())
 
     code = request.GET.get('code')
     access_token = auth.get_access_token(code) if code is not None else ""
