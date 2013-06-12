@@ -11,7 +11,18 @@
     {{ block.super }}
     <script type="text/javascript">
         $(document).ready(function () {
-            $('a.activities-link').popover();
+            $('html').click(function(e) {
+                $('a.activities-link').popover('hide');
+            });
+
+            $('a.activities-link').popover({
+                html: true,
+                trigger: 'manual'
+            }).click(function(e) {
+                $(this).popover('toggle');
+                e.stopPropagation();
+            });
+
         });
     </script>
 {% endblock %}
