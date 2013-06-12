@@ -13,13 +13,7 @@ body {
     margin-right: auto;
 }
 
-.runkeeper-login-button {
-    width: 300px;
-    height: 57px;
-    display: block;
-    padding: 10px;
-    margin: auto;
-}
+.runkeeper-login-button {}
 
 .countdown-value {
     font-weight: bold;
