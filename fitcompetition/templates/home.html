@@ -11,7 +11,7 @@
     {{ block.super }}
     <script type="text/javascript">
         $(document).ready(function () {
-
+            $('a.activities-link').popover();
         });
     </script>
 {% endblock %}
@@ -47,13 +47,28 @@
             {% for record in records %}
                 <tr>
                     <td>{{ record.name }}</td>
-                    <td>{{ record.totalMiles|toMiles }} Miles</td>
+                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-html="true" data-placement="bottom" data-title="Activities" data-content='
+                        {% spaceless %}
+                        <table class="table table-condensed">
+                            <thead>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Miles</th>
+                                <th>Duration</th>
+                            </thead>
+                            <tbody>
+                                {% for activity in record.activities %}
+                                    <tr>
+                                        <td>{{ activity.start_time|date:"M j" }}</td>
+                                        <td>{{ activity.type }}</td>
+                                        <td>{{ activity.total_distance|toMiles }}</td>
+                                        <td>{{ activity.duration|duration }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endspaceless %}'>{{ record.totalMiles|toMiles }} Miles</a></td>
                 </tr>
-    {#                <ul>#}
-    {#                    {% for activity in record.activities %}#}
-    {#                        <li>{{ activity.start_time }} &mdash; {{ activity.type }} &mdash; {{ activity.total_distance|toMiles }} miles &mdash; {{ activity.duration|duration }}</li>#}
-    {#                    {% endfor %}#}
-    {#                </ul>#}
             {% endfor %}
             </table>
         </div>
