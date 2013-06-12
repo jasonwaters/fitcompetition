@@ -36,17 +36,12 @@
         </div>
     </div>
     <div class="row-fluid">
-        <h3>The Rules</h3>
-        <ul>
-            <li>Run or Walk {{ goal.distance }} miles in {{ goal.numDays }} days.</li>
-            <li>Between {{ goal.startdate|date:"F j, Y" }} and {{ goal.enddate|date:"F j, Y" }}</li>
-        </ul>
-        <h3>Leaderboard</h3>
+        <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
         <div class="row-fluid">
             <table class="table table-striped">
                 <thead>
-                    <th>Leader</th>
-                    <th>Miles</th>
+                    <th>Player</th>
+                    <th>Distance</th>
                 </thead>
                 <tbody></tbody>
             {% for record in records %}
@@ -62,5 +57,13 @@
             {% endfor %}
             </table>
         </div>
+        <h3><i class="icon-legal icon-large"></i> The Rules</h3>
+        <ul>
+            <li>Put $10 in the pot.</li>
+            <li>Run or Walk {{ goal.distance }} miles in {{ goal.numDays }} days.  Between {{ goal.startdate|date:"F j, Y" }} and {{ goal.enddate|date:"F j, Y" }}</li>
+            <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
+            <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+        </ul>
+
     </div>
 {% endblock %}
