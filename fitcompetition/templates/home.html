@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load apptags %}
+{% load humanize %}
 
 {% block head_title %}Fit Competition{% endblock %}
 
@@ -57,7 +58,7 @@
                 <tbody></tbody>
             {% for record in records %}
                 <tr>
-                    <td>{{ record.name }}</td>
+                    <td>{{ record.name }} <i class="icon-heart-empty {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
                     <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-html="true" data-placement="bottom" data-title="Activities" data-content='
                         {% spaceless %}
                         <table class="table table-condensed">
@@ -70,7 +71,7 @@
                             <tbody>
                                 {% for activity in record.activities %}
                                     <tr>
-                                        <td>{{ activity.start_time|date:"M j" }}</td>
+                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>
                                         <td>{{ activity.type }}</td>
                                         <td>{{ activity.total_distance|toMiles }}</td>
                                         <td>{{ activity.duration|duration }}</td>
@@ -85,7 +86,7 @@
         </div>
         <h3><i class="icon-legal icon-large"></i> The Rules</h3>
         <ul>
-            <li>Put $10 in the pot.</li>
+            <li>Put ${{ goal.ante|intcomma }} in the pot.</li>
             <li>Run or Walk {{ goal.distance }} miles in {{ goal.numDays }} days.  Between {{ goal.startdate|date:"F j, Y" }} and {{ goal.enddate|date:"F j, Y" }}</li>
             <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
             <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>

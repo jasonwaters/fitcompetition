@@ -1,7 +1,19 @@
+from datetime import datetime, date
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField
 import healthgraph
+
+
+class CurrencyField(models.DecimalField):
+    __metaclass__ = models.SubfieldBase
+
+    def to_python(self, value):
+        try:
+            return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
+        except AttributeError:
+            return None
 
 
 class UniqueBooleanField(BooleanField):
@@ -18,6 +30,7 @@ class UniqueBooleanField(BooleanField):
 # To use with South
 from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
+add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 
 
 class Goal(models.Model):
@@ -27,6 +40,8 @@ class Goal(models.Model):
 
     startdate = models.DateTimeField(verbose_name='Start Date')
     enddate = models.DateTimeField(verbose_name='End Date')
+    ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
+
     isActive = UniqueBooleanField(verbose_name="Is Active")
 
     @property
@@ -101,6 +116,16 @@ class RunkeeperRecord(models.Model):
                 if activity.get('type') in ('Running', 'Walking'):
                     self.activitiesList.append(activity)
 
+
+    @property
+    def activeToday(self):
+        today = datetime.now().date()
+
+        for activity in self.activities:
+            if (activity.get('start_time').date() - today).days == 0:
+                return True
+
+        return False
 
     @property
     def activities(self):
