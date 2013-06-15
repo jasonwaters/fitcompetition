@@ -12,18 +12,23 @@
     {{ block.super }}
     <script type="text/javascript">
         $(document).ready(function () {
-            $('html').click(function(e) {
-                $('a.activities-link').popover('hide');
+            var hidePopovers = function(list) {
+                $(list).popover('hide');
+            };
+
+            $('html').click(function() {
+                hidePopovers($('a.activities-link'));
             });
 
             $('a.activities-link').popover({
                 html: true,
                 trigger: 'manual'
-            }).click(function(e) {
-                $(this).popover('toggle');
-                e.stopPropagation();
-            });
+            }).click(function(evt) {
+                hidePopovers(_.without($('a.activities-link'), evt.target));
 
+                $(this).popover('toggle');
+                evt.stopPropagation(evt.target);
+            });
         });
     </script>
 {% endblock %}
@@ -53,33 +58,37 @@
             <table class="table table-striped">
                 <thead>
                     <th>Player</th>
-                    <th>Distance</th>
+                    <th>Miles</th>
                 </thead>
                 <tbody></tbody>
             {% for record in records %}
                 <tr>
-                    <td>{{ record.name }} <i class="icon-heart-empty {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
-                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-html="true" data-placement="bottom" data-title="Activities" data-content='
+                    <td>{{ record.name }} <i class="icon-heart-empty red {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
+                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-placement="bottom" data-content='
                         {% spaceless %}
                         <table class="table table-condensed">
                             <thead>
                                 <th>Date</th>
-                                <th>Type</th>
                                 <th>Miles</th>
-                                <th>Duration</th>
+                                <th>Time</th>
                             </thead>
                             <tbody>
                                 {% for activity in record.activities %}
                                     <tr>
-                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>
-                                        <td>{{ activity.type }}</td>
-                                        <td>{{ activity.total_distance|toMiles }}</td>
+                                        <td>{{ activity.start_time|naturalday:"M j" }}
+                                            {% if activity.type == "Walking" %}
+                                                <i class="icon-angle-right" title="Walking"></i>
+                                            {% elif activity.type == "Running" %}
+                                                <i class="icon-double-angle-right" title="Running"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ activity.total_distance|toMiles|twoDecimals }}</td>
                                         <td>{{ activity.duration|duration }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        {% endspaceless %}'>{{ record.totalMiles|toMiles }} Miles</a></td>
+                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a> <i class="icon-check-sign green {% if not record.achievedGoal %}hidden{% endif %}"></i></td>
                 </tr>
             {% endfor %}
             </table>
@@ -91,6 +100,5 @@
             <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
             <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
         </ul>
-
     </div>
 {% endblock %}

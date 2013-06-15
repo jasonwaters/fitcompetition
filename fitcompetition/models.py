@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField
+from fitcompetition.templatetags.apptags import toMiles
 import healthgraph
 
 
@@ -66,6 +67,9 @@ class RunkeeperRecord(models.Model):
     def __unicode__(self):
         return self.userID
 
+    def populateGoal(self, goal):
+        self._goal = goal
+
     @property
     def isDead(self):
         return self.settings is None
@@ -103,10 +107,10 @@ class RunkeeperRecord(models.Model):
 
     def ensureActivities(self):
         if not getattr(self, 'activitiesIter', None):
-            try:
-                goal = Goal.objects.get(isActive=True)
-                self.activitiesIter = self.user.get_fitness_activity_iter(date_min=goal.startdate.strftime('%Y-%m-%d'), date_max=goal.enddate.strftime('%Y-%m-%d'))
-            except Goal.DoesNotExist:
+
+            if getattr(self, '_goal', None) is not None:
+                self.activitiesIter = self.user.get_fitness_activity_iter(date_min=self._goal.startdate.strftime('%Y-%m-%d'), date_max=self._goal.enddate.strftime('%Y-%m-%d'))
+            else:
                 self.activitiesIter = self.user.get_fitness_activity_iter()
 
             self.activitiesList = []
@@ -136,8 +140,21 @@ class RunkeeperRecord(models.Model):
     def totalMiles(self):
         self.ensureActivities()
 
-        total = 0
-        for activity in self.activitiesList:
-            total += activity.get('total_distance')
+        cacheVal = getattr(self, '_totalMiles', None)
+        if cacheVal is not None:
+            return cacheVal
 
-        return total
+        self._totalMiles = 0
+        for activity in self.activitiesList:
+            self._totalMiles += toMiles(activity.get('total_distance'))
+
+        return self._totalMiles
+
+    @property
+    def achievedGoal(self):
+        goal = getattr(self, '_goal', None)
+
+        if goal:
+            return self.totalMiles >= goal.distance
+        else:
+            return False

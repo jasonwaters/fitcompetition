@@ -1,5 +1,6 @@
 from datetime import datetime
 from math import floor
+import math
 from django.template.defaultfilters import register
 import pytz
 from django.conf import settings
@@ -13,13 +14,16 @@ SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR
 SECONDS_PER_DAY = SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY
 
+
 @register.filter
 def toMiles(km):
     if not isinstance(km, float):
         return ""
+    return km * 0.62137
 
-    return "%.2f" % (km * 0.62137)
-
+@register.filter
+def twoDecimals(value):
+    return math.ceil(value * 100) / 100
 
 @register.filter
 def duration(secs):
@@ -62,6 +66,7 @@ def deltaDate(targetDate, kind):
         value = 0
 
     return "{0:02.0f}".format(value)
+
 
 @register.filter
 def fullDate(d):

@@ -8,21 +8,26 @@ from fitcompetition.util.ListUtil import multikeysort
 import healthgraph
 
 
-def pruneDead(records):
+def pruneDeadAndPopulateGoal(records, goal):
     pruned = []
 
     for record in records:
         if record.isDead:
             record.delete()
         else:
+            record.populateGoal(goal)
             pruned.append(record)
 
     return pruned
 
 
 def home(request):
-    records = pruneDead(RunkeeperRecord.objects.all())
-    goal = Goal.objects.get(isActive=True)
+    try:
+        goal = Goal.objects.get(isActive=True)
+    except Goal.DoesNotExist:
+        goal = None
+
+    records = pruneDeadAndPopulateGoal(RunkeeperRecord.objects.all(), goal)
 
     return render(request, 'home.html', {
         'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),

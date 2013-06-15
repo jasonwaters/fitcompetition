@@ -27,3 +27,15 @@ h3 i.icon-large {
 a.activities-link {
 	cursor: pointer;
 }
+
+.invisible {
+    visibility: hidden;
+}
+
+.green {
+    color: #00a855;
+}
+
+.red {
+    color: #a80100;
+}
