@@ -66,13 +66,12 @@
             <table class="table table-striped">
                 <thead>
                     <th>Player</th>
-                    <th>Miles</th>
+                    <th class="miles-column">Miles</th>
                 </thead>
-                <tbody></tbody>
             {% for record in records %}
                 <tr>
                     <td>{{ record.name }} <i class="icon-heart-empty red {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
-                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-placement="bottom" data-content='
+                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-placement="bottom" data-title='{{ record.name }}' data-content='
                         {% spaceless %}
                         <table class="activities-list table table-condensed no-margin-bottom">
                             <thead>
