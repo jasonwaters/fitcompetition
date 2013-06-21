@@ -71,3 +71,12 @@ def deltaDate(targetDate, kind):
 @register.filter
 def fullDate(d):
     return d.isoformat()
+
+@register.filter
+def fromSettings(key):
+    try:
+        setting = getattr(settings, key)
+    except AttributeError:
+        setting = None
+
+    return setting
