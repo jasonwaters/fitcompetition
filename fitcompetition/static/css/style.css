@@ -39,3 +39,12 @@ a.activities-link {
 .red {
     color: #a80100;
 }
+
+.show-more-activities{
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0;
+}

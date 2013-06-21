@@ -16,8 +16,10 @@
                 $(list).popover('hide');
             };
 
-            $('html').click(function() {
-                hidePopovers($('a.activities-link'));
+            $('body').click(function(evt) {
+                if($(evt.target).parents('.popover').length == 0) {
+                    hidePopovers($('a.activities-link'));
+                }
             });
 
             $('a.activities-link').popover({
@@ -28,6 +30,12 @@
 
                 $(this).popover('toggle');
                 evt.stopPropagation(evt.target);
+            });
+
+            $('body').delegate('.show-more-activities', 'click', function(evt) {
+                var link = $(evt.target);
+                $('.activities-list tr.hidden').removeClass('hidden');
+                link.addClass('hidden');
             });
         });
     </script>
@@ -66,7 +74,7 @@
                     <td>{{ record.name }} <i class="icon-heart-empty red {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
                     <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-placement="bottom" data-content='
                         {% spaceless %}
-                        <table class="table table-condensed">
+                        <table class="activities-list table table-condensed no-margin-bottom">
                             <thead>
                                 <th>Date</th>
                                 <th>Miles</th>
@@ -74,7 +82,7 @@
                             </thead>
                             <tbody>
                                 {% for activity in record.activities %}
-                                    <tr>
+                                    <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
                                         <td>{{ activity.start_time|naturalday:"M j" }}
                                             {% if activity.type == "Walking" %}
                                                 <i class="icon-angle-right" title="Walking"></i>
@@ -88,6 +96,9 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% if record.activities > 4 %}
+                            <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>
+                        {% endif %}
                         {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a> <i class="icon-check-sign green {% if not record.achievedGoal %}hidden{% endif %}"></i></td>
                 </tr>
             {% endfor %}
