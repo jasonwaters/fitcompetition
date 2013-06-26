@@ -72,11 +72,20 @@
                 </thead>
             {% for record in records %}
                 <tr>
-                    <td>{{ record.name }} <i class="icon-heart-empty red {% if not record.activeToday %}hidden{% endif %}" title="Active today"></i></td>
+                    <td class="player">
+                        <span class="name">{{ record.name }}</span>
+                        {% if record.overAchiever %}
+                            <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}"></i>
+                        {% endif %}
+                        {% if record.activeToday %}
+                            <i class="icon-heart red" title="Active today"></i>
+                        {% endif %}
+                    </td>
                     <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='
                         {% spaceless %}
                         <table class="activities-list table table-condensed no-margin-bottom">
                             <thead>
+                                <th></th>
                                 <th>Date</th>
                                 <th>Miles</th>
                                 <th>Time</th>
@@ -84,13 +93,8 @@
                             <tbody>
                                 {% for activity in record.activities %}
                                     <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
-                                        <td>{{ activity.start_time|naturalday:"M j" }}
-                                            {% if activity.type == "Walking" %}
-                                                <i class="icon-angle-right" title="Walking"></i>
-                                            {% elif activity.type == "Running" %}
-                                                <i class="icon-double-angle-right" title="Running"></i>
-                                            {% endif %}
-                                        </td>
+                                        <td class="activity-icon {% if activity.type == "Walking" %}walking{% else %}running{% endif %}"></td>
+                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>
                                         <td>{{ activity.total_distance|toMiles|twoDecimals }}</td>
                                         <td>{{ activity.duration|duration }}</td>
                                     </tr>

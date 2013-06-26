@@ -52,3 +52,35 @@ a.activities-link {
 .miles-column {
     width: 65px;
 }
+
+.silver {
+    color: #c0c0c0;
+}
+
+.golden {
+    color: gold;
+}
+
+.activity-icon {
+    width: 4px;
+}
+
+.activity-icon.running {
+    background: url('/static/img/icon-running-small.png') no-repeat -2px 4px;
+    /*width: 18px;*/
+    height: 18px;
+}
+
+.activity-icon.walking {
+    background: url('/static/img/icon-walking-small.png') no-repeat -2px 4px;;
+    /*width: 18px;*/
+    height: 18px;
+}
+
+.player {
+
+}
+
+.player [class^="icon-"] {
+    padding-left: 2px;
+}

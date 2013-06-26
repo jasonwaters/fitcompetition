@@ -30,6 +30,7 @@ class UniqueBooleanField(BooleanField):
 
 # To use with South
 from south.modelsinspector import add_introspection_rules
+
 add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
 add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 
@@ -55,7 +56,6 @@ class Goal(models.Model):
     def clean(self):
         if self.startdate > self.enddate:
             raise ValidationError("Start Date must be before End Date")
-
 
 
 class RunkeeperRecord(models.Model):
@@ -109,7 +109,9 @@ class RunkeeperRecord(models.Model):
         if not getattr(self, 'activitiesIter', None):
 
             if getattr(self, '_goal', None) is not None:
-                self.activitiesIter = self.user.get_fitness_activity_iter(date_min=self._goal.startdate.strftime('%Y-%m-%d'), date_max=self._goal.enddate.strftime('%Y-%m-%d'))
+                self.activitiesIter = self.user.get_fitness_activity_iter(
+                    date_min=self._goal.startdate.strftime('%Y-%m-%d'),
+                    date_max=self._goal.enddate.strftime('%Y-%m-%d'))
             else:
                 self.activitiesIter = self.user.get_fitness_activity_iter()
 
@@ -151,10 +153,18 @@ class RunkeeperRecord(models.Model):
         return self._totalMiles
 
     @property
-    def achievedGoal(self):
+    def achievedGoal(self, multiplier=1):
         goal = getattr(self, '_goal', None)
 
         if goal:
-            return self.totalMiles >= goal.distance
+            return self.totalMiles >= (goal.distance * multiplier)
         else:
             return False
+
+    @property
+    def overAchiever(self):
+        return self.achievedGoal(multiplier=1.5)
+
+    @property
+    def doubledGoal(self):
+        return self.achievedGoal(multiplier=2)
