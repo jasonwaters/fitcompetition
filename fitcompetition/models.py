@@ -152,8 +152,7 @@ class RunkeeperRecord(models.Model):
 
         return self._totalMiles
 
-    @property
-    def achievedGoal(self, multiplier=1):
+    def didAchieveGoal(self, multiplier=1):
         goal = getattr(self, '_goal', None)
 
         if goal:
@@ -161,10 +160,15 @@ class RunkeeperRecord(models.Model):
         else:
             return False
 
+
+    @property
+    def achievedGoal(self, multiplier=1, *args, **kwargs):
+        return self.didAchieveGoal(1)
+
     @property
     def overAchiever(self):
-        return self.achievedGoal(multiplier=1.5)
+        return self.didAchieveGoal(1.5)
 
     @property
     def doubledGoal(self):
-        return self.achievedGoal(multiplier=2)
+        return self.didAchieveGoal(2)
