@@ -75,7 +75,7 @@
                     <td class="player">
                         <span class="name">{{ record.name }}</span>
                         {% if record.overAchiever %}
-                            <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
+                            <i class="icon-star icon-spin {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
                         {% endif %}
                         {% if record.activeToday %}
                             <i class="icon-heart red" title="Active today"></i>
