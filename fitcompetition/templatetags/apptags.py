@@ -22,7 +22,15 @@ def toMiles(km):
     return km * 0.62137
 
 @register.filter
+def toLBS(kg):
+    if not isinstance(kg, float):
+        return ""
+    return kg * 2.2046
+
+@register.filter
 def twoDecimals(value):
+    if not isinstance(value, float):
+        return ""
     return math.ceil(value * 100) / 100
 
 @register.filter

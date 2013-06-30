@@ -105,6 +105,25 @@ class RunkeeperRecord(models.Model):
             self._user = healthgraph.User(session=self.session)
         return self._user
 
+    @property
+    def measurements(self):
+        if not getattr(self, '_weightMeasurements', None):
+            measurements = self.user.get_weight_measurement_iter()
+
+            self._weightMeasurements = []
+            for _ in range(measurements.count()):
+                measurement = measurements.next()
+                self._weightMeasurements.append(measurement)
+
+        return self._weightMeasurements
+
+    @property
+    def currentMeasurement(self):
+        if len(self.measurements) > 0:
+            return self.measurements[0]
+        else:
+            return None
+
     def ensureActivities(self):
         if not getattr(self, 'activitiesIter', None):
 
