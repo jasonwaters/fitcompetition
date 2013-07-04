@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load apptags %}
 {% load humanize %}
+{% load staticfiles %}
 
 {% block head_title %}Fit Competition{% endblock %}
 
@@ -8,78 +9,45 @@
     {{ block.super }}
 {% endblock %}
 
-{% block head_scripts %}
-    {{ block.super }}
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var hidePopovers = function(list) {
-                $(list).popover('hide');
-            };
-
-            $('body').click(function(evt) {
-                if($(evt.target).parents('.popover').length == 0) {
-                    hidePopovers($('a.activities-link'));
-                }
-            });
-
-            $('a.activities-link').popover({
-                html: true,
-                trigger: 'manual'
-            }).click(function(evt) {
-                hidePopovers(_.without($('a.activities-link'), evt.target));
-
-                $(this).popover('toggle');
-                evt.stopPropagation(evt.target);
-            });
-
-            $('body').delegate('.show-more-activities', 'click', function(evt) {
-                var link = $(evt.target);
-                $('.activities-list tr.hidden').removeClass('hidden');
-                link.addClass('hidden');
-            });
-        });
-    </script>
-{% endblock %}
-
 {% block content %}
-    <div data-waters="countdown" data-targetdate="{{ goal.enddate|fullDate }}">
-        <div class="inner-countdown">
+    {% verbatim %}
+        <div ng-app="countdown" ng-controller="CountdownController">
             Get moving, there's
-            <span class="days">
-                <span class="countdown-value days-value">{{ goal.enddate|deltaDate:"days" }}</span><span> Days, </span>
-            </span>
-            <span class="hours">
-                <span class="countdown-value hours-value">{{ goal.enddate|deltaDate:"hours" }}</span><span> Hours, </span>
-            </span>
-            <span class="minutes">
-                <span class="countdown-value minutes-value">{{ goal.enddate|deltaDate:"mins" }}</span><span> Minutes and </span>
-            </span>
-            <span class="seconds">
-                <span class="countdown-value seconds-value">{{ goal.enddate|deltaDate:"secs" }}</span><span> Seconds</span>
-            </span>
-            left!
+            <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
+            <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
+            <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
+            <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
         </div>
-    </div>
+    {% endverbatim %}
     <div class="row-fluid">
         <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
         <div class="row-fluid">
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th class="col-small"></th>
                         <th>Player</th>
                         <th class="miles-column">Miles</th>
                     </tr>
                 </thead>
             {% for record in records %}
                 <tr>
+                    <td>
+                        {% if record.achievedGoal %}
+                            <i class="icon-check-sign green"></i>
+                        {% endif %}
+                    </td>
                     <td class="player">
                         <span class="name">{{ record.name }}</span>
-                        {% if record.overAchiever %}
-                            <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
-                        {% endif %}
-                        {% if record.activeToday %}
-                            <i class="icon-heart red" title="Active today"></i>
-                        {% endif %}
+                        <span class="flair">
+                            {% if record.overAchiever %}
+                                <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
+                            {% endif %}
+
+                            {% if record.activeToday %}
+                                <i class="icon-heart red" title="Active today"></i>
+                            {% endif %}
+                        </span>
                     </td>
                     <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='
                         {% spaceless %}
@@ -104,7 +72,7 @@
                         {% if record.activities > 4 %}
                             <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>
                         {% endif %}
-                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a> <i class="icon-check-sign green {% if not record.achievedGoal %}hidden{% endif %}"></i></td>
+                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a></td>
                 </tr>
             {% endfor %}
             </table>
@@ -117,4 +85,34 @@
             <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
         </ul>
     </div>
+    <script type="text/javascript">
+        var COUNTDOWN_TARGET_DATE = '{{ goal.enddate|fullDate }}';
+
+        var hidePopovers = function(list) {
+            $(list).popover('hide');
+        };
+
+        $('body').click(function(evt) {
+            if($(evt.target).parents('.popover').length == 0) {
+                hidePopovers($('a.activities-link'));
+            }
+        });
+
+        $('a.activities-link').popover({
+            html: true,
+            trigger: 'manual'
+        }).click(function(evt) {
+                    hidePopovers(_.without($('a.activities-link'), evt.target));
+
+                    $(this).popover('toggle');
+                    evt.stopPropagation(evt.target);
+                });
+
+        $('body').delegate('.show-more-activities', 'click', function(evt) {
+            var link = $(evt.target);
+            $('.activities-list tr.hidden').removeClass('hidden');
+            link.addClass('hidden');
+        });
+    </script>
+    <script src="{% static "js/countdown-clock.js"%}" type="text/javascript"></script>
 {% endblock %}

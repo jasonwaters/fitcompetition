@@ -50,7 +50,7 @@ a.activities-link {
 }
 
 .miles-column {
-    width: 65px;
+    width: 35px;
 }
 
 .silver {
@@ -77,10 +77,10 @@ a.activities-link {
     height: 18px;
 }
 
-.player {
-
+.flair [class^="icon-"] {
+    padding-left: 2px;
 }
 
-.player [class^="icon-"] {
-    padding-left: 2px;
+.col-small {
+    width: 10px;
 }
