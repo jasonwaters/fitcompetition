@@ -27,40 +27,39 @@ def home(request):
     except Goal.DoesNotExist:
         goal = None
 
-    records = pruneDeadAndPopulateGoal(RunkeeperRecord.objects.all(), goal)
+    # records = pruneDeadAndPopulateGoal(RunkeeperRecord.objects.all(), goal)
 
     return render(request, 'home.html', {
-        'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),
+        # 'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),
         'goal': goal
     })
 
 
+def login_error(request):
+    return HttpResponse("login error")
+
+
 def login(request):
-    auth = healthgraph.AuthManager(getattr(settings, 'RUNKEEPER_CLIENT_ID', ''),
-                                   getattr(settings, 'RUNKEEPER_CLIENT_SECRET', ''),
-                                   'http://%s/login' % request.get_host())
-
-    code = request.GET.get('code')
-    access_token = auth.get_access_token(code) if code is not None else ""
-
-    if code is not None:
-        user = healthgraph.User(session=healthgraph.Session(access_token))
-        profile = user.get_profile()
-
-        userID = user.get('userID')
-        name = profile.get('name')
-
-        record, created = RunkeeperRecord.objects.get_or_create(userID=userID)
-        record.name = name
-        record.code = code
-        record.token = access_token
-        record.save()
-
-        return HttpResponseRedirect('/')
-    else:
-        return render(request, 'login.html', {
-            'login_url': auth.get_login_url(),
-            'login_button_url': auth.get_login_button_url('blue', 'black', 300),
-            'code': code,
-            'token': access_token
-        })
+    # auth = healthgraph.AuthManager(getattr(settings, 'RUNKEEPER_CLIENT_ID', ''),
+    #                                getattr(settings, 'RUNKEEPER_CLIENT_SECRET', ''),
+    #                                'http://%s/login' % request.get_host())
+    #
+    # code = request.GET.get('code')
+    # access_token = auth.get_access_token(code) if code is not None else ""
+    #
+    # if code is not None:
+    #     user = healthgraph.User(session=healthgraph.Session(access_token))
+    #     profile = user.get_profile()
+    #
+    #     userID = user.get('userID')
+    #     name = profile.get('name')
+    #
+    #     record, created = RunkeeperRecord.objects.get_or_create(userID=userID)
+    #     record.name = name
+    #     record.code = code
+    #     record.token = access_token
+    #     record.save()
+    #
+    #     return HttpResponseRedirect('/')
+    # else:
+        return render(request, 'login.html', {})

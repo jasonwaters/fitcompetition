@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from decimal import Decimal
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField
@@ -38,7 +39,7 @@ add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 class Goal(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField(blank=True)
-    distance = models.IntegerField()
+    distance = models.DecimalField(max_digits=16, decimal_places=2)
 
     startdate = models.DateTimeField(verbose_name='Start Date')
     enddate = models.DateTimeField(verbose_name='End Date')
@@ -191,3 +192,17 @@ class RunkeeperRecord(models.Model):
     @property
     def doubledGoal(self):
         return self.didAchieveGoal(2)
+
+
+class FitUserManager(UserManager):
+    pass
+
+
+class FitUser(AbstractUser):
+    runkeeperToken = models.CharField(max_length=255)
+    fullname = models.CharField(max_length=255)
+
+    objects = FitUserManager()
+
+    def is_authenticated(self):
+        return True

@@ -1,5 +1,8 @@
 DEBUG = True
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = ''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.

@@ -3,6 +3,8 @@
 {% block head_title %}Please Log In{% endblock %}
 {% block content %}
     <div class="row-fluid">
-        <a class="runkeeper-login-button middle" href="{{ login_url }}"><img src="{{ login_button_url }}" /></a>
+        <a class="runkeeper-login-button middle" href="{% url 'socialauth_begin' 'runkeeper' %}" title="Sign In">
+            <img src='http://static1.runkeeper.com/images/assets/login-blue-white-300x57.png'/>
+        </a>
     </div>
 {% endblock %}

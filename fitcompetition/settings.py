@@ -72,7 +72,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'b-^tp3^&ag+xa4$h-n!$)5mivl2o0(b00yt8(n@%0&qj73se-9'
+SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -114,7 +114,7 @@ INSTALLED_APPS = (
     'fitcompetition',
     'grappelli',
     'django.contrib.admin',
-    # 'django_openid_auth',
+    'social_auth',
     'south',
 )
 
@@ -147,13 +147,13 @@ LOGGING = {
     }
 }
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
-LOGOUT_URL = '/logout/'
+# AUTH_USER_MODEL = 'fitcompetition.FitUser'
+# SOCIAL_AUTH_USER_MODEL = 'fitcompetition.FitUser'
 
-OPENID_USE_AS_ADMIN_LOGIN = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
-
+AUTHENTICATION_BACKENDS = {
+    'fitcompetition.backends.runkeeper.RunkeeperBackend',
+    'django.contrib.auth.backends.ModelBackend',
+}
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
@@ -162,16 +162,28 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
-    'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    'social_auth.context_processors.social_auth_by_type_backends',
 )
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'fitcompetition.auth.RunkeeperBackend',
+SOCIAL_AUTH_SESSION_EXPIRATION = False
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_auth.backends.pipeline.social.social_auth_user',
+    'social_auth.backends.pipeline.associate.associate_by_email',
+    'fitcompetition.pipeline.get_username',
+    'social_auth.backends.pipeline.user.create_user',
+    'social_auth.backends.pipeline.social.associate_user',
+    'social_auth.backends.pipeline.social.load_extra_data',
+    'social_auth.backends.pipeline.user.update_user_details',
+    # 'social_auth.backends.pipeline.misc.save_status_to_session',
+    #stuff
+
 )
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_ERROR_URL = "/login-error/"
 
 PYTHON_FOLDER_NAME = 'python2.7'
 
@@ -184,4 +196,3 @@ TEMPLATE_DEBUG = DEBUG
 #a virutalenv should be created and located in a folder named "env" at the project root.
 os.environ['PATH'] += ':' + os.path.join(PROJ_ROOT, 'env/bin')
 SITE_PACKAGES_DIR = os.path.join(PROJ_ROOT, 'env', 'lib', PYTHON_FOLDER_NAME, 'site-packages')
-

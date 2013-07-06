@@ -31,9 +31,12 @@
                     <a class="brand" href="/">Fit Competition</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav pull-right">
-                            <li><a href="/login" title="Sign in with Runkeeper">Join The Fun</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url "logout" %}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>
+                            {% else %}
+                                <li><a href="{% url 'socialauth_begin' 'runkeeper' %}" title="Sign in with Runkeeper">Sign In</a></li>
+                            {% endif %}
                         </ul>
-
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
