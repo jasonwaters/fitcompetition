@@ -5,114 +5,29 @@
 
 {% block head_title %}Fit Competition{% endblock %}
 
-{% block head_css %}
-    {{ block.super }}
-{% endblock %}
-
 {% block content %}
-    {% verbatim %}
-        <div ng-app="countdown" ng-controller="CountdownController">
-            Get moving, there's
-            <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
-            <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
-            <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
-            <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
-        </div>
-    {% endverbatim %}
     <div class="row-fluid">
-        <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
-        <div class="row-fluid">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th class="col-small"></th>
-                        <th>Player</th>
-                        <th class="miles-column">Miles</th>
-                    </tr>
-                </thead>
-            {% for record in records %}
+        <h3>Welcome {{ user.first_name }}!</h3>
+        <p>Pick a challenge from the list below.</p>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        {% if record.achievedGoal %}
-                            <i class="icon-check-sign green"></i>
-                        {% endif %}
-                    </td>
-                    <td class="player">
-                        <span class="name">{{ record.name }}</span>
-                        <span class="flair">
-                            {% if record.overAchiever %}
-                                <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
-                            {% endif %}
-
-                            {% if record.activeToday %}
-                                <i class="icon-heart red" title="Active today"></i>
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='
-                        {% spaceless %}
-                        <table class="activities-list table table-condensed no-margin-bottom">
-                            <thead>
-                                <th></th>
-                                <th>Date</th>
-                                <th>Miles</th>
-                                <th>Time</th>
-                            </thead>
-                            <tbody>
-                                {% for activity in record.activities %}
-                                    <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
-                                        <td class="activity-icon {% if activity.type == "Walking" %}walking{% else %}running{% endif %}"></td>
-                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>
-                                        <td>{{ activity.total_distance|toMiles|twoDecimals }}</td>
-                                        <td>{{ activity.duration|duration }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% if record.activities > 4 %}
-                            <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>
-                        {% endif %}
-                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a></td>
+                    <th></th>
+                    <th>Challenge</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for challenge in challenges %}
+                <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
+                    <td>{% if challenge.hasEnded %}<i class="icon-lock"></i>{% endif %}</td>
+                    <td><a href="{% url "challenge" challenge.id %}">{{ challenge.name }}</a></td>
+                    <td>{{ challenge.startdate|date:"F j, Y" }}</td>
+                    <td>{{ challenge.enddate|date:"F j, Y" }}</td>
                 </tr>
             {% endfor %}
-            </table>
-        </div>
-        <h3><i class="icon-legal icon-large"></i> The Rules</h3>
-        <ul>
-            <li>Put ${{ goal.ante|intcomma }} in the pot.</li>
-            <li>Run or Walk {{ goal.distance }} miles in {{ goal.numDays }} days.  Between {{ goal.startdate|date:"F j, Y" }} and {{ goal.enddate|date:"F j, Y" }}</li>
-            <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
-            <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
-        </ul>
+            </tbody>
+        </table>
     </div>
-    <script type="text/javascript">
-        var COUNTDOWN_TARGET_DATE = '{{ goal.enddate|fullDate }}';
-
-        var hidePopovers = function(list) {
-            $(list).popover('hide');
-        };
-
-        $('body').click(function(evt) {
-            if($(evt.target).parents('.popover').length == 0) {
-                hidePopovers($('a.activities-link'));
-            }
-        });
-
-        $('a.activities-link').popover({
-            html: true,
-            trigger: 'manual'
-        }).click(function(evt) {
-                    hidePopovers(_.without($('a.activities-link'), evt.target));
-
-                    $(this).popover('toggle');
-                    evt.stopPropagation(evt.target);
-                });
-
-        $('body').delegate('.show-more-activities', 'click', function(evt) {
-            var link = $(evt.target);
-            $('.activities-list tr.hidden').removeClass('hidden');
-            link.addClass('hidden');
-        });
-    </script>
-    <script src="{% static "js/countdown-clock.js"%}" type="text/javascript"></script>
 {% endblock %}

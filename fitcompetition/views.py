@@ -1,11 +1,7 @@
-import operator
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import RunkeeperRecord, Goal
-from fitcompetition.util.ListUtil import multikeysort
-import healthgraph
+from fitcompetition.models import Challenge
 
 
 def pruneDeadAndPopulateGoal(records, goal):
@@ -22,16 +18,24 @@ def pruneDeadAndPopulateGoal(records, goal):
 
 @login_required
 def home(request):
+    challenges = Challenge.objects.order_by('-startdate')
+
+    return render(request, 'home.html', {
+        'challenges': challenges
+    })
+
+@login_required
+def challenge(request, id):
     try:
-        goal = Goal.objects.get(isActive=True)
-    except Goal.DoesNotExist:
-        goal = None
+        challenge = Challenge.objects.get(id=id)
+    except Challenge.DoesNotExist:
+        challenge = None
 
     # records = pruneDeadAndPopulateGoal(RunkeeperRecord.objects.all(), goal)
 
-    return render(request, 'home.html', {
+    return render(request, 'challenge.html', {
         # 'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),
-        'goal': goal
+        'challenge': challenge
     })
 
 

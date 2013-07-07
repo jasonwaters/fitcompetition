@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.contrib.sites.models import Site
-from fitcompetition.models import Goal
+from fitcompetition.models import Challenge
 
 
-class GoalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'distance', 'startdate', 'enddate', 'isActive')
+class ChallengeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'distance', 'startdate', 'enddate')
     ordering = ('startdate', 'enddate',)
 
-admin.site.register(Goal, GoalAdmin)
+admin.site.register(Challenge, ChallengeAdmin)
 admin.site.unregister(Site)

@@ -84,3 +84,7 @@ a.activities-link {
 .col-small {
     width: 10px;
 }
+
+.dimmed-row {
+    opacity: 0.4;
+}

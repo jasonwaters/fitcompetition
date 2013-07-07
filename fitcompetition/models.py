@@ -4,8 +4,10 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField
+from fitcompetition.settings import TIME_ZONE
 from fitcompetition.templatetags.apptags import toMiles
 import healthgraph
+import pytz
 
 
 class CurrencyField(models.DecimalField):
@@ -36,7 +38,14 @@ add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
 add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 
 
-class Goal(models.Model):
+class ActivityType(models.Model):
+    name = models.CharField(max_length=256)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Challenge(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField(blank=True)
     distance = models.DecimalField(max_digits=16, decimal_places=2)
@@ -45,11 +54,19 @@ class Goal(models.Model):
     enddate = models.DateTimeField(verbose_name='End Date')
     ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
 
-    isActive = UniqueBooleanField(verbose_name="Is Active")
+    approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
 
     @property
     def numDays(self):
         return (self.enddate - self.startdate).days
+
+    @property
+    def hasEnded(self):
+        return self.enddate < datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+    @property
+    def hasStarted(self):
+        return self.startdate <= datetime.now(tz=pytz.timezone(TIME_ZONE))
 
     def __unicode__(self):
         return self.name
