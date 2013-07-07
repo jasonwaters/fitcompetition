@@ -20,7 +20,7 @@ def pruneDeadAndPopulateGoal(records, goal):
 
     return pruned
 
-
+@login_required
 def home(request):
     try:
         goal = Goal.objects.get(isActive=True)

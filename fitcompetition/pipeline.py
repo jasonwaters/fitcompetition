@@ -1,12 +1,4 @@
-from django.http import HttpResponseRedirect
-from social_auth.db.django_models import UserSocialAuth
-
-
-def first_name(request, *args, **kwargs):
-    if 'saved_first_name' in request.session:
-        user = kwargs['user']
-        user.first_name = request.session.get('saved_first_name')
-        user.save()
+from social_auth.models import UserSocialAuth
 
 
 def get_username(details, user=None,

@@ -201,6 +201,10 @@ class FitUserManager(UserManager):
 class FitUser(AbstractUser):
     runkeeperToken = models.CharField(max_length=255)
     fullname = models.CharField(max_length=255)
+    gender = models.CharField(max_length=1,blank=True, null=True,default=None)
+    profile_url = models.CharField(max_length=255,blank=True, null=True,default=None)
+    medium_picture = models.CharField(max_length=255,blank=True, null=True,default=None)
+    normal_picture = models.CharField(max_length=255,blank=True, null=True,default=None)
 
     objects = FitUserManager()
 

@@ -17,22 +17,6 @@ RUNKEEPER_PROFILE_RESOURCE = '/profile'
 class RunkeeperBackend(OAuthBackend):
     name = 'runkeeper'
 
-    @classmethod
-    def extra_data(cls, user, uid, response, details=None):
-        """Return access_token and extra defined names to store in
-        extra_data field"""
-        data = super(RunkeeperBackend, cls).extra_data(user, uid, response,
-                                                       details)
-        try:
-            data['username'] = response['user']['userID']
-            data['gender'] = response['profile']['gender']
-            data['profile_url'] = response['profile']['profile']
-            data['medium_picture'] = response['profile']['medium_picture']
-            data['normal_picture'] = response['profile']['normal_picture']
-        except KeyError:
-            pass
-        return data
-
     def get_user_id(self, details, response):
         return response['user']['userID']
 
@@ -49,13 +33,22 @@ class RunkeeperBackend(OAuthBackend):
 
         token = response['access_token']
 
+        gender = response['profile']['gender']
+        profile_url = response['profile']['profile']
+        medium_picture = response['profile']['medium_picture']
+        normal_picture = response['profile']['normal_picture']
+
         return {
             'username': username,
             'email': '%s@runkeeper.com' % username,
-            # 'fullname': fullname,
-            # 'runkeeperToken': token,
+            'fullname': fullname,
+            'runkeeperToken': token,
             'first_name': first_name,
-            'last_name': last_name
+            'last_name': last_name,
+            'gender': gender,
+            'profile_url': profile_url,
+            'medium_picture': medium_picture,
+            'normal_picture': normal_picture
         }
 
 

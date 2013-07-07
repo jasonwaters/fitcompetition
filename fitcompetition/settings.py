@@ -147,8 +147,15 @@ LOGGING = {
     }
 }
 
-# AUTH_USER_MODEL = 'fitcompetition.FitUser'
-# SOCIAL_AUTH_USER_MODEL = 'fitcompetition.FitUser'
+AUTH_USER_MODEL = 'fitcompetition.FitUser'
+SOCIAL_AUTH_USER_MODEL = 'fitcompetition.FitUser'
+
+#Migratios for social_auth were failing due ot having a custom user.
+#This allowed me to genearate new migrations based on the FitUser model.
+#Sucks, because if we update django-social-auth, we'll have to be sure to generate our own db migrations
+SOUTH_MIGRATION_MODULES = {
+    'social_auth': 'fitcompetition.social_auth',
+}
 
 AUTHENTICATION_BACKENDS = {
     'fitcompetition.backends.runkeeper.RunkeeperBackend',
@@ -171,14 +178,13 @@ SOCIAL_AUTH_SESSION_EXPIRATION = False
 SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.social_auth_user',
     'social_auth.backends.pipeline.associate.associate_by_email',
-    'fitcompetition.pipeline.get_username',
+    # 'fitcompetition.pipeline.get_username',
+    'social_auth.backends.pipeline.user.get_username',
     'social_auth.backends.pipeline.user.create_user',
     'social_auth.backends.pipeline.social.associate_user',
     'social_auth.backends.pipeline.social.load_extra_data',
     'social_auth.backends.pipeline.user.update_user_details',
-    # 'social_auth.backends.pipeline.misc.save_status_to_session',
-    #stuff
-
+    'social_auth.backends.pipeline.misc.save_status_to_session',
 )
 
 LOGIN_URL = '/login/'
