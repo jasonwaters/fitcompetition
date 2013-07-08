@@ -88,3 +88,8 @@ a.activities-link {
 .dimmed-row {
     opacity: 0.4;
 }
+
+.join-challenge {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

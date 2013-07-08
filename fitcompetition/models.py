@@ -38,6 +38,27 @@ add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
 add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 
 
+class FitUserManager(UserManager):
+    pass
+
+
+class FitUser(AbstractUser):
+    runkeeperToken = models.CharField(max_length=255)
+    fullname = models.CharField(max_length=255)
+    gender = models.CharField(max_length=1, blank=True, null=True, default=None)
+    profile_url = models.CharField(max_length=255, blank=True, null=True, default=None)
+    medium_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
+    normal_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
+
+    objects = FitUserManager()
+
+    def __unicode__(self):
+        return self.fullname
+
+    def is_authenticated(self):
+        return True
+
+
 class ActivityType(models.Model):
     name = models.CharField(max_length=256)
 
@@ -55,6 +76,7 @@ class Challenge(models.Model):
     ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
 
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
+    players = models.ManyToManyField(FitUser, blank=True, null=True, default=None)
 
     @property
     def numDays(self):
@@ -159,7 +181,6 @@ class RunkeeperRecord(models.Model):
                 if activity.get('type') in ('Running', 'Walking'):
                     self.activitiesList.append(activity)
 
-
     @property
     def activeToday(self):
         today = datetime.now().date()
@@ -209,21 +230,3 @@ class RunkeeperRecord(models.Model):
     @property
     def doubledGoal(self):
         return self.didAchieveGoal(2)
-
-
-class FitUserManager(UserManager):
-    pass
-
-
-class FitUser(AbstractUser):
-    runkeeperToken = models.CharField(max_length=255)
-    fullname = models.CharField(max_length=255)
-    gender = models.CharField(max_length=1,blank=True, null=True,default=None)
-    profile_url = models.CharField(max_length=255,blank=True, null=True,default=None)
-    medium_picture = models.CharField(max_length=255,blank=True, null=True,default=None)
-    normal_picture = models.CharField(max_length=255,blank=True, null=True,default=None)
-
-    objects = FitUserManager()
-
-    def is_authenticated(self):
-        return True

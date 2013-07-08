@@ -3,13 +3,19 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}Fit Competition{% endblock %}
+{% block head_title %}{{ challenge.name }} | Fit Competition{% endblock %}
 
 {% block head_css %}
     {{ block.super }}
 {% endblock %}
 
 {% block content %}
+    <h3>{{ challenge.name }}</h3>
+    {% if canJoin %}
+        <div class="join-challenge">
+            <button class="btn btn-large btn-block btn-primary" type="button">Join this Challenge</button>
+        </div>
+    {% endif %}
     <p>
     {% if not challenge.hasStarted %}
         This Challenge has not yet started, it will begin on {{ challenge.startdate|date:"F j, Y" }}.
@@ -28,63 +34,67 @@
     {% endif %}
     </p>
     <div class="row-fluid">
-        <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
-        <div class="row-fluid">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th class="col-small"></th>
-                        <th>Player</th>
-                        <th class="miles-column">Miles</th>
+        {% if challenge.hasStarted %}
+            <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
+            <div class="row-fluid">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col-small"></th>
+                            <th>Player</th>
+                            <th class="miles-column">Miles</th>
+                        </tr>
+                    </thead>
+                {% for player in players %}
+                    <tr class="{% if user == player %}warning{% endif %}">
+                        <td>
+    {#                        {% if record.achievedGoal %}#}
+    {#                            <i class="icon-check-sign green"></i>#}
+    {#                        {% endif %}#}
+                        </td>
+                        <td class="player">
+                            <span class="name">{{ player.fullname }}</span>
+    {#                        <span class="flair">#}
+    {#                            {% if record.overAchiever %}#}
+    {#                                <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>#}
+    {#                            {% endif %}#}
+    {##}
+    {#                            {% if record.activeToday %}#}
+    {#                                <i class="icon-heart red" title="Active today"></i>#}
+    {#                            {% endif %}#}
+    {#                        </span>#}
+                        </td>
+                        <td>
+    {#                        <a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='#}
+    {#                        {% spaceless %}#}
+    {#                        <table class="activities-list table table-condensed no-margin-bottom">#}
+    {#                            <thead>#}
+    {#                                <th></th>#}
+    {#                                <th>Date</th>#}
+    {#                                <th>Miles</th>#}
+    {#                                <th>Time</th>#}
+    {#                            </thead>#}
+    {#                            <tbody>#}
+    {#                                {% for activity in record.activities %}#}
+    {#                                    <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">#}
+    {#                                        <td class="activity-icon {% if activity.type == "Walking" %}walking{% else %}running{% endif %}"></td>#}
+    {#                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>#}
+    {#                                        <td>{{ activity.total_distance|toMiles|twoDecimals }}</td>#}
+    {#                                        <td>{{ activity.duration|duration }}</td>#}
+    {#                                    </tr>#}
+    {#                                {% endfor %}#}
+    {#                            </tbody>#}
+    {#                        </table>#}
+    {#                        {% if record.activities > 4 %}#}
+    {#                            <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>#}
+    {#                        {% endif %}#}
+    {#                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a>#}
+                        </td>
                     </tr>
-                </thead>
-            {% for record in records %}
-                <tr>
-                    <td>
-                        {% if record.achievedGoal %}
-                            <i class="icon-check-sign green"></i>
-                        {% endif %}
-                    </td>
-                    <td class="player">
-                        <span class="name">{{ record.name }}</span>
-                        <span class="flair">
-                            {% if record.overAchiever %}
-                                <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>
-                            {% endif %}
-
-                            {% if record.activeToday %}
-                                <i class="icon-heart red" title="Active today"></i>
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td><a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='
-                        {% spaceless %}
-                        <table class="activities-list table table-condensed no-margin-bottom">
-                            <thead>
-                                <th></th>
-                                <th>Date</th>
-                                <th>Miles</th>
-                                <th>Time</th>
-                            </thead>
-                            <tbody>
-                                {% for activity in record.activities %}
-                                    <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
-                                        <td class="activity-icon {% if activity.type == "Walking" %}walking{% else %}running{% endif %}"></td>
-                                        <td>{{ activity.start_time|naturalday:"M j" }}</td>
-                                        <td>{{ activity.total_distance|toMiles|twoDecimals }}</td>
-                                        <td>{{ activity.duration|duration }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% if record.activities > 4 %}
-                            <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>
-                        {% endif %}
-                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a></td>
-                </tr>
-            {% endfor %}
-            </table>
-        </div>
+                {% endfor %}
+                </table>
+            </div>
+        {% endif %}
         <h3><i class="icon-legal icon-large"></i> The Rules</h3>
         <ul>
             <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>

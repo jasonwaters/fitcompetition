@@ -22,7 +22,7 @@
             {% for challenge in challenges %}
                 <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
                     <td>{% if challenge.hasEnded %}<i class="icon-lock"></i>{% endif %}</td>
-                    <td><a href="{% url "challenge" challenge.id %}">{{ challenge.name }}</a></td>
+                    <td><a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a></td>
                     <td>{{ challenge.startdate|date:"F j, Y" }}</td>
                     <td>{{ challenge.enddate|date:"F j, Y" }}</td>
                 </tr>
