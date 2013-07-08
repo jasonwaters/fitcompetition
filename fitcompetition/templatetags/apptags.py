@@ -2,6 +2,7 @@ from datetime import datetime
 from math import floor
 import math
 from django.template.defaultfilters import register
+from fitcompetition.settings import TIME_ZONE
 import pytz
 from django.conf import settings
 
@@ -16,10 +17,28 @@ SECONDS_PER_DAY = SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY
 
 
 @register.filter
-def toMiles(km):
-    if not isinstance(km, float):
+def achievedGoal(meters, goal_miles):
+    return toMiles(meters) > float(goal_miles)
+
+@register.filter
+def overAchiever(meters, goal_miles):
+    return toMiles(meters) > float(goal_miles) * 1.5
+
+@register.filter
+def doubledGoal(meters, goal_miles):
+    return toMiles(meters) > goal_miles * 2
+
+@register.filter
+def isToday(date):
+    diff = date - datetime.now(tz=pytz.timezone(TIME_ZONE))
+    return diff.days == 0
+
+
+@register.filter
+def toMiles(meters):
+    if not isinstance(meters, float):
         return ""
-    return km * 0.62137
+    return meters * 0.00062137
 
 @register.filter
 def toLBS(kg):

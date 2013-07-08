@@ -5,3 +5,5 @@ django-grappelli==2.4.5
 healthgraph-api==0.3.0
 pytz==2013b
 django-social-auth==0.7.23
+requests==1.2.3
+python-dateutil==2.1

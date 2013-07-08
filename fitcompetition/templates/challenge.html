@@ -37,7 +37,7 @@
     {% endif %}
     <div class="row-fluid">
         {% if challenge.hasStarted %}
-            <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
+            <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
             <div class="row-fluid">
                 <table class="table table-striped">
                     <thead>
@@ -50,21 +50,21 @@
                 {% for player in players %}
                     <tr class="{% if user == player %}warning{% endif %}">
                         <td>
-    {#                        {% if record.achievedGoal %}#}
-    {#                            <i class="icon-check-sign green"></i>#}
-    {#                        {% endif %}#}
+                            {% if player.total_distance|achievedGoal:challenge.distance %}
+                                <i class="icon-check-sign green"></i>
+                            {% endif %}
                         </td>
                         <td class="player">
                             <span class="name">{{ player.fullname }}</span>
-    {#                        <span class="flair">#}
-    {#                            {% if record.overAchiever %}#}
-    {#                                <i class="icon-star {% if record.doubledGoal %}golden{% else %}silver{% endif %}" title="{% if record.doubledGoal %}Double Goal Distance!!{% else %}1.5 times Goal Distance!{% endif %}"></i>#}
-    {#                            {% endif %}#}
-    {##}
-    {#                            {% if record.activeToday %}#}
-    {#                                <i class="icon-heart red" title="Active today"></i>#}
-    {#                            {% endif %}#}
-    {#                        </span>#}
+                            <span class="flair">
+                                {% if player.total_distance|overAchiever:challenge.distance %}
+                                    <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
+                                {% endif %}
+
+                                {% if player.latest_activity_date|isToday %}
+                                    <i class="icon-heart red" title="Active today"></i>
+                                {% endif %}
+                            </span>
                         </td>
                         <td>
     {#                        <a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ record.name }}' data-content='#}
@@ -91,13 +91,14 @@
     {#                            <div><a class="show-more-activities">{{ record.activities|length|add:"-4" }} more&hellip;</a></div>#}
     {#                        {% endif %}#}
     {#                        {% endspaceless %}'>{{ record.totalMiles|twoDecimals }}</a>#}
+                            {{ player.total_distance|toMiles|twoDecimals }}
                         </td>
                     </tr>
                 {% endfor %}
                 </table>
             </div>
         {% endif %}
-        <h3><i class="icon-legal icon-large"></i> The Rules</h3>
+        <h3><i class="icon-legal icon-large"></i>The Rules</h3>
         <ul>
             <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
             <li>Complete {{ challenge.distance }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}</li>

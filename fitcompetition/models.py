@@ -43,8 +43,8 @@ class FitUserManager(UserManager):
 
 
 class FitUser(AbstractUser):
-    runkeeperToken = models.CharField(max_length=255)
-    fullname = models.CharField(max_length=255)
+    runkeeperToken = models.CharField(max_length=255, blank=True, null=True, default=None)
+    fullname = models.CharField(max_length=255, blank=True, null=True, default=None)
     gender = models.CharField(max_length=1, blank=True, null=True, default=None)
     profile_url = models.CharField(max_length=255, blank=True, null=True, default=None)
     medium_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
@@ -96,6 +96,16 @@ class Challenge(models.Model):
     def clean(self):
         if self.startdate > self.enddate:
             raise ValidationError("Start Date must be before End Date")
+
+
+class FitnessActivity(models.Model):
+    user = models.ForeignKey(FitUser)
+    type = models.ForeignKey(ActivityType)
+    uri = models.CharField(max_length=255)
+    duration = models.FloatField(blank=True, null=True, default=0)
+    date = models.DateTimeField(blank=True, null=True, default=None)
+    calories = models.FloatField(blank=True, null=True, default=0)
+    distance = models.FloatField(blank=True, null=True, default=0)
 
 
 class RunkeeperRecord(models.Model):
