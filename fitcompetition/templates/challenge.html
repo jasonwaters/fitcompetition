@@ -16,14 +16,17 @@
             <button class="btn btn-large btn-block btn-primary" type="button">Join this Challenge</button>
         </div>
     {% endif %}
-    <p>
     {% if not challenge.hasStarted %}
-        This Challenge has not yet started, it will begin on {{ challenge.startdate|date:"F j, Y" }}.
+        <div class="alert alert-info">
+            This Challenge has not yet started, it will begin on {{ challenge.startdate|date:"F j, Y" }}.
+        </div>
     {% elif challenge.hasEnded %}
-        This Challenge is history.  It ended on {{ challenge.enddate|date:"F j, Y" }}.
+        <div class="alert alert-info">
+            This Challenge is history.  It ended on {{ challenge.enddate|date:"F j, Y" }}.
+        </div>
     {% else %}
         {% verbatim %}
-        <div ng-app="countdown" ng-controller="CountdownController">
+        <div class="alert alert-success" ng-app="countdown" ng-controller="CountdownController">
             Get moving, there's
             <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
             <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
@@ -32,7 +35,6 @@
         </div>
         {% endverbatim %}
     {% endif %}
-    </p>
     <div class="row-fluid">
         {% if challenge.hasStarted %}
             <h3><i class="icon-trophy icon-large"></i> Leaderboard</h3>
@@ -98,7 +100,7 @@
         <h3><i class="icon-legal icon-large"></i> The Rules</h3>
         <ul>
             <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-            <li>Run or Walk {{ challenge.distance }} miles in {{ challenge.numDays }} days.  Between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}</li>
+            <li>Complete {{ challenge.distance }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}</li>
             <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
             <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
         </ul>

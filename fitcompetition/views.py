@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, RunkeeperRecord
-from fitcompetition.util.ListUtil import multikeysort
+from fitcompetition.util.ListUtil import multikeysort, createListFromProperty
 
 
 def pruneDeadAndPopulateGoal(records, goal):
@@ -41,7 +41,8 @@ def challenge(request, id):
         # 'records': multikeysort(records, ['-totalMiles'], getter=operator.attrgetter),
         'challenge': challenge,
         'players': players,
-        'canJoin': canJoin
+        'canJoin': canJoin,
+        'approvedActivities': createListFromProperty(challenge.approvedActivities.all(), 'name')
     })
 
 

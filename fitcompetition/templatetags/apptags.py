@@ -88,3 +88,12 @@ def fromSettings(key):
         setting = None
 
     return setting
+
+@register.filter
+def commaSeparated(list, word="or"):
+    list = [str(item) for item in list]
+    if len(list) == 1:
+        return list[0]
+
+    all_but_last = ", ".join(list[:-1])
+    return "%s %s %s" % (all_but_last, word, list[-1])

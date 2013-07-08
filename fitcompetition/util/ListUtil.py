@@ -62,9 +62,10 @@ def createListFromProperty(list, propertyName):
     result = []
 
     for item in list:
-        if item.get(propertyName) not in hash:
-            hash[item.get(propertyName)] = True
-            result.append(item.get(propertyName))
+        value = getattr(item, propertyName)
+        if value not in hash:
+            hash[value] = True
+            result.append(value)
 
     return result
 
