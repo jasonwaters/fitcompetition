@@ -50,6 +50,7 @@ class FitUser(AbstractUser):
     medium_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
     normal_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
 
+    lastHealthGraphUpdate = models.DateTimeField(blank=True, null=True, default=None)
     objects = FitUserManager()
 
     def __unicode__(self):
