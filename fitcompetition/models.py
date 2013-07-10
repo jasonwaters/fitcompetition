@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from decimal import Decimal
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
@@ -7,8 +7,7 @@ from django.db.models import BooleanField
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
-from fitcompetition.templatetags.apptags import toMiles
-import healthgraph
+from fitcompetition.util import ListUtil
 import pytz
 from requests import RequestException
 from dateutil import parser
@@ -58,10 +57,21 @@ class FitUser(AbstractUser):
     objects = FitUserManager()
 
     def __unicode__(self):
-        return self.fullname
+        return self.fullname or "Unnamed User"
 
     def is_authenticated(self):
         return True
+
+    def refreshFitnessActivities(self, activityTypesMap=None):
+        if activityTypesMap is None:
+            activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
+
+        successful = FitnessActivity.objects.pruneActivities(self)
+        successful = successful and FitnessActivity.objects.syncActivities(self, activityTypesMap)
+
+        if successful:
+            self.lastHealthGraphUpdate = datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.save()
 
 
 class ActivityType(models.Model):
@@ -151,137 +161,3 @@ class FitnessActivity(models.Model):
     distance = models.FloatField(blank=True, null=True, default=0)
 
     objects = FitnessActivityManager()
-
-
-class RunkeeperRecord(models.Model):
-    name = models.CharField(max_length=255)
-    userID = models.IntegerField()
-    code = models.CharField(max_length=255)
-    token = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.userID
-
-    def populateGoal(self, goal):
-        self._goal = goal
-
-    @property
-    def isDead(self):
-        return self.settings is None
-
-    @property
-    def session(self):
-        if not getattr(self, '_session', None):
-            self._session = healthgraph.Session(self.token)
-
-        return self._session
-
-    @property
-    def profile(self):
-        if not getattr(self, '_profile', None):
-            self._profile = self.user.get_profile()
-        return self._profile
-
-    @property
-    def records(self):
-        if not getattr(self, '_records', None):
-            self._records = self.user.get_records()
-        return self._records
-
-    @property
-    def settings(self):
-        if not getattr(self, '_settings', None):
-            self._settings = self.user.get_settings()
-        return self._settings
-
-    @property
-    def user(self):
-        if not getattr(self, '_user', None):
-            self._user = healthgraph.User(session=self.session)
-        return self._user
-
-    @property
-    def measurements(self):
-        if not getattr(self, '_weightMeasurements', None):
-            measurements = self.user.get_weight_measurement_iter()
-
-            self._weightMeasurements = []
-            for _ in range(measurements.count()):
-                measurement = measurements.next()
-                self._weightMeasurements.append(measurement)
-
-        return self._weightMeasurements
-
-    @property
-    def currentMeasurement(self):
-        if len(self.measurements) > 0:
-            return self.measurements[0]
-        else:
-            return None
-
-    def ensureActivities(self):
-        if not getattr(self, 'activitiesIter', None):
-
-            if getattr(self, '_goal', None) is not None:
-                self.activitiesIter = self.user.get_fitness_activity_iter(
-                    date_min=self._goal.startdate.strftime('%Y-%m-%d'),
-                    date_max=self._goal.enddate.strftime('%Y-%m-%d'))
-            else:
-                self.activitiesIter = self.user.get_fitness_activity_iter()
-
-            self.activitiesList = []
-
-            for _ in range(self.activitiesIter.count()):
-                activity = self.activitiesIter.next()
-                if activity.get('type') in ('Running', 'Walking'):
-                    self.activitiesList.append(activity)
-
-    @property
-    def activeToday(self):
-        today = datetime.now().date()
-
-        for activity in self.activities:
-            if (activity.get('start_time').date() - today).days == 0:
-                return True
-
-        return False
-
-    @property
-    def activities(self):
-        self.ensureActivities()
-        return self.activitiesList
-
-    @property
-    def totalMiles(self):
-        self.ensureActivities()
-
-        cacheVal = getattr(self, '_totalMiles', None)
-        if cacheVal is not None:
-            return cacheVal
-
-        self._totalMiles = 0
-        for activity in self.activitiesList:
-            self._totalMiles += toMiles(activity.get('total_distance'))
-
-        return self._totalMiles
-
-    def didAchieveGoal(self, multiplier=1):
-        goal = getattr(self, '_goal', None)
-
-        if goal:
-            return self.totalMiles >= (goal.distance * multiplier)
-        else:
-            return False
-
-
-    @property
-    def achievedGoal(self, multiplier=1, *args, **kwargs):
-        return self.didAchieveGoal(1)
-
-    @property
-    def overAchiever(self):
-        return self.didAchieveGoal(1.5)
-
-    @property
-    def doubledGoal(self):
-        return self.didAchieveGoal(2)

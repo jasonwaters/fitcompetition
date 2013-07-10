@@ -22,14 +22,20 @@
                 </tr>
             </thead>
             <tbody>
-            {% for challenge in challenges %}
-                <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
-                    <td>{% if challenge.hasEnded %}<i class="icon-lock"></i>{% endif %}</td>
-                    <td><a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a></td>
-                    <td>{{ challenge.startdate|date:"F j, Y" }}</td>
-                    <td>{{ challenge.enddate|date:"F j, Y" }}</td>
+            {% if challenges|length > 0 %}
+                {% for challenge in challenges %}
+                    <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
+                        <td>{% if challenge.hasEnded %}<i class="icon-lock"></i>{% endif %}</td>
+                        <td><a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a></td>
+                        <td>{{ challenge.startdate|date:"F j, Y" }}</td>
+                        <td>{{ challenge.enddate|date:"F j, Y" }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">Looks like there aren't any challenges yet...</td>
                 </tr>
-            {% endfor %}
+            {% endif %}
             </tbody>
         </table>
     </div>

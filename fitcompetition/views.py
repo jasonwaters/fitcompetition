@@ -29,8 +29,14 @@ def challenge(request, id):
         FitnessActivity.objects.pruneActivities(request.user)
         FitnessActivity.objects.syncActivities(request.user, activityTypesMap)
 
+    joinNow = request.GET.get('join', False)
+
     players = challenge.players.all()
     canJoin = request.user not in players
+
+    if joinNow and canJoin:
+        challenge.players.add(request.user)
+        canJoin = False
 
     approvedTypes = challenge.approvedActivities.all()
 

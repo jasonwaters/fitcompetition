@@ -37,9 +37,7 @@
         {% endverbatim %}
     {% endif %}
     {% if canJoin %}
-        <div class="join-challenge">
-            <button class="btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
-        </div>
+        <button class="join-challenge btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
     {% endif %}
     <div class="row-fluid">
         {% if challenge.hasStarted %}
@@ -125,6 +123,11 @@
             var link = $(evt.target);
             $('.activities-list tr.hidden').removeClass('hidden');
             link.addClass('hidden');
+        });
+
+        $('button.join-challenge').click(function(evt) {
+            evt.preventDefault();
+            window.location.href = '{{ request.get_full_path }}?join=1';
         });
     </script>
     <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>

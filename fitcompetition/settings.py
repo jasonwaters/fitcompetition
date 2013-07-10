@@ -178,13 +178,13 @@ SOCIAL_AUTH_SESSION_EXPIRATION = False
 SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.social_auth_user',
     'social_auth.backends.pipeline.associate.associate_by_email',
-    # 'fitcompetition.pipeline.get_username',
     'social_auth.backends.pipeline.user.get_username',
     'social_auth.backends.pipeline.user.create_user',
     'social_auth.backends.pipeline.social.associate_user',
     'social_auth.backends.pipeline.social.load_extra_data',
     'social_auth.backends.pipeline.user.update_user_details',
     'social_auth.backends.pipeline.misc.save_status_to_session',
+    'fitcompetition.pipeline.persistHealthgraphData',
 )
 
 LOGIN_URL = '/login/'
