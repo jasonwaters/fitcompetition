@@ -4,10 +4,14 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField
+from fitcompetition import RunkeeperService
+from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.templatetags.apptags import toMiles
 import healthgraph
 import pytz
+from requests import RequestException
+from dateutil import parser
 
 
 class CurrencyField(models.DecimalField):
@@ -99,6 +103,44 @@ class Challenge(models.Model):
             raise ValidationError("Start Date must be before End Date")
 
 
+class FitnessActivityManager(models.Manager):
+    def pruneActivities(self, user):
+        successful = True
+        #delete the activities cached in the database that have been deleted on the health graph
+        try:
+            changelog = RunkeeperService.getChangeLog(user, modifiedSince=user.lastHealthGraphUpdate)
+            deletedActivities = changelog.get('fitness_activities', {}).get('deleted', [])
+
+            for deletedUri in deletedActivities:
+                try:
+                    activity = FitnessActivity.objects.get(uri=deletedUri)
+                    activity.delete()
+                except FitnessActivity.DoesNotExist:
+                    pass
+        except(RunkeeperException, RequestException):
+            apiFailed = False
+
+        return successful
+
+    def syncActivities(self, user, activityTypesMap):
+        successful = True
+        #populate the database with activities from the health graph
+        try:
+            activities = RunkeeperService.getFitnessActivities(user, modifiedSince=user.lastHealthGraphUpdate)
+            for activity in activities:
+                type = activityTypesMap.get(activity.get('type'), None)
+                dbo, created = FitnessActivity.objects.get_or_create(user=user, type=type, uri=activity.get('uri'))
+                dbo.duration = activity.get('duration')
+                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
+                dbo.calories = activity.get('total_calories')
+                dbo.distance = activity.get('total_distance')
+                dbo.save()
+        except(RunkeeperException, RequestException):
+            successful = False
+
+        return successful
+
+
 class FitnessActivity(models.Model):
     user = models.ForeignKey(FitUser)
     type = models.ForeignKey(ActivityType)
@@ -107,6 +149,8 @@ class FitnessActivity(models.Model):
     date = models.DateTimeField(blank=True, null=True, default=None)
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
+
+    objects = FitnessActivityManager()
 
 
 class RunkeeperRecord(models.Model):

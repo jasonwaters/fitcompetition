@@ -35,11 +35,11 @@
         };
     }
 
-    var countdownApp = angular.module('countdown', []);
+    var leaderboardApp = angular.module('leaderboard', []);
 
-    countdownApp.value('targetDate', moment(COUNTDOWN_TARGET_DATE).toDate());
+    leaderboardApp.value('targetDate', moment(COUNTDOWN_TARGET_DATE).toDate());
 
-    countdownApp.filter('pad', function() {
+    leaderboardApp.filter('pad', function() {
         return function (value, size) {
             var s = value+"";
             while (s.length < size) s = "0" + s;
@@ -47,7 +47,7 @@
         };
     });
 
-    countdownApp.controller('CountdownController', function($scope, targetDate) {
+    leaderboardApp.controller('countdown-controller', function($scope, targetDate) {
         var timer = setInterval(function() {
             var timeLeft = getTimeLeft(targetDate);
 

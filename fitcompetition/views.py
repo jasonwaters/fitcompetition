@@ -4,7 +4,8 @@ from django.core import serializers
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity
+from fitcompetition.models import Challenge, FitnessActivity, ActivityType
+from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
 
 @login_required
@@ -21,6 +22,12 @@ def challenge(request, id):
         challenge = Challenge.objects.get(id=id)
     except Challenge.DoesNotExist:
         challenge = None
+
+    refresh = request.GET.get('refresh', False)
+    if refresh:
+        activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
+        FitnessActivity.objects.pruneActivities(request.user)
+        FitnessActivity.objects.syncActivities(request.user, activityTypesMap)
 
     players = challenge.players.all()
     canJoin = request.user not in players

@@ -32,6 +32,10 @@ a.activities-link {
     visibility: hidden;
 }
 
+.white {
+    color: white;
+}
+
 .green {
     color: #00a855;
 }
@@ -77,7 +81,11 @@ a.activities-link {
     height: 18px;
 }
 
-.flair [class^="icon-"] {
+.player .name {
+    margin-left: 5px;
+}
+
+.player .flair [class^="icon-"] {
     padding-left: 2px;
 }
 
@@ -92,4 +100,28 @@ a.activities-link {
 .join-challenge {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.row-icons a, .row-icons a:hover {
+    text-decoration: none;
+}
+
+.avatar {
+    position: relative;
+}
+
+.avatar .icon-check-sign {
+    position: absolute;
+    right: 8px;
+    top: 17px;
+}
+
+.img-small {
+    width: 50px;
+    height: 50px;
+}
+
+table.leaderboard tr td {
+    vertical-align: middle;
+    text-align: left;
 }
