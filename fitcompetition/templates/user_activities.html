@@ -1,0 +1,23 @@
+{% load humanize %}
+
+<table class="activities-list table table-condensed no-margin-bottom">
+    <thead>
+    <th></th>
+    <th>Date</th>
+    <th>Miles</th>
+    <th>Time</th>
+    </thead>
+    <tbody>
+    {% for activity in activities %}
+        <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
+            <td class="activity-icon {{ activity.type.name|slugify }}"></td>
+            <td>{{ activity.date|naturalday:"M j" }}</td>
+            <td>{{ activity.distance|toMiles|twoDecimals }}</td>
+            <td>{{ activity.duration|duration }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if activities|length > 4 %}
+    <div><a class="show-more-activities">{{ activities|length|add:"-4" }} more&hellip;</a></div>
+{% endif %}

@@ -52,9 +52,7 @@ def challenge(request, id):
     })
 
 
-def json_useractivities(request):
-    challengeID = request.GET.get('challengeID')
-    userID = request.GET.get('userID')
+def user_activities(request, userID, challengeID):
     activities = []
 
     if challengeID is not None and userID is not None:
@@ -70,7 +68,9 @@ def json_useractivities(request):
         activitiesFilter = dateFilter & typeFilter
         activities = FitnessActivity.objects.filter(activitiesFilter).order_by('-date')
 
-    return HttpResponse(serializers.serialize('json', activities, fields=('duration', 'date', 'calories', 'distance')), mimetype="application/json")
+    return render(request, 'user_activities.html', {
+        'activities': activities
+    })
 
 
 def login_error(request):

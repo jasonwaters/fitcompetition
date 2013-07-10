@@ -73,7 +73,7 @@
                             </span>
                         </td>
                         <td>
-                            <a class="activities-link" data-userid="{{ record.userID }}" data-toggle="popover" data-placement="left" data-html="true" data-title='{{ player.fullname }}'>
+                            <a class="activities-link" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-placement="left" data-title='{{ player.fullname }}'>
                                 {{ player.total_distance|toMiles|twoDecimals }}
                             </a>
                         </td>
@@ -107,11 +107,19 @@
             html: true,
             trigger: 'manual'
         }).click(function(evt) {
-                    hidePopovers(_.without($('a.activities-link'), evt.target));
+            evt.stopPropagation(evt.target);
+            hidePopovers(_.without($('a.activities-link'), evt.target));
 
+            var url = $(this).data('url');
+            if($('.popover').length == 0) {
+                $.get(url, function(result) {
+                    $(this).attr('data-content', result);
                     $(this).popover('toggle');
-                    evt.stopPropagation(evt.target);
-                });
+                }.bind(this));
+            }else {
+                $(this).popover('toggle');
+            }
+        });
 
         $('body').delegate('.show-more-activities', 'click', function(evt) {
             var link = $(evt.target);

@@ -15,6 +15,6 @@ urlpatterns = patterns('',
                        url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/', }, name='logout'),
                        url(r'^login-error/$', 'fitcompetition.views.login_error'),
 
-                       url(r'^api/useractivities/$', 'fitcompetition.views.json_useractivities', name="useractivities"),
+                       url(r'^useractivities/(?P<userID>\d+)/(?P<challengeID>\d+)/$', 'fitcompetition.views.user_activities', name="useractivities"),
                        url(r'^admin/', include(admin.site.urls)),
 )
