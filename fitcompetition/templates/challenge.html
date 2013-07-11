@@ -14,7 +14,7 @@
         <li><a href="{% url "home" %}">Challenges</a> <span class="divider">&raquo;</span></li>
         <li class="active">{{ challenge.name }}</li>
         <li class="row-icons pull-right">
-            <a href="{{ request.get_full_path }}?refresh=1" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
+            <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
         </li>
     </ul>
     {% if not challenge.hasStarted %}
@@ -85,7 +85,7 @@
                     <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
                 </ul>
             {% else %}
-                <p>Crickets.  <a href="{{ request.get_full_path }}?join=1">Join this challenge</a> and recruit your friends to compete.</p>
+                <p>Crickets.  <a href="#" class="join-challenge">Join this challenge</a> and recruit your friends to compete.</p>
             {% endif %}
         </div>
 
@@ -130,9 +130,18 @@
             link.addClass('hidden');
         });
 
-        $('button.join-challenge').click(function(evt) {
+        $('.join-challenge').click(function(evt) {
             evt.preventDefault();
-            window.location.href = '{{ request.get_full_path }}?join=1';
+            $.get("{% url 'join_challenge' challenge.id %}", function(result) {
+                window.location.reload();
+            });
+        });
+
+        $('.refresh-healthgraph').click(function(evt) {
+            evt.preventDefault();
+            $.get("{% url 'refresh_user_activities' %}", function(result) {
+                window.location.reload();
+            });
         });
     </script>
     <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>

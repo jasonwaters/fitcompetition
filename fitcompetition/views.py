@@ -31,18 +31,8 @@ def challenge(request, id):
     except Challenge.DoesNotExist:
         challenge = None
 
-    refresh = request.GET.get('refresh', False) or request.user.healthGraphStale()
-    if refresh:
-        request.user.refreshFitnessActivities()
-
-    joinNow = request.GET.get('join', False)
-
     players = challenge.players.all().order_by('fullname')
     canJoin = request.user not in players
-
-    if joinNow and canJoin:
-        challenge.players.add(request.user)
-        canJoin = False
 
     approvedTypes = challenge.approvedActivities.all()
 
@@ -65,6 +55,23 @@ def challenge(request, id):
     })
 
 
+@login_required
+def join_challenge(request, id):
+    try:
+        challenge = Challenge.objects.get(id=id)
+    except Challenge.DoesNotExist:
+        challenge = None
+
+    challenge.players.add(request.user)
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+@login_required
+def refresh_user_activities(request):
+    request.user.refreshFitnessActivities()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+@login_required
 def user_activities(request, userID, challengeID):
     activities = []
 
