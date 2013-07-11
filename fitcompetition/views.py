@@ -32,7 +32,7 @@ def challenge(request, id):
         challenge = None
 
     players = challenge.players.all().order_by('fullname')
-    canJoin = request.user not in players
+    canJoin = not challenge.hasEnded and request.user not in players
 
     approvedTypes = challenge.approvedActivities.all()
 
