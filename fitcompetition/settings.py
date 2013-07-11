@@ -156,6 +156,11 @@ SOUTH_MIGRATION_MODULES = {
     'social_auth': 'fitcompetition.social_auth',
 }
 
+AUTHENTICATION_BACKENDS = {
+    "fitcompetition.backends.runkeeper.RunkeeperBackend",
+    "django.contrib.auth.backends.ModelBackend"
+}
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
