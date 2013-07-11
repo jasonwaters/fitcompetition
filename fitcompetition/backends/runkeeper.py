@@ -30,6 +30,7 @@ class RunkeeperBackend(OAuthBackend):
                 first_name, last_name = fullname.rsplit(' ', 1)
             except ValueError:
                 first_name = fullname
+                last_name = ""
 
         token = response['access_token']
 
