@@ -9,14 +9,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         db.rename_table('fitcompetition_goal', 'fitcompetition_challenge')
-        db.rename_table('fitcompetition_goal_approvedactivities', 'fitcompetition_challenge_approvedactivities')
-        db.rename_column('fitcompetition_challenge_approvedactivities', 'goal_id', 'challenge_id')
+        db.rename_table('fitcompetition_goal_approvedActivities', 'fitcompetition_challenge_approvedActivities')
+        db.rename_column('fitcompetition_challenge_approvedActivities', 'goal_id', 'challenge_id')
 
     def backwards(self, orm):
 
         db.rename_table('fitcompetition_challenge', 'fitcompetition_goal')
-        db.rename_table('fitcompetition_challenge_approvedactivities', 'fitcompetition_goal_approvedactivities')
-        db.rename_column('fitcompetition_goal_approvedactivities', 'challenge_id', 'goal_id')
+        db.rename_table('fitcompetition_challenge_approvedActivities', 'fitcompetition_goal_approvedActivities')
+        db.rename_column('fitcompetition_goal_approvedActivities', 'challenge_id', 'goal_id')
 
 
     models = {

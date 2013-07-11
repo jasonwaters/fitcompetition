@@ -19,7 +19,7 @@ class Migration(SchemaMigration):
         db.delete_column(u'fitcompetition_goal', 'isActive')
 
         # Adding M2M table for field approvedActivities on 'Goal'
-        m2m_table_name = db.shorten_name(u'fitcompetition_goal_approvedactivities')
+        m2m_table_name = db.shorten_name(u'fitcompetition_goal_approvedActivities')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('goal', models.ForeignKey(orm[u'fitcompetition.goal'], null=False)),
@@ -55,7 +55,7 @@ class Migration(SchemaMigration):
                       keep_default=False)
 
         # Removing M2M table for field approvedActivities on 'Goal'
-        db.delete_table(db.shorten_name(u'fitcompetition_goal_approvedactivities'))
+        db.delete_table(db.shorten_name(u'fitcompetition_goal_approvedActivities'))
 
 
     models = {
