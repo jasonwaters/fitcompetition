@@ -24,7 +24,7 @@ class Migration(SchemaMigration):
         # Adding model 'Nonce'
         db.create_table(u'social_auth_nonce', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('server_url', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('server_url', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('timestamp', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
             ('salt', self.gf('django.db.models.fields.CharField')(max_length=40)),
         ))
@@ -36,8 +36,8 @@ class Migration(SchemaMigration):
         # Adding model 'Association'
         db.create_table(u'social_auth_association', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('server_url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('handle', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('server_url', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('handle', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('secret', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('issued', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
             ('lifetime', self.gf('django.db.models.fields.IntegerField')()),
@@ -111,18 +111,18 @@ class Migration(SchemaMigration):
         'social_auth.association': {
             'Meta': {'unique_together': "(('server_url', 'handle'),)", 'object_name': 'Association'},
             'assoc_type': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'issued': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
             'lifetime': ('django.db.models.fields.IntegerField', [], {}),
             'secret': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'server_url': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'server_url': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'social_auth.nonce': {
             'Meta': {'unique_together': "(('server_url', 'timestamp', 'salt'),)", 'object_name': 'Nonce'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'salt': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'server_url': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'server_url': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'timestamp': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'})
         },
         'social_auth.usersocialauth': {
