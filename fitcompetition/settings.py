@@ -78,7 +78,6 @@ SECRET_KEY = ''
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -155,11 +154,6 @@ SOCIAL_AUTH_USER_MODEL = 'fitcompetition.FitUser'
 #Sucks, because if we update django-social-auth, we'll have to be sure to generate our own db migrations
 SOUTH_MIGRATION_MODULES = {
     'social_auth': 'fitcompetition.social_auth',
-}
-
-AUTHENTICATION_BACKENDS = {
-    'fitcompetition.backends.runkeeper.RunkeeperBackend',
-    'django.contrib.auth.backends.ModelBackend',
 }
 
 TEMPLATE_CONTEXT_PROCESSORS = (
