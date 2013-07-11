@@ -18,18 +18,27 @@ SECONDS_PER_DAY = SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY
 
 @register.filter
 def achievedGoal(meters, goal_miles):
+    if not meters:
+        return False
     return toMiles(meters) > float(goal_miles)
 
 @register.filter
 def overAchiever(meters, goal_miles):
+    if not meters:
+        return False
     return toMiles(meters) > float(goal_miles) * 1.5
 
 @register.filter
 def doubledGoal(meters, goal_miles):
+    if not meters:
+        return False
     return toMiles(meters) > goal_miles * 2
 
 @register.filter
 def isToday(date):
+    if not date:
+        return False
+
     diff = date - datetime.now(tz=pytz.timezone(TIME_ZONE))
     return diff.days == 0
 
@@ -118,3 +127,8 @@ def commaSeparated(list, word="or"):
 
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
+
+
+@register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
+def challenges_table(context, user, challenges):
+    return {'user': user, 'challenges': challenges}

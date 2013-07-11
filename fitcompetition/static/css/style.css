@@ -93,6 +93,10 @@ a.activities-link {
     width: 10px;
 }
 
+.col-medium {
+    width: 100px;
+}
+
 .dimmed-row {
     opacity: 0.4;
 }

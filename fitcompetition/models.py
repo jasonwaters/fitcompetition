@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -73,6 +74,12 @@ class FitUser(AbstractUser):
             self.lastHealthGraphUpdate = datetime.now(tz=pytz.timezone(TIME_ZONE))
             self.save()
 
+    def healthGraphStale(self):
+        if self.lastHealthGraphUpdate is None:
+            return True
+
+        timeago = datetime.now(tz=pytz.timezone(TIME_ZONE)) + relativedelta(minutes=-20)
+        return self.lastHealthGraphUpdate < timeago
 
 class ActivityType(models.Model):
     name = models.CharField(max_length=256)

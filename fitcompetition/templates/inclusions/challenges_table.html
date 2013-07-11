@@ -1,0 +1,25 @@
+{% load apptags %}
+{% load humanize %}
+
+<table class="table table-striped">
+    <tbody>
+    {% if challenges|length > 0 %}
+        {% for challenge in challenges %}
+            <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
+                <td>
+                    <a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>
+                    {% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %}
+                    <ul class="inline">
+                        <li>Start: {{ challenge.startdate|date:"M j, Y" }}</li>
+                        <li>Finish: {{ challenge.enddate|date:"M j, Y" }}</li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4">Looks like there aren't any challenges yet...</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

@@ -40,9 +40,9 @@
         <button class="join-challenge btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
     {% endif %}
     <div class="row-fluid">
-        {% if challenge.hasStarted %}
-            <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
-            <div class="row-fluid">
+        <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
+        <div class="row-fluid">
+            {% if players %}
                 <table class="table table-striped leaderboard">
                     <thead>
                         <tr>
@@ -78,8 +78,17 @@
                     </tr>
                 {% endfor %}
                 </table>
-            </div>
-        {% endif %}
+                <ul class="inline">
+                    <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today</li>
+                    <li><i class="icon-check-sign"></i> &mdash; Achieved the goal.</li>
+                    <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
+                    <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
+                </ul>
+            {% else %}
+                <p>Crickets.  <a href="{{ request.get_full_path }}?join=1">Join this challenge</a> and recruit your friends to compete.</p>
+            {% endif %}
+        </div>
+
         <h3><i class="icon-legal icon-large"></i>The Rules</h3>
         <ul>
             <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>

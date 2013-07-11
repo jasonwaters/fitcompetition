@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
@@ -5,33 +6,38 @@ from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, ActivityType
+from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
+import pytz
+
 
 @login_required
 def home(request):
-    challenges = Challenge.objects.order_by('-startdate')
+    myChallenges = Challenge.objects.filter(players__id=request.user.id).order_by('-enddate')
+    otherChallenges = Challenge.objects.exclude(players__id=request.user.id).order_by('-enddate')
 
     return render(request, 'home.html', {
-        'challenges': challenges
+        'myChallenges': myChallenges,
+        'otherChallenges': otherChallenges
     })
 
 @login_required
 def challenge(request, id):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
     try:
         challenge = Challenge.objects.get(id=id)
     except Challenge.DoesNotExist:
         challenge = None
 
-    refresh = request.GET.get('refresh', False)
+    refresh = request.GET.get('refresh', False) or request.user.healthGraphStale()
     if refresh:
-        activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
-        FitnessActivity.objects.pruneActivities(request.user)
-        FitnessActivity.objects.syncActivities(request.user, activityTypesMap)
+        request.user.refreshFitnessActivities()
 
     joinNow = request.GET.get('join', False)
 
-    players = challenge.players.all()
+    players = challenge.players.all().order_by('fullname')
     canJoin = request.user not in players
 
     if joinNow and canJoin:
@@ -40,15 +46,16 @@ def challenge(request, id):
 
     approvedTypes = challenge.approvedActivities.all()
 
-    dateFilter = Q(fitnessactivity__date__gte=challenge.startdate) & Q(fitnessactivity__date__lte=challenge.enddate)
-    typeFilter = Q()
+    if challenge.startdate <= now:
+        dateFilter = Q(fitnessactivity__date__gte=challenge.startdate) & Q(fitnessactivity__date__lte=challenge.enddate)
+        typeFilter = Q()
 
-    for type in approvedTypes:
-        typeFilter |= Q(fitnessactivity__type=type)
+        for type in approvedTypes:
+            typeFilter |= Q(fitnessactivity__type=type)
 
-    activitiesFilter = dateFilter & typeFilter
+        activitiesFilter = dateFilter & typeFilter
 
-    players = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+        players = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
 
     return render(request, 'challenge.html', {
         'challenge': challenge,

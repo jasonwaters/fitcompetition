@@ -10,33 +10,17 @@
         <li class="active">Challenges</li>
     </ul>
     <div class="row-fluid">
-        <h3>Welcome {{ user.first_name }}!</h3>
-        <p>Pick a challenge from the list below.</p>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Challenge</th>
-                    <th>Start</th>
-                    <th>End</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% if challenges|length > 0 %}
-                {% for challenge in challenges %}
-                    <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
-                        <td>{% if challenge.hasEnded %}<i class="icon-lock"></i>{% endif %}</td>
-                        <td><a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a></td>
-                        <td>{{ challenge.startdate|date:"F j, Y" }}</td>
-                        <td>{{ challenge.enddate|date:"F j, Y" }}</td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="4">Looks like there aren't any challenges yet...</td>
-                </tr>
-            {% endif %}
-            </tbody>
-        </table>
+        <h4>Welcome {{ user.first_name }}!</h4>
+        <p>Pick a challenge below.</p>
+
+        {% if myChallenges %}
+            <h5>My Challenges</h5>
+            {% challenges_table user myChallenges %}
+        {% endif %}
+
+        {% if otherChallenges %}
+            <h5>{% if not myChallenges %}Join these{% else %}Other{% endif %} Challenges</h5>
+            {% challenges_table user otherChallenges %}
+        {% endif %}
     </div>
 {% endblock %}
