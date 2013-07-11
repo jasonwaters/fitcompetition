@@ -118,14 +118,10 @@
             hidePopovers(_.without($('a.activities-link'), evt.target));
 
             var url = $(this).data('url');
-            if($('.popover').length == 0) {
-                $.get(url, function(result) {
-                    $(this).attr('data-content', result);
-                    $(this).popover('toggle');
-                }.bind(this));
-            }else {
+            $.get(url, function(result) {
+                $(this).attr('data-content', result);
                 $(this).popover('toggle');
-            }
+            }.bind(this));
         });
 
         $('body').delegate('.show-more-activities', 'click', function(evt) {
