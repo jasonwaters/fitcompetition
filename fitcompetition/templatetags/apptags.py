@@ -2,7 +2,7 @@ from datetime import datetime
 from math import floor
 import math
 from django.template.defaultfilters import register
-from fitcompetition.settings import TIME_ZONE
+from fitcompetition.settings import TIME_ZONE, STATIC_URL
 import pytz
 from django.conf import settings
 
@@ -22,17 +22,20 @@ def achievedGoal(meters, goal_miles):
         return False
     return toMiles(meters) > float(goal_miles)
 
+
 @register.filter
 def overAchiever(meters, goal_miles):
     if not meters:
         return False
     return toMiles(meters) > float(goal_miles) * 1.5
 
+
 @register.filter
 def doubledGoal(meters, goal_miles):
     if not meters:
         return False
     return toMiles(meters) > goal_miles * 2
+
 
 @register.filter
 def isToday(date):
@@ -44,10 +47,19 @@ def isToday(date):
 
 
 @register.filter
+def avatar(url):
+    if url:
+        return url
+
+    return STATIC_URL + 'img/blank-avatar.png'
+
+
+@register.filter
 def toMiles(meters):
     if not isinstance(meters, float):
         return ""
     return meters * 0.00062137
+
 
 @register.filter
 def toLBS(kg):
@@ -55,11 +67,13 @@ def toLBS(kg):
         return ""
     return kg * 2.2046
 
+
 @register.filter
 def twoDecimals(value):
     if not isinstance(value, float):
         return ""
     return math.ceil(value * 100) / 100
+
 
 @register.filter
 def duration(secs):
@@ -108,6 +122,7 @@ def deltaDate(targetDate, kind):
 def fullDate(d):
     return d.isoformat()
 
+
 @register.filter
 def fromSettings(key):
     try:
@@ -116,6 +131,7 @@ def fromSettings(key):
         setting = None
 
     return setting
+
 
 @register.filter
 def commaSeparated(list, word="or"):
