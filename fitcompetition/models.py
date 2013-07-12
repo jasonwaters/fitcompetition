@@ -98,8 +98,7 @@ class Challenge(models.Model):
     ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
 
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
-    players = models.ManyToManyField(FitUser, blank=True, null=True, default=None)
-
+    players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
     @property
     def moneyInThePot(self):
         return self.ante * self.players.count()
@@ -126,6 +125,17 @@ class Challenge(models.Model):
     def clean(self):
         if self.startdate > self.enddate:
             raise ValidationError("Start Date must be before End Date")
+
+
+class Challenger(models.Model):
+    fituser = models.ForeignKey(FitUser)
+    challenge = models.ForeignKey(Challenge)
+    date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None)
+    hasPaid = models.BooleanField(verbose_name="Has Paid", default=False)
+
+    class Meta:
+        db_table = 'fitcompetition_challenge_players'
+        unique_together = (('fituser', 'challenge'))
 
 
 class FitnessActivityManager(models.Manager):

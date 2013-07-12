@@ -5,7 +5,7 @@ from django.core import serializers
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, ActivityType
+from fitcompetition.models import Challenge, FitnessActivity, ActivityType, Challenger
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
@@ -21,6 +21,7 @@ def home(request):
         'myChallenges': myChallenges,
         'otherChallenges': otherChallenges
     })
+
 
 @login_required
 def challenge(request, id):
@@ -45,7 +46,9 @@ def challenge(request, id):
 
         activitiesFilter = dateFilter & typeFilter
 
-        players = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+        players = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'),
+                                                            latest_activity_date=Max('fitnessactivity__date')).order_by(
+            '-total_distance')
 
     return render(request, 'challenge.html', {
         'challenge': challenge,
@@ -62,14 +65,22 @@ def join_challenge(request, id):
     except Challenge.DoesNotExist:
         challenge = None
 
-    challenge.players.add(request.user)
+    try:
+        challenger = challenge.challenger_set.get(fituser=request.user)
+    except Challenger.DoesNotExist:
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        challenger = Challenger.objects.create(challenge=challenge,
+                                               fituser=request.user,
+                                               date_joined=now)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
 
 @login_required
 def refresh_user_activities(request):
     request.user.refreshFitnessActivities()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
 
 @login_required
 def user_activities(request, userID, challengeID):
