@@ -32,12 +32,12 @@ class RunkeeperBackend(OAuthBackend):
                 first_name = fullname
                 last_name = ""
 
-        token = response['access_token']
+        token = response.get('access_token')
 
-        gender = response['profile']['gender']
-        profile_url = response['profile']['profile']
-        medium_picture = response['profile']['medium_picture']
-        normal_picture = response['profile']['normal_picture']
+        gender = response['profile'].get('gender')
+        profile_url = response['profile'].get('profile')
+        medium_picture = response['profile'].get('medium_picture')
+        normal_picture = response['profile'].get('normal_picture')
 
         return {
             'username': username,
