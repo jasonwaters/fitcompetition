@@ -10,92 +10,99 @@
 {% endblock %}
 
 {% block content %}
-    <ul class="breadcrumb">
-        <li><a href="{% url "home" %}">Challenges</a> <span class="divider">&raquo;</span></li>
-        <li class="active">{{ challenge.name }}</li>
-        <li class="row-icons pull-right">
-            <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
-        </li>
-    </ul>
-    {% if not challenge.hasStarted %}
-        <div class="alert alert-info">
-            This Challenge has not yet started, it will begin on {{ challenge.startdate|date:"F j, Y" }}.
-        </div>
-    {% elif challenge.hasEnded %}
-        <div class="alert alert-info">
-            This Challenge is history.  It ended on {{ challenge.enddate|date:"F j, Y" }}.
-        </div>
-    {% else %}
-        {% verbatim %}
-        <div class="alert alert-success" ng-app="leaderboard" ng-controller="countdown-controller">
-            Get moving, there's
-            <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
-            <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
-            <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
-            <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
-        </div>
-        {% endverbatim %}
-    {% endif %}
-    {% if canJoin %}
-        <button class="join-challenge btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
-    {% endif %}
     <div class="row-fluid">
-        <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
-        <div class="row-fluid">
-            {% if players %}
-                <table class="table table-striped leaderboard">
-                    <thead>
-                        <tr>
-                            <th>Player</th>
-                            <th class="miles-column">Miles</th>
-                        </tr>
-                    </thead>
-                {% for player in players %}
-                    <tr class="{% if user == player %}warning{% endif %}">
-                        <td class="player">
-                            <span class="avatar">
-                                <img src="{{ player.medium_picture }}" class="img-small img-rounded">
-                                {% if player.total_distance|achievedGoal:challenge.distance %}
-                                    <i class="icon-check-sign white"></i>
-                                {% endif %}
-                            </span>
-                            <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
-                            <span class="flair">
-                                {% if player.total_distance|overAchiever:challenge.distance %}
-                                    <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
-                                {% endif %}
-
-                                {% if player.latest_activity_date|isToday %}
-                                    <i class="icon-heart red" title="Active today"></i>
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            <a class="activities-link" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-placement="left" data-title='{{ player.fullname }}'>
-                                {{ player.total_distance|toMiles|twoDecimals }}
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </table>
-                <ul class="inline">
-                    <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today</li>
-                    <li><i class="icon-check-sign"></i> &mdash; Achieved the goal.</li>
-                    <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
-                    <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
-                </ul>
-            {% else %}
-                <p>Crickets.  <a href="#" class="join-challenge">Join this challenge</a> and recruit your friends to compete.</p>
-            {% endif %}
-        </div>
-
-        <h3><i class="icon-legal icon-large"></i>The Rules</h3>
-        <ul>
-            <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-            <li>Complete {{ challenge.distance }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}</li>
-            <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
-            <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+        <ul class="breadcrumb">
+            <li><a href="{% url "home" %}">Challenges</a> <span class="divider">&raquo;</span></li>
+            <li class="active">{{ challenge.name }}</li>
+            <li class="row-icons pull-right">
+                <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
+            </li>
         </ul>
+        {% if not challenge.hasStarted %}
+            <div class="alert alert-block alert-info">
+                <h4 class="alert-heading">${{ challenge.moneyInThePot|intcomma }} in the pot!</h4>
+                This Challenge has not yet started, it will begin on {{ challenge.startdate|date:"F j, Y" }}.
+            </div>
+        {% elif challenge.hasEnded %}
+            <div class="alert alert-block alert-info">
+                <h4 class="alert-heading">${{ challenge.moneyInThePot|intcomma }} in the pot!</h4>
+                This Challenge is history.  It ended on {{ challenge.enddate|date:"F j, Y" }}.
+            </div>
+        {% else %}
+            <div class="alert alert-block alert-success" ng-app="leaderboard" ng-controller="countdown-controller">
+                <h4 class="alert-heading">${{ challenge.moneyInThePot|intcomma }} in the pot!</h4>
+                {% verbatim %}
+                <p>
+                    Get moving, there's
+                    <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
+                    <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
+                    <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
+                    <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
+                </p>
+            </div>
+            {% endverbatim %}
+        {% endif %}
+        {% if canJoin %}
+            <button class="join-challenge btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
+        {% endif %}
+            <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
+            <div class="row-fluid">
+                {% if players %}
+                    <table class="table table-striped leaderboard">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th class="miles-column">Miles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for player in players %}
+                            <tr class="{% if user == player %}warning{% endif %}">
+                                <td class="player">
+                                    <span class="avatar">
+                                        <img src="{{ player.medium_picture }}" class="img-small img-rounded">
+                                        {% if player.total_distance|achievedGoal:challenge.distance %}
+                                            <i class="icon-check-sign white"></i>
+                                        {% endif %}
+                                    </span>
+                                    <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
+                                    <span class="flair">
+                                        {% if player.total_distance|overAchiever:challenge.distance %}
+                                            <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
+                                        {% endif %}
+
+                                        {% if player.latest_activity_date|isToday %}
+                                            <i class="icon-heart red" title="Active today"></i>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a class="activities-link" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-placement="left" data-title='{{ player.fullname }}'>
+                                        {{ player.total_distance|toMiles|twoDecimals }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <ul class="inline">
+                        <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today</li>
+                        <li><i class="icon-check-sign"></i> &mdash; Achieved the goal.</li>
+                        <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
+                        <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
+                    </ul>
+                {% else %}
+                    <p>Crickets.  <a href="#" class="join-challenge">Join this challenge</a> and recruit your friends to compete.</p>
+                {% endif %}
+            </div>
+
+            <h3><i class="icon-legal icon-large"></i>The Rules</h3>
+            <ul>
+                <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
+                <li>Complete {{ challenge.distance }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}</li>
+                <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a></li>
+                <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+            </ul>
     </div>
     <script type="text/javascript">
         var COUNTDOWN_TARGET_DATE = '{{ challenge.enddate|fullDate }}';

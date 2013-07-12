@@ -101,6 +101,14 @@ class Challenge(models.Model):
     players = models.ManyToManyField(FitUser, blank=True, null=True, default=None)
 
     @property
+    def moneyInThePot(self):
+        return self.ante * self.players.count()
+
+    @property
+    def numPlayers(self):
+        return self.players.count()
+
+    @property
     def numDays(self):
         return (self.enddate - self.startdate).days
 

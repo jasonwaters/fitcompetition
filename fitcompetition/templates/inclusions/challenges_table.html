@@ -14,6 +14,12 @@
                         <li>Finish: {{ challenge.enddate|date:"M j, Y" }}</li>
                     </ul>
                 </td>
+                <td>
+                    <ul class="inline">
+                        <li><span class="badge badge-info">${{ challenge.moneyInThePot|intcomma }}</span></li>
+                        <li><span class="badge badge-info">{{ challenge.numPlayers }} Players</span></li>
+                    </ul>
+                </td>
             </tr>
         {% endfor %}
     {% else %}
