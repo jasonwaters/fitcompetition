@@ -51,6 +51,7 @@
                     <table class="table table-striped leaderboard">
                         <thead>
                             <tr>
+                                <th class="avatar-column"></th>
                                 <th>Player</th>
                                 <th class="miles-column">Miles</th>
                             </tr>
@@ -58,13 +59,15 @@
                         <tbody>
                         {% for player in players %}
                             <tr class="{% if user == player %}warning{% endif %}">
-                                <td class="player">
-                                    <span class="avatar">
-                                        <img src="{{ player.medium_picture }}" class="img-small img-rounded">
+                                <td>
+                                    <span class="avatar img-rounded">
+                                        <img src="{{ player.medium_picture }}" class="img-small">
                                         {% if player.total_distance|achievedGoal:challenge.distance %}
                                             <i class="icon-check-sign white"></i>
                                         {% endif %}
                                     </span>
+                                </td>
+                                <td class="player">
                                     <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
                                     <span class="flair">
                                         {% if player.total_distance|overAchiever:challenge.distance %}

@@ -82,7 +82,9 @@ a.activities-link {
 }
 
 .player .name {
+    display: inline-block;
     margin-left: 5px;
+    vertical-align: middle;
 }
 
 .player .flair [class^="icon-"] {
@@ -110,19 +112,27 @@ a.activities-link {
     text-decoration: none;
 }
 
+.avatar-column {
+    width: 50px;
+}
+
 .avatar {
     position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
 }
 
 .avatar .icon-check-sign {
     position: absolute;
-    right: 8px;
-    top: 17px;
+    right: 4px;
+    bottom: 4px;
 }
 
 .img-small {
     width: 50px;
-    height: 50px;
+    height: auto;
 }
 
 table.leaderboard tr td {
