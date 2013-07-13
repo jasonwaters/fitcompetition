@@ -2,12 +2,12 @@
 {% load apptags %}
 {% load humanize %}
 
-{% block head_title %}Error{% endblock %}
+{% block head_title %}404 Error{% endblock %}
 
 
 {% block content %}
     <div class="row-fluid">
-        <h3>Whoopsie</h3>
-        <p>Houston, we have a problem....  Try back later.</p>
+        <h3>Well, this is embarrassing&hellip;</h3>
+        <p>It seems that you have tried to access a page that does not exist.  Would you like to <a href="{% url "home" %}">try that again?</a></p>
     </div>
 {% endblock %}

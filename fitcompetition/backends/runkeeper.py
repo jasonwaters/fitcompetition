@@ -29,7 +29,10 @@ class RunkeeperBackend(OAuthBackend):
             try:  # Try to split name for django user storage
                 first_name, last_name = fullname.rsplit(' ', 1)
             except ValueError:
-                first_name = fullname
+                if fullname is not None and len(fullname) > 0:
+                    first_name = fullname
+                else:
+                    first_name = "Unnamed"
                 last_name = ""
 
         token = response.get('access_token')
