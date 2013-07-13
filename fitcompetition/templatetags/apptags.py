@@ -42,8 +42,7 @@ def isToday(date):
     if not date:
         return False
 
-    diff = date - datetime.now(tz=pytz.timezone(TIME_ZONE))
-    return diff.days == 0
+    return date.date() == datetime.today().date()
 
 
 @register.filter
