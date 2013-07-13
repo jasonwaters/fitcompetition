@@ -133,6 +133,10 @@ class Challenger(models.Model):
     date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None)
     hasPaid = models.BooleanField(verbose_name="Has Paid", default=False)
 
+    @property
+    def user(self):
+        return self.fituser
+
     class Meta:
         db_table = 'fitcompetition_challenge_players'
         unique_together = (('fituser', 'challenge'))

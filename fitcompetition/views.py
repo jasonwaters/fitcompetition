@@ -50,10 +50,16 @@ def challenge(request, id):
                                                             latest_activity_date=Max('fitnessactivity__date')).order_by(
             '-total_distance')
 
+    try:
+        competitor = challenge.challenger_set.get(fituser=request.user)
+    except Challenger.DoesNotExist:
+        competitor = None
+
     return render(request, 'challenge.html', {
         'challenge': challenge,
         'players': players,
         'canJoin': canJoin,
+        'competitor': competitor,
         'approvedActivities': createListFromProperty(approvedTypes, 'name')
     })
 
