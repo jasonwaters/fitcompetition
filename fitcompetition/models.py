@@ -174,7 +174,7 @@ class FitnessActivityManager(models.Manager):
                 dbo.calories = activity.get('total_calories')
                 dbo.distance = activity.get('total_distance')
                 dbo.save()
-        except(RunkeeperException, RequestException):
+        except (RunkeeperException, RequestException) as e:
             successful = False
 
         return successful

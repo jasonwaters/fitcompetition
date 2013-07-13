@@ -18,7 +18,7 @@
                 <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
             </li>
         </ul>
-        <h2>${{ challenge.moneyInThePot|intcomma }} in the pot!</h2>
+        <h2>${{ challenge.moneyInThePot|intcomma }} in the pot! <small>{{ numPlayers }} Competitors.</small></h2>
         <div class="alert alert-info">
             <a class="close" data-dismiss="alert" href="#">&times;</a>
             <p>
@@ -96,34 +96,11 @@
                         </thead>
                         <tbody>
                         {% for player in players %}
-                            <tr class="{% if user == player %}success{% endif %}">
-                                <td>
-                                    <span class="avatar img-rounded">
-                                        <img src="{{ player.medium_picture|avatar }}" class="img-small">
-                                        {% if player.total_distance|achievedGoal:challenge.distance %}
-                                            <i class="icon-check-sign white"></i>
-                                        {% endif %}
-                                    </span>
-                                </td>
-                                <td class="player">
-                                    <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
-                                    <span class="flair">
-                                        {% if player.total_distance|overAchiever:challenge.distance %}
-                                            <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
-                                        {% endif %}
-
-                                        {% if player.latest_activity_date|isToday %}
-                                            <i class="icon-heart red" title="Active today"></i>
-                                        {% endif %}
-                                    </span>
-                                </td>
-                                <td>
-                                    <a class="activities-link" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-placement="left" data-title='{{ player.fullname }}'>
-                                        {{ player.total_distance|toMiles|twoDecimals }}
-                                    </a>
-                                </td>
-                            </tr>
+                            {% player_row player challenge %}
                         {% endfor %}
+                        {% if competitor and not inLeaderboard and players|length > 0%}
+                            {% player_row user challenge %}
+                        {% endif %}
                         </tbody>
                     </table>
                     <ul class="inline">
@@ -133,7 +110,7 @@
                         <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
                     </ul>
                 {% else %}
-                    <p>Crickets.  <a href="#" class="join-challenge">Join this challenge</a> and recruit your friends to compete.</p>
+                    <div>{{ numPlayers }} people are competing in this challenge.  The leaderboard shows only players who have logged miles.  Will you be the first to get off the couch?</div>
                 {% endif %}
             </div>
 

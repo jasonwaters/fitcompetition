@@ -57,27 +57,26 @@ def avatar(url):
 @register.filter
 def toMiles(meters):
     if not isinstance(meters, float):
-        return ""
+        return 0
     return meters * 0.00062137
 
 
 @register.filter
 def toLBS(kg):
     if not isinstance(kg, float):
-        return ""
+        return 0
     return kg * 2.2046
 
 
 @register.filter
 def twoDecimals(value):
     if not isinstance(value, float):
-        return ""
+        return 0
     return math.ceil(value * 100) / 100
 
 
 @register.filter
 def duration(secs):
-    # return str(datetime.timedelta(seconds=secs))
     m, s = divmod(secs, 60)
     h, m = divmod(m, 60)
     return "%d:%02d:%02d" % (h, m, s)
@@ -148,3 +147,8 @@ def commaSeparated(list, word="or"):
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
 def challenges_table(context, user, challenges):
     return {'user': user, 'challenges': challenges}
+
+@register.inclusion_tag('inclusions/player_row.html', takes_context=True)
+def player_row(context, player, challenge):
+    return {'player': player,
+            'challenge': challenge}

@@ -46,9 +46,7 @@ def challenge(request, id):
 
         activitiesFilter = dateFilter & typeFilter
 
-        players = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'),
-                                                            latest_activity_date=Max('fitnessactivity__date')).order_by(
-            '-total_distance')
+        leaderboard = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
 
     try:
         competitor = challenge.challenger_set.get(fituser=request.user)
@@ -57,9 +55,11 @@ def challenge(request, id):
 
     return render(request, 'challenge.html', {
         'challenge': challenge,
-        'players': players,
+        'players': leaderboard,
         'canJoin': canJoin,
         'competitor': competitor,
+        'inLeaderboard': competitor is not None and request.user in leaderboard,
+        'numPlayers': len(players),
         'approvedActivities': createListFromProperty(approvedTypes, 'name')
     })
 
