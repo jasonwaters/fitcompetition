@@ -63,16 +63,27 @@ class FitUser(AbstractUser):
     def is_authenticated(self):
         return True
 
-    def refreshFitnessActivities(self, activityTypesMap=None):
+    def syncRunkeeperData(self, activityTypesMap=None):
         if activityTypesMap is None:
             activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
 
-        successful = FitnessActivity.objects.pruneActivities(self)
+        successful = self.syncProfileWithRunkeeper()
+        successful = successful and FitnessActivity.objects.pruneActivities(self)
         successful = successful and FitnessActivity.objects.syncActivities(self, activityTypesMap)
 
         if successful:
             self.lastHealthGraphUpdate = datetime.now(tz=pytz.timezone(TIME_ZONE))
             self.save()
+
+    def syncProfileWithRunkeeper(self):
+        profile = RunkeeperService.getUserProfile(self)
+
+        self.medium_picture = profile.get('medium_picture')
+        self.normal_picture = profile.get('normal_picture')
+        self.gender = profile.get('gender')
+        self.profile_url = profile.get('profile')
+        self.save()
+
 
     def healthGraphStale(self):
         if self.lastHealthGraphUpdate is None:

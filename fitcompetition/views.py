@@ -84,7 +84,7 @@ def join_challenge(request, id):
 
 @login_required
 def refresh_user_activities(request):
-    request.user.refreshFitnessActivities()
+    request.user.syncRunkeeperData()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 

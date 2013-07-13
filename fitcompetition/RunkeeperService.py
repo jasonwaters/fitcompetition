@@ -87,3 +87,17 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
         raise RunkeeperException("Status Code: %s" % r.status_code)
 
     return r.json()
+
+
+def getUserProfile(user):
+    params = {
+        'access_token': user.runkeeperToken,
+    }
+
+    url = "%s%s" % (RUNKEEPER_API_URL, PROFILE)
+    r = requests.get(url, params=params)
+
+    if r.status_code != 200:
+        raise RunkeeperException("Status Code: %s" % r.status_code)
+
+    return r.json()

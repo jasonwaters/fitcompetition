@@ -9,4 +9,4 @@ class Command(BaseCommand):
         activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
 
         for user in users:
-            user.refreshFitnessActivities(activityTypesMap=activityTypesMap)
+            user.syncRunkeeperData(activityTypesMap=activityTypesMap)
