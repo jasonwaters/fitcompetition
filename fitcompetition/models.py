@@ -76,14 +76,18 @@ class FitUser(AbstractUser):
             self.save()
 
     def syncProfileWithRunkeeper(self):
-        profile = RunkeeperService.getUserProfile(self)
+        successful = True
+        try:
+            profile = RunkeeperService.getUserProfile(self)
+            self.medium_picture = profile.get('medium_picture')
+            self.normal_picture = profile.get('normal_picture')
+            self.gender = profile.get('gender')
+            self.profile_url = profile.get('profile')
+            self.save()
+        except(RunkeeperException, RequestException):
+            successful = False
 
-        self.medium_picture = profile.get('medium_picture')
-        self.normal_picture = profile.get('normal_picture')
-        self.gender = profile.get('gender')
-        self.profile_url = profile.get('profile')
-        self.save()
-
+        return successful
 
     def healthGraphStale(self):
         if self.lastHealthGraphUpdate is None:
@@ -168,7 +172,7 @@ class FitnessActivityManager(models.Manager):
                 except FitnessActivity.DoesNotExist:
                     pass
         except(RunkeeperException, RequestException):
-            apiFailed = False
+            successful = False
 
         return successful
 
