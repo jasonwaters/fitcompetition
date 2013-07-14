@@ -3,8 +3,9 @@ from math import floor
 import math
 from django.template.defaultfilters import register
 from django.utils import timezone
-from fitcompetition.settings import STATIC_URL, TZ
+from fitcompetition.settings import STATIC_URL, TIME_ZONE
 from django.conf import settings
+import pytz
 
 
 MILLIS_PER_SECOND = 1000
@@ -42,7 +43,7 @@ def isToday(date):
     if not date:
         return False
     now = timezone.localtime(timezone.now())
-    return date.astimezone(TZ).date() == now.date()
+    return date.astimezone(pytz.timezone(TIME_ZONE)).date() == now.date()
 
 
 @register.filter
@@ -83,7 +84,7 @@ def duration(secs):
 
 @register.filter
 def deltaDate(targetDate, kind):
-    now = datetime.now(tz=TZ)
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
     diff = targetDate - now
 
     negative = diff.total_seconds() < 0

@@ -5,7 +5,7 @@ from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger
-from fitcompetition.settings import TZ
+from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
 
@@ -75,7 +75,7 @@ def join_challenge(request, id):
     try:
         challenger = challenge.challenger_set.get(fituser=request.user)
     except Challenger.DoesNotExist:
-        now = datetime.now(tz=TZ)
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         challenger = Challenger.objects.create(challenge=challenge,
                                                fituser=request.user,
                                                date_joined=now)
