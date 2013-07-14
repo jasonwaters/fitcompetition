@@ -15,7 +15,7 @@
             <li><a href="{% url "home" %}">Challenges</a> <span class="divider">&raquo;</span></li>
             <li class="active">{{ challenge.name }}</li>
             <li class="row-icons pull-right">
-                <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>
+{#                <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>#}
             </li>
         </ul>
         <h2>${{ challenge.moneyInThePot|intcomma }} in the pot! <small>{{ numPlayers }} Competitors.</small></h2>
@@ -85,22 +85,23 @@
         {% endif %}
             <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
             <div class="row-fluid">
-                {% if players %}
+                {% if allPlayers %}
                     <table class="table table-striped leaderboard">
                         <thead>
                             <tr>
+                                <th class="col-small"></th>
                                 <th class="avatar-column"></th>
                                 <th></th>
                                 <th class="miles-column">Miles</th>
                             </tr>
                         </thead>
                         <tbody>
-                        {% for player in players %}
-                            {% player_row player challenge %}
+                        {% for player in playersWithActivities %}
+                            {% player_row player challenge forloop.counter %}
                         {% endfor %}
-                        {% if competitor and not inLeaderboard and players|length > 0%}
-                            {% player_row user challenge %}
-                        {% endif %}
+                        {% for player in playersWithoutActivities %}
+                            {% player_row player challenge forloop.counter playersWithActivities|length %}
+                        {% endfor %}
                         </tbody>
                     </table>
                     <ul class="inline">
@@ -109,8 +110,6 @@
                         <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
                         <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
                     </ul>
-                {% else %}
-                    <div>{{ numPlayers }} people are competing in this challenge.  The leaderboard shows only players who have logged miles.  Will you be the first to get off the couch?</div>
                 {% endif %}
             </div>
 
@@ -162,12 +161,12 @@
             });
         });
 
-        $('.refresh-healthgraph').click(function(evt) {
-            evt.preventDefault();
-            $.get("{% url 'refresh_user_activities' %}", function(result) {
-                window.location.reload();
-            });
-        });
+{#        $('.refresh-healthgraph').click(function(evt) {#}
+{#            evt.preventDefault();#}
+{#            $.get("{% url 'refresh_user_activities' %}", function(result) {#}
+{#                window.location.reload();#}
+{#            });#}
+{#        });#}
     </script>
     <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>
 {% endblock %}

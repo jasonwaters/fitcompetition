@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
 
@@ -30,10 +31,13 @@ def challenge(request, id):
     except Challenge.DoesNotExist:
         challenge = None
 
-    players = challenge.players.all().order_by('fullname')
-    canJoin = not challenge.hasEnded and request.user not in players
+    allPlayers = challenge.players.all().order_by('fullname')
+    canJoin = not challenge.hasEnded and request.user not in allPlayers
 
     approvedTypes = challenge.approvedActivities.all()
+
+    playersWithActivities = []
+    playersWithActivitiesMap = {}
 
     if challenge.startdate <= now:
         dateFilter = Q(fitnessactivity__date__gte=challenge.startdate) & Q(fitnessactivity__date__lte=challenge.enddate)
@@ -44,7 +48,8 @@ def challenge(request, id):
 
         activitiesFilter = dateFilter & typeFilter
 
-        leaderboard = players.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+        playersWithActivities = allPlayers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+        playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
 
     try:
         competitor = challenge.challenger_set.get(fituser=request.user)
@@ -54,13 +59,20 @@ def challenge(request, id):
     if competitor and challenge.startdate <= now <= challenge.enddate:
         request.user.syncRunkeeperData()
 
+    playersWithoutActivities = []
+
+    for player in allPlayers:
+        if playersWithActivitiesMap.get(player.id) is None:
+            playersWithoutActivities.append(player)
+
     return render(request, 'challenge.html', {
         'challenge': challenge,
-        'players': leaderboard,
+        'allPlayers': allPlayers,
+        'playersWithActivities': playersWithActivities,
+        'playersWithoutActivities': playersWithoutActivities,
         'canJoin': canJoin,
         'competitor': competitor,
-        'inLeaderboard': competitor is not None and request.user in leaderboard,
-        'numPlayers': len(players),
+        'numPlayers': len(allPlayers),
         'approvedActivities': createListFromProperty(approvedTypes, 'name')
     })
 

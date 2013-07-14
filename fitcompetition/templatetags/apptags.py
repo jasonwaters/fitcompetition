@@ -149,6 +149,7 @@ def challenges_table(context, user, challenges):
     return {'user': user, 'challenges': challenges}
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)
-def player_row(context, player, challenge):
+def player_row(context, player, challenge, rank, offset=0):
     return {'player': player,
-            'challenge': challenge}
+            'challenge': challenge,
+            'rank': rank + offset}
