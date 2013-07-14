@@ -53,7 +53,7 @@ def challenge(request, id):
     except Challenger.DoesNotExist:
         competitor = None
 
-    if competitor:
+    if competitor and challenge.startdate <= now <= challenge.enddate:
         request.user.syncRunkeeperData()
 
     return render(request, 'challenge.html', {
