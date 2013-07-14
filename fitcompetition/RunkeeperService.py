@@ -41,7 +41,7 @@ def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSin
     headers = {}
 
     if modifiedSince is not None:
-        headers['If-Modified-Since'] = modifiedSince.replace(tzinfo=pytz.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     url = "%s%s" % (RUNKEEPER_API_URL, FITNESS_ACTIVITIES)
     r = requests.get(url, params=params, headers=headers)

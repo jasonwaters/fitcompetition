@@ -72,7 +72,7 @@ class FitUser(AbstractUser):
         successful = successful and FitnessActivity.objects.syncActivities(self, activityTypesMap)
 
         if successful:
-            self.lastHealthGraphUpdate = datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.lastHealthGraphUpdate = datetime.utcnow().replace(tzinfo=pytz.utc)
             self.save()
 
     def syncProfileWithRunkeeper(self):
@@ -185,7 +185,7 @@ class FitnessActivityManager(models.Manager):
                 type = activityTypesMap.get(activity.get('type'), None)
                 dbo, created = FitnessActivity.objects.get_or_create(user=user, type=type, uri=activity.get('uri'))
                 dbo.duration = activity.get('duration')
-                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
+                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.utc)
                 dbo.calories = activity.get('total_calories')
                 dbo.distance = activity.get('total_distance')
                 dbo.save()

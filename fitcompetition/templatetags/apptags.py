@@ -42,7 +42,7 @@ def isToday(date):
     if not date:
         return False
 
-    return date.date() == datetime.today().date()
+    return date.replace(tzinfo=pytz.utc).date() == datetime.today().replace(tzinfo=pytz.utc).date()
 
 
 @register.filter
