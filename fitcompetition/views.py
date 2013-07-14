@@ -53,6 +53,9 @@ def challenge(request, id):
     except Challenger.DoesNotExist:
         competitor = None
 
+    if competitor:
+        request.user.syncRunkeeperData()
+
     return render(request, 'challenge.html', {
         'challenge': challenge,
         'players': leaderboard,
