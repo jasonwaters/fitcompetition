@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import BooleanField
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
-from fitcompetition.settings import TIME_ZONE
+from fitcompetition.settings import TZ
 from fitcompetition.util import ListUtil
 import pytz
 from requests import RequestException
@@ -93,7 +93,7 @@ class FitUser(AbstractUser):
         if self.lastHealthGraphUpdate is None:
             return True
 
-        timeago = datetime.now(tz=pytz.timezone(TIME_ZONE)) + relativedelta(minutes=-20)
+        timeago = datetime.now(tz=TZ) + relativedelta(minutes=-20)
         return self.lastHealthGraphUpdate < timeago
 
 class ActivityType(models.Model):
@@ -128,11 +128,11 @@ class Challenge(models.Model):
 
     @property
     def hasEnded(self):
-        return self.enddate < datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.enddate < datetime.now(tz=TZ)
 
     @property
     def hasStarted(self):
-        return self.startdate <= datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.startdate <= datetime.now(tz=TZ)
 
     def __unicode__(self):
         return self.name
@@ -185,7 +185,7 @@ class FitnessActivityManager(models.Manager):
                 type = activityTypesMap.get(activity.get('type'), None)
                 dbo, created = FitnessActivity.objects.get_or_create(user=user, type=type, uri=activity.get('uri'))
                 dbo.duration = activity.get('duration')
-                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.utc)
+                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=TZ)
                 dbo.calories = activity.get('total_calories')
                 dbo.distance = activity.get('total_distance')
                 dbo.save()

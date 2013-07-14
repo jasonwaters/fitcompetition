@@ -2,8 +2,8 @@ from datetime import datetime
 from math import floor
 import math
 from django.template.defaultfilters import register
-from fitcompetition.settings import TIME_ZONE, STATIC_URL
-import pytz
+from django.utils import timezone
+from fitcompetition.settings import STATIC_URL, TZ
 from django.conf import settings
 
 
@@ -41,8 +41,8 @@ def doubledGoal(meters, goal_miles):
 def isToday(date):
     if not date:
         return False
-
-    return date.replace(tzinfo=pytz.utc).date() == datetime.today().replace(tzinfo=pytz.utc).date()
+    now = timezone.localtime(timezone.now())
+    return date.astimezone(TZ).date() == now.date()
 
 
 @register.filter
@@ -83,7 +83,7 @@ def duration(secs):
 
 @register.filter
 def deltaDate(targetDate, kind):
-    now = datetime.now(tz=pytz.timezone(getattr(settings, "TIME_ZONE", '')))
+    now = datetime.now(tz=TZ)
     diff = targetDate - now
 
     negative = diff.total_seconds() < 0

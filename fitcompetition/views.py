@@ -1,13 +1,11 @@
 from datetime import datetime
 import json
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, ActivityType, Challenger
-from fitcompetition.settings import TIME_ZONE
-from fitcompetition.util import ListUtil
+from fitcompetition.models import Challenge, FitnessActivity, Challenger
+from fitcompetition.settings import TZ
 from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
 
@@ -25,7 +23,7 @@ def home(request):
 
 @login_required
 def challenge(request, id):
-    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    now = datetime.utcnow().replace(tzinfo=pytz.utc)
 
     try:
         challenge = Challenge.objects.get(id=id)
@@ -77,7 +75,7 @@ def join_challenge(request, id):
     try:
         challenger = challenge.challenger_set.get(fituser=request.user)
     except Challenger.DoesNotExist:
-        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        now = datetime.now(tz=TZ)
         challenger = Challenger.objects.create(challenge=challenge,
                                                fituser=request.user,
                                                date_joined=now)
