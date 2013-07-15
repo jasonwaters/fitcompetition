@@ -11,51 +11,47 @@
 
 {% block content %}
     <div class="row-fluid">
-        <ul class="breadcrumb">
-            <li><a href="{% url "home" %}">Challenges</a> <span class="divider">&raquo;</span></li>
-            <li class="active">{{ challenge.name }}</li>
-            <li class="row-icons pull-right">
-{#                <a href="#" class="refresh-healthgraph" title="Reload with the latest from Runkeeper."><i class="icon-refresh"></i></a>#}
-            </li>
-        </ul>
-        <h2>${{ challenge.moneyInThePot|intcomma }} in the pot! <small>{{ numPlayers }} Competitors.</small></h2>
-        <div class="alert alert-info">
-            <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <div class="hero-unit">
+            <h2>{{ challenge.name }}</h2>
             <p>
-                <strong>
-                    {% if competitor %}
-                        {% if not challenge.hasEnded %}
-                            {{ competitor.user.first_name }}, you are competing in this challenge!
-                        {% else %}
-                            {{ competitor.user.first_name }}, you competed in this challenge.
-                        {% endif %}
-                    {% else %}
-                        {% if not challenge.hasEnded %}
-                            It's not too late to join this challenge.  Get in on the fun!
-                        {% else %}
-                            This challenge is history.
-                        {% endif %}
-                    {% endif %}
-                </strong>
+                Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
+                There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitors.
 
+            {% if competitor %}
+                    {% if not challenge.hasEnded %}
+                        {{ competitor.user.first_name }}, you are competing in this challenge!
+                    {% else %}
+                        {{ competitor.user.first_name }}, you competed in this challenge.
+                    {% endif %}
+                {% else %}
+                    {% if not challenge.hasEnded %}
+                        It's not too late to join this challenge.  Get in on the fun! Just click the button below, put ${{ challenge.ante|intcomma }} in the pot, and get moving!
+                    {% else %}
+                        This challenge is history.
+                    {% endif %}
+                {% endif %}
+                </p>
+                <p>
                 {% if not challenge.hasStarted %}
-                    It begins on {{ challenge.startdate|date:"F j, Y" }}.
+                    This Challenge will start in {{ challenge.startdate|timeuntil }}.
                 {% elif challenge.hasEnded %}
-                    It ended on {{ challenge.enddate|date:"F j, Y" }}.
+                    This Challenge ended {{ challenge.enddate|timesince }} ago.
                 {% else%}
                     <div ng-app="leaderboard" ng-controller="countdown-controller">
                         {% verbatim %}
-                            Get moving, there's
-                            <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
-                            <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
-                            <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
-                            <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
+                        This Challenge is under way, there's
+                        <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
+                        <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
+                        <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
+                        <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
                         {% endverbatim %}
                     </div>
                 {% endif %}
             </p>
+            {% if canJoin %}
+                <button class="join-challenge btn btn-large btn-success" type="button">Join this Challenge</button>
+            {% endif %}
         </div>
-
         {% if competitor and not competitor.hasPaid %}
             <div class="alert alert-danger">
                 <img class="pull-right" src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" border="0" alt="PayPal" />
@@ -80,46 +76,54 @@
             </div>
         {% endif %}
 
-        {% if canJoin %}
-            <button class="join-challenge btn btn-large btn-block btn-success" type="button">Join this Challenge</button>
-        {% endif %}
-            <h3><i class="icon-trophy icon-large"></i>Leaderboard</h3>
-            <div class="row-fluid">
-                {% if allPlayers %}
-                    <table class="table table-striped leaderboard">
-                        <thead>
-                            <tr>
-                                <th class="col-small"></th>
-                                <th class="avatar-column"></th>
-                                <th></th>
-                                <th class="miles-column">Miles</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for player in playersWithActivities %}
-                            {% player_row player challenge forloop.counter %}
-                        {% endfor %}
-                        {% for player in playersWithoutActivities %}
-                            {% player_row player challenge forloop.counter playersWithActivities|length %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <ul class="inline">
-                        <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today.</li>
-                        <li><i class="icon-check-sign"></i> &mdash; Achieved the goal.</li>
-                        <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
-                        <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
-                    </ul>
-                {% endif %}
-            </div>
-
-            <h3><i class="icon-legal icon-large"></i>The Rules</h3>
-            <ul>
-                <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-                <li>Complete {{ challenge.distance }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}.</li>
-                <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
-                <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
+                <li><a href="#rules" data-toggle="tab">The Rules</a> </li>
             </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="leaderboard">
+                    {% if allPlayers %}
+                        <table class="table table-striped leaderboard">
+                            <thead>
+                                <tr>
+                                    <th class="rank-column"></th>
+                                    <th class="avatar-column"></th>
+                                    <th></th>
+                                    <th class="miles-column">Miles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for player in playersWithActivities %}
+                                {% player_row player challenge forloop.counter %}
+                            {% endfor %}
+                            {% for player in playersWithoutActivities %}
+                                {% player_row player challenge forloop.counter playersWithActivities|length %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <ul class="inline">
+                            <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today.</li>
+                            <li><i class="icon-check-sign"></i> &mdash; Achieved the goal.</li>
+                            <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
+                            <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
+                        </ul>
+                    {% else %}
+                        <p>
+                            This challenge is now open to join.  You could be the first!
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="tab-pane" id="rules">
+                    <ul>
+                        <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
+                        <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}.</li>
+                        <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
+                        <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
     <script type="text/javascript">
         var COUNTDOWN_TARGET_DATE = '{{ challenge.enddate|fullDate }}';

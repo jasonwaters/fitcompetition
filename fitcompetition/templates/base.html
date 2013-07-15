@@ -31,6 +31,9 @@
                     </button>
                     <a class="brand" href="/">Fit Competition</a>
                     <div class="nav-collapse collapse">
+                        <ul class="nav">
+                            <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
+                        </ul>
                         <ul class="nav pull-right">
                             {% if user.is_authenticated %}
                                 <li><a href="{% url "logout" %}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>

@@ -1,10 +1,41 @@
 body {
-    background: #f0f0f0 url('/static/img/darknoise.png');
+    background: #ffffff;
 }
 
 @media (min-width: 980px) {
     body {
         padding-top: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 24px;
+    }
+
+    .hero-unit {
+        padding: 20px;
+        font-size: 16px;
+
+    }
+    .avatar-column {
+        width: 25px;
+    }
+
+    .avatar {
+        width: 25px;
+        height: 25px;
+    }
+
+    .avatar .icon-check-sign {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+    }
+
+    .img-small {
+        width: 25px;
+        height: auto;
     }
 }
 
@@ -110,6 +141,10 @@ a.activities-link {
 
 .row-icons a, .row-icons a:hover {
     text-decoration: none;
+}
+
+.rank-column {
+    width: 10px;
 }
 
 .avatar-column {
