@@ -183,7 +183,8 @@ class FitnessActivityManager(models.Manager):
             activities = RunkeeperService.getFitnessActivities(user, modifiedSince=user.lastHealthGraphUpdate)
             for activity in activities:
                 type = activityTypesMap.get(activity.get('type'), None)
-                dbo, created = FitnessActivity.objects.get_or_create(user=user, type=type, uri=activity.get('uri'))
+                dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
+                dbo.type = type
                 dbo.duration = activity.get('duration')
                 dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
                 dbo.calories = activity.get('total_calories')
@@ -197,7 +198,7 @@ class FitnessActivityManager(models.Manager):
 
 class FitnessActivity(models.Model):
     user = models.ForeignKey(FitUser)
-    type = models.ForeignKey(ActivityType)
+    type = models.ForeignKey(ActivityType, blank=True, null=True, default=None)
     uri = models.CharField(max_length=255)
     duration = models.FloatField(blank=True, null=True, default=0)
     date = models.DateTimeField(blank=True, null=True, default=None)
