@@ -2,43 +2,6 @@ body {
     background: #ffffff;
 }
 
-@media (min-width: 980px) {
-    body {
-        padding-top: 60px;
-    }
-}
-
-@media (max-width: 480px) {
-    h2 {
-        font-size: 24px;
-    }
-
-    .hero-unit {
-        padding: 20px;
-        font-size: 16px;
-
-    }
-    .avatar-column {
-        width: 25px;
-    }
-
-    .avatar {
-        width: 25px;
-        height: 25px;
-    }
-
-    .avatar .icon-check-sign {
-        position: absolute;
-        right: 4px;
-        bottom: 4px;
-    }
-
-    .img-small {
-        width: 25px;
-        height: auto;
-    }
-}
-
 .middle {
     margin-left: auto;
     margin-right: auto;
@@ -148,16 +111,18 @@ a.activities-link {
 }
 
 .avatar-column {
-    width: 50px;
+    width: 59px;
 }
 
 .avatar {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 50px;
+    width: 75px;
+    height: 75px;
     overflow: hidden;
+    background-color: lightgrey;
 }
+
 
 .avatar .icon-check-sign {
     position: absolute;
@@ -166,11 +131,53 @@ a.activities-link {
 }
 
 .img-small {
-    width: 50px;
+    width: 75px;
     height: auto;
 }
 
 table.leaderboard tr td {
     vertical-align: middle;
     text-align: left;
+}
+
+
+@media (min-width: 980px) {
+    body {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 360px) {
+    table.leaderboard th, table.leaderboard td {
+        padding: 4px 4px 4px 4px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    .hero-unit {
+        padding: 20px;
+        font-size: 16px;
+
+    }
+    .avatar-column {
+        width: 17px;
+    }
+
+    .avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .avatar .icon-check-sign {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+    }
+
+    .img-small {
+        width: 30px;
+        height: auto;
+    }
 }

@@ -1,19 +1,20 @@
 {% load apptags %}
 {% load humanize %}
 
-<tr class="{% if user == player %}success{% endif %}">
+<tr class="{% if user == player %}info{% endif %} {% if player.total_distance|achievedGoal:challenge.distance %}goal-achieved{% endif %}">
     <td>{{ rank }}.</td>
     <td>
         <span class="avatar img-rounded">
             <img src="{{ player.medium_picture|avatar }}" class="img-small">
-            {% if player.total_distance|achievedGoal:challenge.distance %}
-                <i class="icon-check-sign white"></i>
-            {% endif %}
         </span>
     </td>
     <td class="player">
         <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
         <span class="flair">
+            {% if player.total_distance|achievedGoal:challenge.distance %}
+                <i class="icon-trophy"></i>
+            {% endif %}
+
             {% if player.total_distance|overAchiever:challenge.distance %}
                 <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
             {% endif %}

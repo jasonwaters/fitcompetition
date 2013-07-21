@@ -16,8 +16,16 @@
                 </td>
                 <td>
                     <ul class="inline">
-                        <li><span class="badge badge-info">${{ challenge.moneyInThePot|intcomma }}</span></li>
-                        <li><span class="badge badge-info">{{ challenge.numPlayers }} Players</span></li>
+                        <li>
+                            <span class="badge badge-info">
+                                {% if challenge.ante == 0 %}
+                                    FREE
+                                {% else %}
+                                    ${{ challenge.moneyInThePot|intcomma }}
+                                {% endif %}
+                            </span>
+                        </li>
+                        <li><span class="badge badge-info">{{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</span></li>
                     </ul>
                 </td>
             </tr>
