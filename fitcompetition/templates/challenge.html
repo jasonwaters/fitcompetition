@@ -22,7 +22,7 @@
                 Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
                 There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitors.
 
-            {% if competitor %}
+                {% if competitor %}
                     {% if not challenge.hasEnded %}
                         {{ competitor.user.first_name }}, you are competing in this challenge!
                     {% else %}
@@ -35,22 +35,16 @@
                         This challenge is history.
                     {% endif %}
                 {% endif %}
-                </p>
-                <p>
+            </p>
+            <p>
                 {% if not challenge.hasStarted %}
                     This Challenge will start in {{ challenge.startdate|timeuntil }}.
                 {% elif challenge.hasEnded %}
                     This Challenge ended {{ challenge.enddate|timesince }} ago.
                 {% else%}
-                    <div ng-app="leaderboard" ng-controller="countdown-controller">
-                        {% verbatim %}
-                        This Challenge is under way, there's
-                        <ng-pluralize count="data.days" when="{'1': ' 1 Day', 'other': '{} Days'}"></ng-pluralize>,
-                        <ng-pluralize count="data.hours" when="{'1': ' 1 Hour', 'other': '{} Hours'}"></ng-pluralize>,
-                        <ng-pluralize count="data.minutes" when="{'1': ' 1 Minute', 'other': '{} Minutes'}"></ng-pluralize> and
-                        <ng-pluralize count="data.seconds" when="{'1': ' 1 Second', 'other': '{} Seconds'}"></ng-pluralize> left!
-                        {% endverbatim %}
-                    </div>
+                    <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
+                        This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
+                    </span>
                 {% endif %}
             </p>
             {% if canJoin %}
@@ -217,5 +211,4 @@
             }());
         {% endif %}
     </script>
-    <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>
 {% endblock %}
