@@ -66,6 +66,7 @@ def challenge(request, id):
             playersWithoutActivities.append(player)
 
     return render(request, 'challenge.html', {
+        'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
         'allPlayers': allPlayers,
         'playersWithActivities': playersWithActivities,
