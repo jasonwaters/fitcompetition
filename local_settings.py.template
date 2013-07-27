@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
@@ -13,6 +13,8 @@ DATABASES = {
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+PIPELINE_YUGLIFY_BINARY = "/usr/local/bin/yuglify"
 
 RUNKEEPER_CLIENT_ID = ''
 RUNKEEPER_CLIENT_SECRET = ''

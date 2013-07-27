@@ -2,7 +2,7 @@
 import manage
 import os
 
-DEBUG = True
+DEBUG = False
 
 ADMINS = (
     ('Jason Waters', 'jason@myheck.net'),
@@ -71,6 +71,8 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
@@ -86,6 +88,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -115,7 +119,35 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'social_auth',
     'south',
+    'pipeline',
 )
+
+PIPELINE_DISABLE_WRAPPER=True
+
+PIPELINE_CSS = {
+    'all-css': {
+        'source_filenames': (
+            'css/bootstrap.css',
+            'css/bootstrap-responsive.css',
+            'css/font-awesome.css',
+            'css/style.css',
+        ),
+        'output_filename': 'css/all.css',
+    },
+}
+
+PIPELINE_JS = {
+    'all-js': {
+        'source_filenames': (
+            'js/jquery.js',
+            'js/bootstrap.js',
+            'js/moment.js',
+            'js/lodash.js',
+            'js/countdown.js',
+        ),
+        'output_filename': 'js/all.js',
+    }
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
