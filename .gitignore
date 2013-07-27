@@ -19,3 +19,5 @@ Thumbs.db
 .idea/workspace.xml
 
 local_settings.py
+
+node_modules/*
