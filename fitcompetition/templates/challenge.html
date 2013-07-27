@@ -8,11 +8,8 @@
 
 {% block head_scripts %}
     {{ block.super }}
-    <script type="text/javascript">
-        var disqus_shortname = 'fitcompetition'; // required: replace example with your forum shortname
-        var disqus_identifier = '{{ disqus_identifier }}';
-    </script>
 {% endblock %}
+
 {% block head_css %}
     {{ block.super }}
 {% endblock %}
@@ -98,7 +95,9 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="leaderboard">
-                    <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+                    {% if "DISQUS_SHORTNAME"|fromSettings %}
+                        <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+                    {% endif %}
                     {% if allPlayers %}
                         <table class="table table-striped leaderboard">
                             <thead>
@@ -131,16 +130,13 @@
                     {% endif %}
                 </div>
                 <div class="tab-pane" id="disqus">
-                    <div id="disqus_thread"></div>
-                    <script type="text/javascript">
-                        (function() {
-                            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                        })();
-                    </script>
-                    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    {% if "DISQUS_SHORTNAME"|fromSettings %}
+                        <div id="disqus_thread"></div>
+                        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    {% else %}
+                        DISQUS not available.
+                    {% endif %}
                 </div>
                 <div class="tab-pane" id="rules">
                     <ul>
@@ -203,12 +199,23 @@
             $('#challenge_tabs a[href="#disqus"]').tab('show');
         });
 
-        (function () {
-            var s = document.createElement('script'); s.async = true;
-            s.type = 'text/javascript';
-            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-        }());
+        {% if "DISQUS_SHORTNAME"|fromSettings %}
+            //disqus instantiation javascript.
+            var disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}'; // required: replace example with your forum shortname
+            var disqus_identifier = '{{ disqus_identifier }}';
+
+            (function () {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+
+
+                var s = document.createElement('script'); s.async = true;
+                s.type = 'text/javascript';
+                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+            }());
+        {% endif %}
     </script>
     <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>
 {% endblock %}

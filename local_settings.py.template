@@ -17,6 +17,9 @@ DATABASES = {
 RUNKEEPER_CLIENT_ID = ''
 RUNKEEPER_CLIENT_SECRET = ''
 
+#The unique identifier for your website as registered on Disqus. If undefined, the Disqus embed will not load.
+DISQUS_SHORTNAME = ""
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
