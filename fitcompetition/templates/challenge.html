@@ -5,6 +5,14 @@
 
 {% block head_title %}{{ challenge.name }} | Fit Competition{% endblock %}
 
+
+{% block head_scripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        var disqus_shortname = 'fitcompetition'; // required: replace example with your forum shortname
+        var disqus_identifier = '{{ disqus_identifier }}';
+    </script>
+{% endblock %}
 {% block head_css %}
     {{ block.super }}
 {% endblock %}
@@ -75,9 +83,8 @@
 
             </div>
         {% endif %}
-
         <div class="tabbable">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" id="challenge_tabs">
                 <li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -91,6 +98,7 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="leaderboard">
+                    <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
                     {% if allPlayers %}
                         <table class="table table-striped leaderboard">
                             <thead>
@@ -125,11 +133,6 @@
                 <div class="tab-pane" id="disqus">
                     <div id="disqus_thread"></div>
                     <script type="text/javascript">
-                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-                        var disqus_shortname = 'fitcompetition'; // required: replace example with your forum shortname
-                        var disqus_identifier = '{{ disqus_identifier }}';
-
-                        /* * * DON'T EDIT BELOW THIS LINE * * */
                         (function() {
                             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
@@ -190,10 +193,22 @@
             });
         });
 
-        $('.dropdown-menu li a').click(function() {
+        $('#challenge_tabs .dropdown-menu li a').on('shown', function(evt) {
            var text = $(this).text();
             $(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
         });
+
+        $('a#disqus_count').click(function(evt) {
+           evt.preventDefault();
+            $('#challenge_tabs a[href="#disqus"]').tab('show');
+        });
+
+        (function () {
+            var s = document.createElement('script'); s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
     </script>
     <script src="{% static "js/leaderboard.js"%}" type="text/javascript"></script>
 {% endblock %}
