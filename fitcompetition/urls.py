@@ -10,6 +10,7 @@ urlpatterns = patterns('',
                        url(r'^$', 'fitcompetition.views.home', name='home'),
                        url(r'^c/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details"),
                        url(r'^c/join/(?P<id>\d+)/$', 'fitcompetition.views.join_challenge', name="join_challenge"),
+                       url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.views.withdraw_challenge', name="withdraw_challenge"),
                        url(r'^c/refresh-user-activities/$', 'fitcompetition.views.refresh_user_activities', name="refresh_user_activities"),
 
                        url(r'^login/$', 'fitcompetition.views.login', name="login"),

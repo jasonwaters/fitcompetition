@@ -14,7 +14,8 @@ DATABASES = {
     }
 }
 
-PIPELINE_YUGLIFY_BINARY = "/usr/local/bin/yuglify"
+#this is used in the instructions for putting money in the pot.
+PAYPAL_ACCOUNT_EMAIL = ''
 
 RUNKEEPER_CLIENT_ID = ''
 RUNKEEPER_CLIENT_SECRET = ''

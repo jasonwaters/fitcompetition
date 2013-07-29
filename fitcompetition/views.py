@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, Challenger
+from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
@@ -31,8 +31,13 @@ def challenge(request, id):
     except Challenge.DoesNotExist:
         challenge = None
 
-    allPlayers = challenge.players.all().order_by('fullname')
-    canJoin = not challenge.hasEnded and request.user not in allPlayers
+    try:
+        competitor = challenge.challenger_set.get(fituser=request.user)
+    except Challenger.DoesNotExist:
+        competitor = None
+
+    allPlayers = challenge.challengers
+    canJoin = not challenge.hasEnded and not competitor
 
     approvedTypes = challenge.approvedActivities.all()
 
@@ -50,11 +55,6 @@ def challenge(request, id):
 
         playersWithActivities = allPlayers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
         playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
-
-    try:
-        competitor = challenge.challenger_set.get(fituser=request.user)
-    except Challenger.DoesNotExist:
-        competitor = None
 
     if competitor and challenge.startdate <= now <= challenge.enddate:
         request.user.syncRunkeeperData()
@@ -86,14 +86,31 @@ def join_challenge(request, id):
         challenge = None
 
     try:
-        challenger = challenge.challenger_set.get(fituser=request.user)
+        challenge.challenger_set.get(fituser=request.user)
     except Challenger.DoesNotExist:
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        challenger = Challenger.objects.create(challenge=challenge,
+        Challenger.objects.create(challenge=challenge,
                                                fituser=request.user,
                                                date_joined=now)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+@login_required
+def withdraw_challenge(request, id):
+    try:
+        challenge = Challenge.objects.get(id=id)
+    except Challenge.DoesNotExist:
+        challenge = None
+
+    try:
+        challenger = Challenger.objects.get(challenge=challenge, fituser=request.user)
+        if not challenge.hasEnded:
+            challenger.delete()
+        success = True
+    except Challenger.DoesNotExist:
+        success = False
+
+    return HttpResponse(json.dumps({'success': success}), content_type="application/json")
 
 
 @login_required

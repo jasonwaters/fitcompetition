@@ -114,13 +114,21 @@ class Challenge(models.Model):
 
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
     players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
+
+    @property
+    def challengers(self):
+        if self.ante > 0:
+            return FitUser.objects.filter(challenge=self, challenger__hasPaid=True).order_by('fullname')
+        else:
+            return FitUser.objects.filter(challenge=self).order_by('fullname')
+
     @property
     def moneyInThePot(self):
-        return self.ante * self.players.count()
+        return self.ante * self.numPlayers
 
     @property
     def numPlayers(self):
-        return self.players.count()
+        return self.challengers.count()
 
     @property
     def numDays(self):
