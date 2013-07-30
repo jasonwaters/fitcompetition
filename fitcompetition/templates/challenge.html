@@ -15,144 +15,143 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row-fluid">
-        <div class="hero-unit">
-            <h2>{{ challenge.name }}</h2>
-            <p>
-                Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-                There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitors.
+    <div class="jumbotron">
+        <h2>{{ challenge.name }}</h2>
+        <p>
+            Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
+            There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitors.
 
-                {% if competitor %}
-                    {% if not challenge.hasEnded %}
-                        {{ competitor.user.first_name }}, you are competing in this challenge!
-                    {% else %}
-                        {{ competitor.user.first_name }}, you competed in this challenge.
-                    {% endif %}
+            {% if competitor %}
+                {% if not challenge.hasEnded %}
+                    {{ competitor.user.first_name }}, you are competing in this challenge!
                 {% else %}
-                    {% if not challenge.hasEnded %}
-                        It's not too late to join this challenge.  Get in on the fun! Just click the button below, put ${{ challenge.ante|intcomma }} in the pot, and get moving!
-                    {% else %}
-                        This challenge is history.
-                    {% endif %}
+                    {{ competitor.user.first_name }}, you competed in this challenge.
                 {% endif %}
+            {% else %}
+                {% if not challenge.hasEnded %}
+                    It's not too late to join this challenge.  Get in on the fun! Just click the button below, put ${{ challenge.ante|intcomma }} in the pot, and get moving!
+                {% else %}
+                    This challenge is history.
+                {% endif %}
+            {% endif %}
+        </p>
+        <p>
+            {% if not challenge.hasStarted %}
+                This Challenge will start in {{ challenge.startdate|timeuntil }}.
+            {% elif challenge.hasEnded %}
+                This Challenge ended {{ challenge.enddate|timesince }} ago.
+            {% else%}
+                <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
+                    This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
+                </span>
+            {% endif %}
+        </p>
+        {% if canJoin %}
+            <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+        {% endif %}
+    </div>
+    {% if challenge.ante > 0 and competitor and not competitor.hasPaid %}
+        <div class="alert alert-block alert-error">
+        <h3>It's Time to Ante Up!</h3>
+            <img class="img-thumbnail pull-right" src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" border="0" alt="PayPal" />
+            <p class="lead">
+                <strong>{{ competitor.user.first_name }}</strong>, you're almost ready to compete!  All you have to do now is put some cash in the pot. You can take care of that right now&hellip;
             </p>
             <p>
-                {% if not challenge.hasStarted %}
-                    This Challenge will start in {{ challenge.startdate|timeuntil }}.
-                {% elif challenge.hasEnded %}
-                    This Challenge ended {{ challenge.enddate|timesince }} ago.
-                {% else%}
-                    <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
-                        This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
-                    </span>
-                {% endif %}
-            </p>
-            {% if canJoin %}
-                <button class="join-challenge vertical-padding btn btn-large btn-success" type="button">Join this Challenge</button>
-            {% endif %}
-        </div>
-        {% if challenge.ante > 0 and competitor and not competitor.hasPaid %}
-            <div class="alert alert-block">
-                <img class="img-polaroid pull-right" src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" border="0" alt="PayPal" />
-                <p class="lead">
-                    <strong>{{ competitor.user.first_name }}</strong>, you're almost ready to compete!  All you have to do now is put some cash in the pot. You can take care of that right now&hellip;
-                </p>
-                <p>
-                    <ol>
-                        <li>Log in to your PayPal account.</li>
-                        <li>Click <strong>Send Money</strong> at the top of the page.</li>
-                        <li>Fill out the form.
-                            <ul>
-                                <li>Enter <strong>{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}</strong> in the TO field.</li>
-                                <li>Specify <strong>${{ challenge.ante|intcomma }}</strong> in the AMOUNT field.</li>
-                                <li>Select <strong>I'm sending money to family or friends</strong>.</li>
-                            </ul>
-                        </li>
-                        <li>Continue with the transaction.</li>
-                    </ol>
-                </p>
-                <div class="btn-group vertical-padding">
-                    <button class="btn btn-large btn-primary settle-up">Settle up with PayPal</button>
-                    <button class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="mailto:{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}">Settle up, without PayPal.</a></li>
-                        <li><a href="#" class="withdraw-challenge">On second thought, I'd rather just withdraw from this challenge.</a></li>
-                    </ul>
-                </div>
-                <p>
-                    Once your payment is received this message will disappear.  Winnings at the end of the challenge will also be paid to you via PayPal.</small>
-                </p>
-            </div>
-        {% endif %}
-
-        <div class="tabbable">
-            <ul class="nav nav-tabs" id="challenge_tabs">
-                <li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        More <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#disqus" data-toggle="tab">Smack talk</a></li>
-                        <li><a href="#rules" data-toggle="tab">The Rules</a> </li>
-                    </ul>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="leaderboard">
-                    {% if "DISQUS_SHORTNAME"|fromSettings %}
-                        <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
-                    {% endif %}
-                    {% if allPlayers %}
-                        <table class="table table-striped leaderboard">
-                            <thead>
-                                <tr>
-                                    <th class="rank-column"></th>
-                                    <th class="avatar-column"></th>
-                                    <th></th>
-                                    <th class="miles-column">Miles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for player in playersWithActivities %}
-                                {% player_row user player challenge forloop.counter %}
-                            {% endfor %}
-                            {% for player in playersWithoutActivities %}
-                                {% player_row user player challenge forloop.counter playersWithActivities|length %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <ul class="inline">
-                            <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today.</li>
-                            <li><i class="icon-trophy"></i> &mdash; Achieved the goal.</li>
-                            <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
-                            <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
+                <ol>
+                    <li>Log in to your PayPal account.</li>
+                    <li>Click <strong>Send Money</strong> at the top of the page.</li>
+                    <li>Fill out the form.
+                        <ul>
+                            <li>Enter <strong>{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}</strong> in the TO field.</li>
+                            <li>Specify <strong>${{ challenge.ante|intcomma }}</strong> in the AMOUNT field.</li>
+                            <li>Select <strong>I'm sending money to family or friends</strong>.</li>
                         </ul>
-                    {% else %}
-                        <p>
-                            This challenge is now open to join.  You could be the first!
-                        </p>
-                    {% endif %}
-                </div>
-                <div class="tab-pane" id="disqus">
-                    {% if "DISQUS_SHORTNAME"|fromSettings %}
-                        <div id="disqus_thread"></div>
-                        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-                    {% else %}
-                        DISQUS not available.
-                    {% endif %}
-                </div>
-                <div class="tab-pane" id="rules">
-                    <ul>
-                        <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-                        <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}.</li>
-                        <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
-                        <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+                    </li>
+                    <li>Continue with the transaction.</li>
+                </ol>
+            </p>
+            <div class="btn-group vertical-padding">
+                <button class="btn btn-large btn-primary settle-up">Settle up with PayPal</button>
+                <button class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="mailto:{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}">Settle up, without PayPal.</a></li>
+                    <li><a href="#" class="withdraw-challenge">On second thought, I'd rather just withdraw from this challenge.</a></li>
+                </ul>
+            </div>
+            <p>
+                Once your payment is received this message will disappear.  Winnings at the end of the challenge will also be paid to you via PayPal.</small>
+            </p>
+        </div>
+    {% endif %}
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs" id="challenge_tabs">
+            <li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    More <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#disqus" data-toggle="tab">Smack talk</a></li>
+                    <li><a href="#rules" data-toggle="tab">The Rules</a> </li>
+                </ul>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="leaderboard">
+                {% if "DISQUS_SHORTNAME"|fromSettings %}
+                    <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+                {% endif %}
+                {% if allPlayers %}
+                    <table class="table table-striped leaderboard">
+                        <thead>
+                            <tr>
+                                <th class="rank-column"></th>
+                                <th class="avatar-column"></th>
+                                <th></th>
+                                <th class="miles-column">Miles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for player in playersWithActivities %}
+                            {% player_row user player challenge forloop.counter %}
+                        {% endfor %}
+                        {% for player in playersWithoutActivities %}
+                            {% player_row user player challenge forloop.counter playersWithActivities|length %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <ul class="list-inline">
+                        <li><i class="icon-heart red" title="Active today"></i> &mdash; Active today.</li>
+                        <li><i class="icon-trophy"></i> &mdash; Achieved the goal.</li>
+                        <li><i class="icon-star silver"></i> &mdash; Achieved 1.5 times the goal.</li>
+                        <li><i class="icon-star golden"></i> &mdash; Doubled the goal distance.</li>
                     </ul>
-                </div>
+                {% else %}
+                    <p>
+                        This challenge is now open to join.  You could be the first!
+                    </p>
+                {% endif %}
+            </div>
+            <div class="tab-pane" id="disqus">
+                {% if "DISQUS_SHORTNAME"|fromSettings %}
+                    <div id="disqus_thread"></div>
+                    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                {% else %}
+                    DISQUS not available.
+                {% endif %}
+            </div>
+            <div class="tab-pane" id="rules">
+                <ul>
+                    <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
+                    <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}.</li>
+                    <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
+                    <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -209,13 +208,13 @@
             });
         });
 
-        $('#challenge_tabs .dropdown-menu li a').on('shown', function(evt) {
-           var text = $(this).text();
+        $('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
+            var text = $(this).text();
             $(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
         });
 
         $('a#disqus_count').click(function(evt) {
-           evt.preventDefault();
+            evt.preventDefault();
             $('#challenge_tabs a[href="#disqus"]').tab('show');
         });
 

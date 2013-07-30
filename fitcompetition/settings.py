@@ -128,7 +128,6 @@ PIPELINE_CSS = {
     'all-css': {
         'source_filenames': (
             'css/bootstrap.css',
-            'css/bootstrap-responsive.css',
             'css/font-awesome.css',
             'css/style.css',
         ),

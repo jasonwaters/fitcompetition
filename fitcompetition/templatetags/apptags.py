@@ -145,8 +145,8 @@ def commaSeparated(list, word="or"):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
-def challenges_table(context, user, challenges):
-    return {'user': user, 'challenges': challenges}
+def challenges_table(context, user, challenges, title):
+    return {'user': user, 'challenges': challenges, 'title': title}
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)
 def player_row(context, user, player, challenge, rank, offset=0):

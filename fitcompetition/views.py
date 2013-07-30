@@ -13,12 +13,22 @@ import pytz
 
 @login_required
 def home(request):
-    myChallenges = Challenge.objects.filter(players__id=request.user.id).order_by('-enddate')
-    otherChallenges = Challenge.objects.exclude(players__id=request.user.id).order_by('-enddate')
+    allMyChallenges = Challenge.objects.filter(players__id=request.user.id).order_by('-enddate')
+    otherChallenges = Challenge.objects.openChallenges(request.user.id).order_by('-enddate')
+
+    myChallenges = []
+    completedChallenges = []
+
+    for challenge in allMyChallenges:
+        if challenge.hasEnded:
+            completedChallenges.append(challenge)
+        else:
+            myChallenges.append(challenge)
 
     return render(request, 'home.html', {
         'myChallenges': myChallenges,
-        'otherChallenges': otherChallenges
+        'otherChallenges': otherChallenges,
+        'completedChallenges': completedChallenges
     })
 
 

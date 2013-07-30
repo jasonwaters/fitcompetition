@@ -9,6 +9,7 @@ from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
+from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
 from requests import RequestException
 from dateutil import parser
@@ -103,6 +104,12 @@ class ActivityType(models.Model):
         return self.name
 
 
+class ChallengeManager(models.Manager):
+    def openChallenges(self, userid):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.exclude(players__id=userid).filter(enddate__gt=now)
+
+
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField(blank=True)
@@ -114,6 +121,12 @@ class Challenge(models.Model):
 
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
     players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
+
+    objects = ChallengeManager()
+
+    @property
+    def approvedActivityNames(self):
+        return createListFromProperty(self.approvedActivities.all(), 'name')
 
     @property
     def challengers(self):

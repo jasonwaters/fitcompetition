@@ -1,7 +1,10 @@
-body {
-    background: #ffffff;
+.main-container {
+    padding: 0 10px;
 }
 
+.nav-tabs {
+    margin-bottom: 15px;
+}
 .middle {
     margin-left: auto;
     margin-right: auto;
@@ -9,12 +12,7 @@ body {
 
 .runkeeper-login-button {}
 
-.countdown-value {
-    font-weight: bold;
-}
-
 h3 i.icon-large {
-    /*line-height: 28px;*/
     margin-right: 15px;
 }
 
@@ -60,7 +58,7 @@ a.activities-link {
 }
 
 .activity-icon {
-    width: 4px;
+    width: 18px;
 }
 
 .activity-icon.running {
@@ -141,26 +139,16 @@ table.leaderboard tr td {
 }
 
 
-@media (min-width: 980px) {
-    body {
-        padding-top: 60px;
-    }
-}
-
 @media (max-width: 360px) {
     table.leaderboard th, table.leaderboard td {
         padding: 4px 4px 4px 4px;
     }
 
-    h2 {
-        font-size: 24px;
+    .jumbotron {
+        padding: 15px;
+        font-size: 14px;
     }
 
-    .hero-unit {
-        padding: 20px;
-        font-size: 16px;
-
-    }
     .avatar-column {
         width: 17px;
     }

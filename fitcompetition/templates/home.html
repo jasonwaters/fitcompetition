@@ -6,20 +6,11 @@
 {% block head_title %}Fit Competition{% endblock %}
 
 {% block content %}
-    <div class="row-fluid">
-        <div class="hero-unit">
-            <h2>Hey {{ user.first_name }}!!</h2>
-            <p>Put your game face on and select a challenge below.</p>
-        </div>
-
-        {% if myChallenges %}
-            <h5>My Challenges</h5>
-            {% challenges_table user myChallenges %}
-        {% endif %}
-
-        {% if otherChallenges %}
-            <h5>{% if not myChallenges %}Join a Challenge!{% else %}Other Challenges{% endif %}</h5>
-            {% challenges_table user otherChallenges %}
-        {% endif %}
+    <div class="jumbotron">
+        <h2>Hey {{ user.first_name }}!!</h2>
+        <p class="lead">Put your game face on and select a challenge below.</p>
     </div>
+    {% challenges_table user myChallenges "My Challenges" %}
+    {% challenges_table user otherChallenges "Open Challenges" %}
+    {% challenges_table user completedChallenges "Completed Challenges" %}
 {% endblock %}

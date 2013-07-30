@@ -1,39 +1,23 @@
 {% load apptags %}
 {% load humanize %}
-
-<table class="table table-striped">
-    <tbody>
-    {% if challenges|length > 0 %}
-        {% for challenge in challenges %}
-            <tr class="{% if challenge.hasEnded %}dimmed-row{% endif %}">
-                <td>
-                    <a href="{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>
-                    {% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %}
-                    <ul class="inline">
-                        <li>Start: {{ challenge.startdate|date:"M j, Y" }}</li>
-                        <li>Finish: {{ challenge.enddate|date:"M j, Y" }}</li>
-                    </ul>
-                </td>
-                <td>
-                    <ul class="inline">
-                        <li>
-                            <span class="badge badge-info">
-                                {% if challenge.ante == 0 %}
-                                    FREE
-                                {% else %}
-                                    ${{ challenge.moneyInThePot|intcomma }}
-                                {% endif %}
-                            </span>
-                        </li>
-                        <li><span class="badge badge-info">{{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</span></li>
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td colspan="4">Looks like there aren't any challenges yet...</td>
-        </tr>
-    {% endif %}
-    </tbody>
-</table>
+{% if challenges and challenges|length > 0 %}
+    <div class="row">
+        <h3>{{ title }}</h3>
+        <div class="list-group">
+            {% for challenge in challenges %}
+                <a href="{% url "challenge_details" challenge.id %}" class="list-group-item">
+                    <h4 class="list-group-item-heading">{% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %} {{ challenge.name }}</h4>
+                    <p class="list-group-item-text">
+                        Complete {{ challenge.distance|floatformat:"-1" }} miles by {{ challenge.approvedActivityNames|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS" }} and {{ challenge.enddate|date:"M jS Y" }}.
+                        {% if challenge.ante == 0 %}
+                            FREE to join;
+                        {% else %}
+                            ${{ challenge.ante|intcomma }} to join, ${{ challenge.moneyInThePot|intcomma }} in the pot;
+                        {% endif %}
+                        {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.
+                    </p>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

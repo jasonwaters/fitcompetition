@@ -15,32 +15,30 @@
         {% block head_scripts %}{% endblock %}
     </head>
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container-fluid">
-                    <button type="button" class="btn btn-navbar collapsed" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="brand" href="/">Fit Competition</a>
-                    <div class="nav-collapse collapse">
-                        <ul class="nav">
-                            <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
-                        </ul>
-                        <ul class="nav pull-right">
-                            {% if user.is_authenticated %}
-                                <li><a href="{% url "logout" %}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>
-                            {% else %}
-                                <li><a href="{% url 'login' %}" title="Sign in with Runkeeper">Sign In</a></li>
-                            {% endif %}
-                        </ul>
-                    </div><!--/.nav-collapse -->
+        <div class="navbar navbar-inverse">
+            <div class="container">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Fit Competition</a>
+                <div class="nav-collapse collapse navbar-responsive-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav pull-right">
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url "logout" %}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}" title="Sign in with Runkeeper">Sign In</a></li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="container-fluid">
+        <div class="container main-container">
             {% block content %}
             {% endblock %}
         </div>
