@@ -1,23 +1,21 @@
 {% load apptags %}
 {% load humanize %}
 {% if challenges and challenges|length > 0 %}
-    <div class="row">
-        <h3>{{ title }}</h3>
-        <div class="list-group">
-            {% for challenge in challenges %}
-                <a href="{% url "challenge_details" challenge.id %}" class="list-group-item">
-                    <h4 class="list-group-item-heading">{% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %} {{ challenge.name }}</h4>
-                    <p class="list-group-item-text">
-                        Complete {{ challenge.distance|floatformat:"-1" }} miles by {{ challenge.approvedActivityNames|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS" }} and {{ challenge.enddate|date:"M jS Y" }}.
-                        {% if challenge.ante == 0 %}
-                            FREE to join;
-                        {% else %}
-                            ${{ challenge.ante|intcomma }} to join, ${{ challenge.moneyInThePot|intcomma }} in the pot;
-                        {% endif %}
-                        {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.
-                    </p>
-                </a>
-            {% endfor %}
-        </div>
+    <h3>{{ title }}</h3>
+    <div class="list-group">
+        {% for challenge in challenges %}
+            <a href="{% url "challenge_details" challenge.id %}" class="list-group-item">
+                <h4 class="list-group-item-heading">{% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %} {{ challenge.name }}</h4>
+                <p class="list-group-item-text">
+                    Complete {{ challenge.distance|floatformat:"-1" }} miles by {{ challenge.approvedActivityNames|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS" }} and {{ challenge.enddate|date:"M jS Y" }}.
+                    {% if challenge.ante == 0 %}
+                        FREE to join;
+                    {% else %}
+                        ${{ challenge.ante|intcomma }} to join, ${{ challenge.moneyInThePot|intcomma }} in the pot;
+                    {% endif %}
+                    {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.
+                </p>
+            </a>
+        {% endfor %}
     </div>
 {% endif %}
