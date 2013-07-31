@@ -10,7 +10,7 @@
         <h2>Hey {{ user.first_name }}!!</h2>
         <p class="lead">Put your game face on and select a challenge below.</p>
     </div>
-    {% challenges_table user myChallenges "My Challenges" %}
-    {% challenges_table user otherChallenges "Open Challenges" %}
-    {% challenges_table user completedChallenges "Completed Challenges" %}
+    {% challenges_table user myChallenges "My Challenges" "icon-home" %}
+    {% challenges_table user otherChallenges "Open Challenges" "icon-shopping-cart" %}
+    {% challenges_table user completedChallenges "Completed Challenges" "icon-flag-checkered" %}
 {% endblock %}

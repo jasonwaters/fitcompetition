@@ -1,3 +1,18 @@
+body {
+    padding-top: 60px;
+}
+
+.fc-header {
+    text-align: left;
+    font-size: 21px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+.fc-header p {
+    font-weight: 200;
+}
+
 .main-container {
     padding: 0 10px;
 }
@@ -22,6 +37,10 @@ a.activities-link {
 
 .invisible {
     visibility: hidden;
+}
+
+.black {
+    color: black;
 }
 
 .white {
@@ -142,6 +161,17 @@ table.leaderboard tr td {
 @media (max-width: 360px) {
     table.leaderboard th, table.leaderboard td {
         padding: 4px 4px 4px 4px;
+    }
+
+    .fc-header {
+        text-align: left;
+        font-size: 15px;
+        line-height: 1.4;
+        margin-bottom: 15px;
+    }
+
+    .fc-header p {
+        font-weight: 200;
     }
 
     .jumbotron {

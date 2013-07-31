@@ -1,11 +1,14 @@
 {% load apptags %}
 {% load humanize %}
 {% if challenges and challenges|length > 0 %}
-    <h3>{{ title }}</h3>
+    <h3>
+        {% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
+        {{ title }}
+    </h3>
     <div class="list-group">
         {% for challenge in challenges %}
             <a href="{% url "challenge_details" challenge.id %}" class="list-group-item">
-                <h4 class="list-group-item-heading">{% if challenge.hasEnded %}<i class="icon-ok"></i>{% endif %} {{ challenge.name }}</h4>
+                <h4 class="list-group-item-heading">{{ challenge.name }}</h4>
                 <p class="list-group-item-text">
                     Complete {{ challenge.distance|floatformat:"-1" }} miles by {{ challenge.approvedActivityNames|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS" }} and {{ challenge.enddate|date:"M jS Y" }}.
                     {% if challenge.ante == 0 %}
