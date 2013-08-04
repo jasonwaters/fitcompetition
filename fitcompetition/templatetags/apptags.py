@@ -37,6 +37,12 @@ def doubledGoal(meters, goal_miles):
         return False
     return toMiles(meters) > goal_miles * 2
 
+@register.filter
+def tripledGoal(meters, goal_miles):
+    if not meters:
+        return False
+    return toMiles(meters) > goal_miles * 3
+
 
 @register.filter
 def isToday(date):
@@ -143,6 +149,12 @@ def commaSeparated(list, word="or"):
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
 
+@register.filter
+def times(number):
+    if number is None:
+        return range(0)
+
+    return range(number)
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
 def challenges_table(context, user, challenges, title, iconClass=None):

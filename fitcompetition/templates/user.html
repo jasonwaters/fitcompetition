@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block head_title %}{{ user.fullname }} | Fit Competition{% endblock %}
+
+{% block head_scripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block head_css %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="user-photo">
+            <img src="{{ user.normal_picture }}" class="thumbnail" />
+        </div>
+        <h4 class="user-name">{{ user.fullname }}</h4>
+        <div>
+            <a href="{{ user.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
+        </div>
+    </div>
+
+    <h2>Recent Activities</h2>
+    <table class="table table-striped">
+        <thead>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Miles</th>
+            <th>Duration</th>
+        </thead>
+        <tbody>
+            {% for activity in recentActivities %}
+                <tr>
+                    <td>{{ activity.date|naturalday:"F j, Y" }}</td>
+                    <td>{{ activity.type.name }}</td>
+                    <td>{{ activity.distance|toMiles|twoDecimals }}</td>
+                    <td>{{ activity.duration|duration }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Challenges</h2>
+    {% challenges_table user activeChallenges "Active Challenges" "icon-heart" %}
+    {% challenges_table user completedChallenges "Completed Challenges" "icon-flag-checkered" %}
+{% endblock %}

@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
@@ -13,24 +14,34 @@ import pytz
 
 @login_required
 def home(request):
-    allMyChallenges = Challenge.objects.filter(players__id=request.user.id).order_by('-enddate')
+    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
     otherChallenges = Challenge.objects.openChallenges(request.user.id).order_by('-enddate')
 
-    myChallenges = []
-    completedChallenges = []
-
-    for challenge in allMyChallenges:
-        if challenge.hasEnded:
-            completedChallenges.append(challenge)
-        else:
-            myChallenges.append(challenge)
-
     return render(request, 'home.html', {
-        'myChallenges': myChallenges,
+        'myChallenges': activeUserChallenges,
         'otherChallenges': otherChallenges,
-        'completedChallenges': completedChallenges
+        'completedChallenges': completedUserChallenges
     })
 
+@login_required
+def user(request, id):
+    try:
+        user = FitUser.objects.get(id=id)
+    except FitUser.DoesNotExist:
+        user = None
+
+    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(id)
+
+    thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
+
+    recentActivities = FitnessActivity.objects.filter(date__gte=thirtyDaysAgo,user=user).order_by('-date')
+
+    return render(request, 'user.html', {
+        'user': user,
+        'activeChallenges': activeUserChallenges,
+        'completedChallenges': completedUserChallenges,
+        'recentActivities': recentActivities
+    })
 
 @login_required
 def challenge(request, id):

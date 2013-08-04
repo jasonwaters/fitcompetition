@@ -9,14 +9,14 @@
         </span>
     </td>
     <td class="player">
-        <span class="name"><a href="{{ player.profile_url }}" target="_blank">{{ player.fullname }}</a></span>
+        <span class="name"><a href="{% url "user_details" player.id %}">{{ player.fullname }}</a></span>
         <span class="flair">
             {% if player.total_distance|achievedGoal:challenge.distance %}
                 <i class="icon-trophy"></i>
             {% endif %}
 
             {% if player.total_distance|overAchiever:challenge.distance %}
-                <i class="icon-star {% if player.total_distance|doubledGoal:challenge.distance %}golden{% else %}silver{% endif %}"></i>
+                <i class="icon-star {% if player.total_distance|tripledGoal:challenge.distance %}gold{% elif player.total_distance|doubledGoal:challenge.distance %}silver{% else %}bronze{% endif %}"></i>
             {% endif %}
 
             {% if player.latest_activity_date|isToday %}

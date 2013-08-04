@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'social_auth',
     'south',
     'pipeline',
+    # 'brabeion',
 )
 
 PIPELINE_DISABLE_WRAPPER=True

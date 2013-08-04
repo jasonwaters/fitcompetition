@@ -15,7 +15,7 @@
         {% block head_scripts %}{% endblock %}
     </head>
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar navbar-inverse navbar-static-top">
             <div class="container">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
                     <span class="icon-bar"></span>
@@ -25,7 +25,10 @@
                 <a class="navbar-brand" href="/">Fit Competition</a>
                 <div class="nav-collapse collapse navbar-responsive-collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
+                            <li><a href="{% url "user_details" user.id %}">My Profile</a></li>
+                        {% endif %}
                     </ul>
                     <ul class="nav navbar-nav pull-right">
                         {% if user.is_authenticated %}

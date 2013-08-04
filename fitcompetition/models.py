@@ -109,6 +109,20 @@ class ChallengeManager(models.Manager):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         return self.exclude(players__id=userid).filter(enddate__gt=now)
 
+    def userChallenges(self, userid):
+        activeUserChallenges = []
+        completedUserChallenges = []
+
+        allUserChallenges = Challenge.objects.filter(players__id=userid).order_by('-enddate')
+
+        for challenge in allUserChallenges:
+            if challenge.hasEnded:
+                completedUserChallenges.append(challenge)
+            else:
+                activeUserChallenges.append(challenge)
+
+        return allUserChallenges, activeUserChallenges, completedUserChallenges
+
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
