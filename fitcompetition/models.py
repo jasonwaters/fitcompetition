@@ -54,6 +54,7 @@ class FitUser(AbstractUser):
     profile_url = models.CharField(max_length=255, blank=True, null=True, default=None)
     medium_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
     normal_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
+    phoneNumber = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     lastHealthGraphUpdate = models.DateTimeField(blank=True, null=True, default=None)
     objects = FitUserManager()
@@ -96,6 +97,16 @@ class FitUser(AbstractUser):
 
         timeago = datetime.now(tz=pytz.timezone(TIME_ZONE)) + relativedelta(minutes=-20)
         return self.lastHealthGraphUpdate < timeago
+
+    @property
+    def lackingDetail(self):
+        if self.email is None or self.email == '':
+            return True
+
+        if self.phoneNumber is None or self.phoneNumber == '':
+            return True
+
+        return False
 
 class ActivityType(models.Model):
     name = models.CharField(max_length=256)

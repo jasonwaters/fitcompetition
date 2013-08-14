@@ -44,7 +44,6 @@ class RunkeeperBackend(OAuthBackend):
 
         return {
             'username': username,
-            'email': '%s@runkeeper.com' % username,
             'fullname': fullname,
             'runkeeperToken': token,
             'first_name': first_name,

@@ -140,10 +140,14 @@ PIPELINE_JS = {
     'all-js': {
         'source_filenames': (
             'js/jquery.js',
+            'js/jquery.cookie.js',
+            'js/jquery.validate.js',
+            'js/additional-methods.js',
             'js/bootstrap.js',
             'js/moment.js',
             'js/lodash.js',
             'js/countdown.js',
+            'js/script.js'
         ),
         'output_filename': 'js/all.js',
     }
@@ -208,7 +212,6 @@ SOCIAL_AUTH_SESSION_EXPIRATION = False
 
 SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.social.social_auth_user',
-    'social_auth.backends.pipeline.associate.associate_by_email',
     'social_auth.backends.pipeline.user.get_username',
     'social_auth.backends.pipeline.user.create_user',
     'social_auth.backends.pipeline.social.associate_user',

@@ -15,19 +15,22 @@
         {% block head_scripts %}{% endblock %}
     </head>
     <body>
-        <div class="navbar navbar-inverse navbar-static-top">
+        <header class="navbar navbar-static-top navbar-inverse" role="navigation">
             <div class="container">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/">Fit Competition</a>
-                <div class="nav-collapse collapse navbar-responsive-collapse">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Fit Competition</a>
+                </div>
+
+                <nav class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         {% if user.is_authenticated %}
                             <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
-                            <li><a href="{% url "user_details" user.id %}">My Profile</a></li>
+                            <li><a href="{% url "user_profile" %}">My Profile</a></li>
                         {% endif %}
                     </ul>
                     <ul class="nav navbar-nav pull-right">
@@ -37,9 +40,9 @@
                             <li><a href="{% url 'login' %}" title="Sign in with Runkeeper">Sign In</a></li>
                         {% endif %}
                     </ul>
-                </div>
+                </nav>
             </div>
-        </div>
+        </header>
 
         <div class="container main-container">
             {% block content %}

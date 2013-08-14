@@ -8,7 +8,7 @@ from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
-from fitcompetition.util.ListUtil import createListFromProperty
+from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
 
@@ -22,6 +22,10 @@ def home(request):
         'otherChallenges': otherChallenges,
         'completedChallenges': completedUserChallenges
     })
+
+@login_required
+def profile(request):
+    return user(request, attr(request, 'user').id)
 
 @login_required
 def user(request, id):
@@ -133,6 +137,14 @@ def withdraw_challenge(request, id):
 
     return HttpResponse(json.dumps({'success': success}), content_type="application/json")
 
+
+@login_required
+def user_details_update(request):
+    request.user.email = request.POST.get('emailAddress')
+    request.user.phoneNumber = request.POST.get('phoneNumber')
+    request.user.save()
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
 def refresh_user_activities(request):

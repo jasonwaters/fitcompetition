@@ -37,6 +37,7 @@ def doubledGoal(meters, goal_miles):
         return False
     return toMiles(meters) > goal_miles * 2
 
+
 @register.filter
 def tripledGoal(meters, goal_miles):
     if not meters:
@@ -149,12 +150,14 @@ def commaSeparated(list, word="or"):
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
 
+
 @register.filter
 def times(number):
     if number is None:
         return range(0)
 
     return range(number)
+
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
 def challenges_table(context, user, challenges, title, iconClass=None):
@@ -163,9 +166,26 @@ def challenges_table(context, user, challenges, title, iconClass=None):
             'title': title,
             'iconClass': iconClass}
 
+
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)
 def player_row(context, user, player, challenge, rank, offset=0):
     return {'user': user,
             'player': player,
             'challenge': challenge,
             'rank': rank + offset}
+
+
+@register.inclusion_tag('inclusions/player_ante.html', takes_context=True)
+def player_ante(context, user, challenge, competitor):
+    return {
+        'user': user,
+        'challenge': challenge,
+        'competitor': competitor
+    }
+
+
+@register.inclusion_tag('inclusions/player_email.html', takes_context=True)
+def player_email(context, user):
+    return {
+        'user': user
+    }
