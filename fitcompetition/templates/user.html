@@ -16,7 +16,7 @@
 {% block content %}
     <div>
         <div class="user-photo">
-            <img src="{{ user.normal_picture }}" class="thumbnail" />
+            <img src="{{ user.normal_picture|avatar }}" class="thumbnail" />
         </div>
         <h4 class="user-name">{{ user.fullname }}</h4>
         <div>

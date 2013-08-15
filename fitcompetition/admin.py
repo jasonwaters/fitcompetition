@@ -7,6 +7,7 @@ from fitcompetition.models import Challenge, FitUser, Challenger
 class ChallengerInline(admin.TabularInline):
     model = Challenger
 
+
 class ChallengeAdmin(admin.ModelAdmin):
     list_display = ('name', 'distance', 'startdate', 'enddate')
     ordering = ('startdate', 'enddate',)
@@ -14,8 +15,9 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 
 class FitUserAdmin(UserAdmin):
-    pass
+    list_display = ('fullname', 'email', 'phoneNumber', 'profile_url', 'lastHealthGraphUpdate', 'runkeeperToken', 'date_joined')
+    ordering = ('date_joined',)
 
 admin.site.register(Challenge, ChallengeAdmin)
-admin.site.register(FitUser)
+admin.site.register(FitUser, FitUserAdmin)
 admin.site.unregister(Site)
