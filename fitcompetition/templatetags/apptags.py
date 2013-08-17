@@ -147,7 +147,7 @@ def positive(value):
 
 @register.filter
 def currency(value):
-    locale.setlocale(locale.LC_ALL, 'en_US')
+    locale.setlocale(locale.LC_ALL, getattr(settings, 'LOCALE'))
     return locale.currency(value)
 
 

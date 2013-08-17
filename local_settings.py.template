@@ -15,6 +15,9 @@ DATABASES = {
     }
 }
 
+#run 'locale -a' in terminal and select one.
+LOCALE = 'en_US.utf8'
+
 #this is used in the instructions for putting money in the pot.
 PAYPAL_ACCOUNT_EMAIL = ''
 
