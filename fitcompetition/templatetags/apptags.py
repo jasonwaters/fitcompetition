@@ -6,6 +6,7 @@ from django.utils import timezone
 from fitcompetition.settings import STATIC_URL, TIME_ZONE
 from django.conf import settings
 import pytz
+import locale
 
 
 MILLIS_PER_SECOND = 1000
@@ -137,6 +138,17 @@ def fromSettings(key):
         setting = None
 
     return setting
+
+
+@register.filter
+def positive(value):
+    return math.fabs(value)
+
+
+@register.filter
+def currency(value):
+    locale.setlocale(locale.LC_ALL, 'en_US')
+    return locale.currency(value)
 
 
 @register.filter

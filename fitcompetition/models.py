@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField
+from django.db.models import BooleanField, Sum, Q
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
@@ -62,6 +62,11 @@ class FitUser(AbstractUser):
     def __unicode__(self):
         return self.fullname or "Unnamed User"
 
+    @property
+    def balance(self):
+        result = Transaction.objects.filter(user=self).aggregate(balance=Sum('amount'))
+        return ListUtil.attr(result, 'balance', 0)
+
     def is_authenticated(self):
         return True
 
@@ -107,6 +112,10 @@ class FitUser(AbstractUser):
             return True
 
         return False
+
+    class Meta:
+        ordering = ['fullname']
+
 
 class ActivityType(models.Model):
     name = models.CharField(max_length=256)
@@ -155,10 +164,8 @@ class Challenge(models.Model):
 
     @property
     def challengers(self):
-        if self.ante > 0:
-            return FitUser.objects.filter(challenge=self, challenger__hasPaid=True).order_by('fullname')
-        else:
-            return FitUser.objects.filter(challenge=self).order_by('fullname')
+        # return FitUser.objects.filter(challenge=self).order_by('fullname')
+        return FitUser.objects.filter(challenge=self).annotate(account_balance=Sum('transaction__amount')).filter(Q(account_balance__gte=0) | Q(account_balance=None)).order_by('fullname')
 
     @property
     def moneyInThePot(self):
@@ -192,7 +199,6 @@ class Challenger(models.Model):
     fituser = models.ForeignKey(FitUser)
     challenge = models.ForeignKey(Challenge)
     date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None)
-    hasPaid = models.BooleanField(verbose_name="Has Paid", default=False)
 
     @property
     def user(self):
@@ -252,3 +258,11 @@ class FitnessActivity(models.Model):
     distance = models.FloatField(blank=True, null=True, default=0)
 
     objects = FitnessActivityManager()
+
+
+class Transaction(models.Model):
+    date = models.DateField(blank=True)
+    user = models.ForeignKey(FitUser)
+    description = models.CharField(max_length=255)
+    amount = CurrencyField(max_digits=16, decimal_places=2)
+    challenge = models.ForeignKey(Challenge, blank=True, null=True, default=None)

@@ -35,6 +35,7 @@
                     </ul>
                     <ul class="nav navbar-nav pull-right">
                         {% if user.is_authenticated %}
+                            <li><a href="#">Balance: {{ user.balance|currency }}</a></li>
                             <li><a href="{% url "logout" %}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>
                         {% else %}
                             <li><a href="{% url 'login' %}" title="Sign in with Runkeeper">Sign In</a></li>

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser
+from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
@@ -23,9 +23,11 @@ def home(request):
         'completedChallenges': completedUserChallenges
     })
 
+
 @login_required
 def profile(request):
     return user(request, attr(request, 'user').id)
+
 
 @login_required
 def user(request, id):
@@ -38,14 +40,15 @@ def user(request, id):
 
     thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
 
-    recentActivities = FitnessActivity.objects.filter(date__gte=thirtyDaysAgo,user=user).order_by('-date')
+    recentActivities = FitnessActivity.objects.filter(date__gte=thirtyDaysAgo, user=user).order_by('-date')
 
     return render(request, 'user.html', {
-        'user': user,
+        'userprofile': user,
         'activeChallenges': activeUserChallenges,
         'completedChallenges': completedUserChallenges,
         'recentActivities': recentActivities
     })
+
 
 @login_required
 def challenge(request, id):
@@ -115,10 +118,17 @@ def join_challenge(request, id):
     except Challenger.DoesNotExist:
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         Challenger.objects.create(challenge=challenge,
-                                               fituser=request.user,
-                                               date_joined=now)
+                                  fituser=request.user,
+                                  date_joined=now)
+
+        Transaction.objects.create(date=now,
+                                   user=request.user,
+                                   description="Joined '%s' competition." % challenge.name,
+                                   amount=challenge.ante * -1,
+                                   challenge=challenge)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
 
 @login_required
 def withdraw_challenge(request, id):
@@ -131,7 +141,15 @@ def withdraw_challenge(request, id):
         challenger = Challenger.objects.get(challenge=challenge, fituser=request.user)
         if not challenge.hasEnded:
             challenger.delete()
-        success = True
+            now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+            Transaction.objects.create(date=now,
+                                       user=request.user,
+                                       description="Withdrew from '%s' competition." % challenge.name,
+                                       amount=challenge.ante,
+                                       challenge=challenge)
+            success = True
+
     except Challenger.DoesNotExist:
         success = False
 
@@ -145,6 +163,7 @@ def user_details_update(request):
     request.user.save()
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
 
 @login_required
 def refresh_user_activities(request):

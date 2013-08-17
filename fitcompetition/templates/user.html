@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ user.fullname }} | Fit Competition{% endblock %}
+{% block head_title %}{{ userprofile.fullname }} | Fit Competition{% endblock %}
 
 {% block head_scripts %}
     {{ block.super }}
@@ -16,11 +16,11 @@
 {% block content %}
     <div>
         <div class="user-photo">
-            <img src="{{ user.normal_picture|avatar }}" class="thumbnail" />
+            <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />
         </div>
-        <h4 class="user-name">{{ user.fullname }}</h4>
+        <h4 class="user-name">{{ userprofile.fullname }}</h4>
         <div>
-            <a href="{{ user.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
+            <a href="{{ userprofile.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
         </div>
     </div>
 

@@ -1,13 +1,19 @@
 import operator
 
 
-def attr(obj, key):
+def attr(obj, key, defaultValue=None):
     if obj is None:
-        return None
+        return defaultValue
     elif type(obj) is dict:
-        return obj[key]
+        try:
+            if obj[key] is None:
+                return defaultValue
+            else:
+                return obj[key]
+        except KeyError:
+            return defaultValue
     else:
-        return getattr(obj, key)
+        return getattr(obj, key, defaultValue)
 
 
 def groupBy(list, dictKeyName):
