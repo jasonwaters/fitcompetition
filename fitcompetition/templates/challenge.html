@@ -23,9 +23,17 @@
 
             {% if competitor %}
                 {% if not challenge.hasEnded %}
-                    {{ competitor.user.first_name }}, you are competing in this challenge!
+                    {% if userAchievedGoal %}
+                        <strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
+                    {% else %}
+                        <strong class="text-primary">You are competing in this challenge!</strong>
+                    {% endif %}
                 {% else %}
-                    {{ competitor.user.first_name }}, you competed in this challenge.
+                    {% if userAchievedGoal %}
+                        <strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
+                    {% else %}
+                        <strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
+                    {% endif %}
                 {% endif %}
             {% else %}
                 {% if not challenge.hasEnded %}

@@ -1,13 +1,14 @@
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField, Sum, Q
+from django.db.models import BooleanField, Sum, Q, Max
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.templatetags.apptags import toMeters
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
@@ -61,6 +62,10 @@ class FitUser(AbstractUser):
 
     def __unicode__(self):
         return self.fullname or "Unnamed User"
+
+    @property
+    def delinquent(self):
+        return self.balance < 0
 
     @property
     def balance(self):
@@ -165,7 +170,63 @@ class Challenge(models.Model):
     @property
     def challengers(self):
         # return FitUser.objects.filter(challenge=self).order_by('fullname')
-        return FitUser.objects.filter(challenge=self).annotate(account_balance=Sum('transaction__amount')).filter(Q(account_balance__gte=0) | Q(account_balance=None)).order_by('fullname')
+        #return only users without an outstanding balance
+        return FitUser.objects.filter(challenge=self).annotate(account_balance=Sum('transaction__amount', distinct=True)).filter(Q(account_balance__gte=0) | Q(account_balance=None)).order_by('fullname')
+
+    def getAchievedGoal(self, fituser):
+        if fituser.delinquent:
+            return False
+
+        dateFilter = Q(date__gte=self.startdate) & Q(date__lte=self.enddate)
+        typeFilter = Q()
+
+        approvedTypes = self.approvedActivities.all()
+
+        for type in approvedTypes:
+            typeFilter |= Q(type=type)
+
+        activityFilter = Q(user=fituser) & dateFilter & typeFilter
+
+        dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_distance=Sum('distance'))
+        return dbo.get('total_distance') >= toMeters(self.distance)
+
+    @property
+    def numAchieved(self):
+        return len(self.getChallengersWithActivities(achieversOnly=True))
+
+    @property
+    def achievedValue(self):
+        if self.numAchieved == 0:
+            return Decimal(0)
+        value = self.moneyInThePot / self.numAchieved
+        return value.quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+
+    def getChallengersWithActivities(self, achieversOnly=False):
+        now = datetime.utcnow().replace(tzinfo=pytz.utc)
+        approvedTypes = self.approvedActivities.all()
+
+        result = []
+        if self.startdate <= now:
+            dateFilter = Q(fitnessactivity__date__gte=self.startdate) & Q(fitnessactivity__date__lte=self.enddate)
+            typeFilter = Q()
+
+            for type in approvedTypes:
+                typeFilter |= Q(fitnessactivity__type=type)
+
+            activitiesFilter = dateFilter & typeFilter
+
+            challengersList = self.challengers
+            l = []
+
+            for u in challengersList:
+                l.append(u.id)
+
+            if achieversOnly:
+                result = FitUser.objects.filter(id__in=l).filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
+            else:
+                result = FitUser.objects.filter(id__in=l).filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+
+        return result
 
     @property
     def moneyInThePot(self):

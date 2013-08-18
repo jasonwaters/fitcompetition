@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from math import floor
 import math
 from django.template.defaultfilters import register
@@ -67,6 +68,11 @@ def toMiles(meters):
     if not isinstance(meters, float):
         return 0
     return meters * 0.00062137
+
+
+@register.filter
+def toMeters(miles):
+    return miles / Decimal(0.00062137)
 
 
 @register.filter

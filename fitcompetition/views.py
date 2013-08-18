@@ -69,20 +69,8 @@ def challenge(request, id):
 
     approvedTypes = challenge.approvedActivities.all()
 
-    playersWithActivities = []
-    playersWithActivitiesMap = {}
-
-    if challenge.startdate <= now:
-        dateFilter = Q(fitnessactivity__date__gte=challenge.startdate) & Q(fitnessactivity__date__lte=challenge.enddate)
-        typeFilter = Q()
-
-        for type in approvedTypes:
-            typeFilter |= Q(fitnessactivity__type=type)
-
-        activitiesFilter = dateFilter & typeFilter
-
-        playersWithActivities = allPlayers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance'), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
-        playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
+    playersWithActivities = challenge.getChallengersWithActivities()
+    playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
 
     if competitor and challenge.startdate <= now <= challenge.enddate:
         request.user.syncRunkeeperData()
@@ -102,6 +90,7 @@ def challenge(request, id):
         'canJoin': canJoin,
         'competitor': competitor,
         'numPlayers': len(allPlayers),
+        'userAchievedGoal': challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name')
     })
 
