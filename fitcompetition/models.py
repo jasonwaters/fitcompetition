@@ -169,14 +169,9 @@ class Challenge(models.Model):
 
     @property
     def challengers(self):
-        # return FitUser.objects.filter(challenge=self).order_by('fullname')
-        #return only users without an outstanding balance
-        return FitUser.objects.filter(challenge=self).annotate(account_balance=Sum('transaction__amount', distinct=True)).filter(Q(account_balance__gte=0) | Q(account_balance=None)).order_by('fullname')
+        return FitUser.objects.filter(challenge=self).order_by('fullname')
 
     def getAchievedGoal(self, fituser):
-        if fituser.delinquent:
-            return False
-
         dateFilter = Q(date__gte=self.startdate) & Q(date__lte=self.enddate)
         typeFilter = Q()
 
@@ -215,16 +210,10 @@ class Challenge(models.Model):
 
             activitiesFilter = dateFilter & typeFilter
 
-            challengersList = self.challengers
-            l = []
-
-            for u in challengersList:
-                l.append(u.id)
-
             if achieversOnly:
-                result = FitUser.objects.filter(id__in=l).filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
+                result = self.challengers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
             else:
-                result = FitUser.objects.filter(id__in=l).filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+                result = self.challengers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
 
         return result
 

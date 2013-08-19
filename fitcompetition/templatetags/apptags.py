@@ -156,6 +156,9 @@ def currency(value):
     locale.setlocale(locale.LC_ALL, getattr(settings, 'LOCALE'))
     return locale.currency(value)
 
+@register.filter
+def userAchievedChallenge(challenge, user):
+    return challenge.getAchievedGoal(user)
 
 @register.filter
 def commaSeparated(list, word="or"):

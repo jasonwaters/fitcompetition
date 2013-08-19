@@ -16,7 +16,7 @@
                     {% else %}
                         ${{ challenge.ante|intcomma }} to join, ${{ challenge.moneyInThePot|intcomma }} in the pot;
                     {% endif %}
-                    {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.
+                    {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.<br/>
                 </p>
             </a>
         {% endfor %}

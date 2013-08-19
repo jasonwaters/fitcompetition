@@ -19,7 +19,7 @@
         <h2>{{ challenge.name }}</h2>
         <p>
             Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-            There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitors.
+            There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
 
             {% if competitor %}
                 {% if not challenge.hasEnded %}
