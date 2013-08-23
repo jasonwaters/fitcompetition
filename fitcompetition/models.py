@@ -172,6 +172,9 @@ class Challenge(models.Model):
         return FitUser.objects.filter(challenge=self).order_by('fullname')
 
     def getAchievedGoal(self, fituser):
+        if not fituser.is_authenticated():
+            return False
+
         dateFilter = Q(date__gte=self.startdate) & Q(date__lte=self.enddate)
         typeFilter = Q()
 

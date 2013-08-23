@@ -38,7 +38,7 @@
                 {% endif %}
             {% else %}
                 {% if not challenge.hasEnded %}
-                    It's not too late to join this challenge.  Get in on the fun! Just click the button below, put ${{ challenge.ante|intcomma }} in the pot, and get moving!
+                    It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
                 {% else %}
                     This challenge is history.
                 {% endif %}
@@ -56,7 +56,11 @@
             {% endif %}
         </p>
         {% if canJoin %}
-            <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+            {% if user.is_authenticated %}
+                <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+            {% else %}
+                <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Join this Challenge</a>
+            {% endif %}
         {% endif %}
     </div>
 

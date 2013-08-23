@@ -7,8 +7,20 @@
 
 {% block content %}
     <div class="jumbotron">
-        <h2>Hey {{ user.first_name }}!!</h2>
+        {% if user.is_authenticated %}
+            <h2>Hey {{ user.first_name }}!!</h2>
+        {% else %}
+            <h2>Fit Competition</h2>
+        {% endif %}
         <p class="lead">Put your game face on and select a challenge below.</p>
+        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#help-text">
+            Learn more <i class="icon-double-angle-right"></i>
+        </button>
+        <div id="help-text" class="collapse">
+            <p>Maybe you're fit, maybe you're trying to get fit.  Either way, Fit Competition is fun for everybody.</p>
+            <p>It's simple.  Join a challenge to complete a certain number of miles within a specific time frame.  Put the required ante in the pot, and if you complete the challenge, you share a peice of the pot with everyone else who completed the challenge!</p>
+            <p>If everyone completes the challenge, everyone gets thier money back!  But if you are one of only a few to complete the challenge, you could win big!  You've got nothing to lose &mdash; except your excuses.</p>
+        </div>
     </div>
     {% player_email user %}
     {% challenges_table user myChallenges "My Challenges" "icon-home" %}

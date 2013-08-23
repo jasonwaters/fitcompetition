@@ -12,7 +12,6 @@ from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
 
-@login_required
 def home(request):
     allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
     otherChallenges = Challenge.objects.openChallenges(request.user.id).order_by('-enddate')
@@ -29,7 +28,6 @@ def profile(request):
     return user(request, attr(request, 'user').id)
 
 
-@login_required
 def user(request, id):
     try:
         user = FitUser.objects.get(id=id)
@@ -50,7 +48,6 @@ def user(request, id):
     })
 
 
-@login_required
 def challenge(request, id):
     now = datetime.utcnow().replace(tzinfo=pytz.utc)
 
@@ -59,10 +56,13 @@ def challenge(request, id):
     except Challenge.DoesNotExist:
         challenge = None
 
-    try:
-        competitor = challenge.challenger_set.get(fituser=request.user)
-    except Challenger.DoesNotExist:
-        competitor = None
+    competitor = None
+
+    if request.user.is_authenticated():
+        try:
+            competitor = challenge.challenger_set.get(fituser=request.user)
+        except Challenger.DoesNotExist:
+            competitor = None
 
     allPlayers = challenge.challengers
     canJoin = not challenge.hasEnded and not competitor
@@ -160,7 +160,6 @@ def refresh_user_activities(request):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
-@login_required
 def user_activities(request, userID, challengeID):
     activities = []
 
