@@ -1,0 +1,14 @@
+<p>
+    <ol>
+        <li>Log in to your PayPal account.</li>
+        <li>Click <strong>Send Money</strong> at the top of the page.</li>
+        <li>Fill out the form.
+            <ul>
+                <li>Enter <strong>{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}</strong> in the TO field.</li>
+                <li>Specify at least <strong>{{ user.balance|positive|currency }}</strong> in the AMOUNT field.</li>
+                <li>Select <strong>I'm sending money to family or friends</strong>.</li>
+            </ul>
+        </li>
+        <li>Continue with the transaction.</li>
+    </ol>
+</p>

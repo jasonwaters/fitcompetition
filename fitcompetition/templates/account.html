@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block head_title %}{{ user.fullname }} | Fit Competition{% endblock %}
+
+{% block head_scripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block head_css %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h2>Account Summary</h2>
+    <h3>Balance: {{ user.balance|currency }}</h3>
+    {% if user.balance > 0 %}
+        <div class="alert alert-info">
+            <p>You have a positive account balance.  You may join another challenge or cash out.</p>
+            <div class="top-padding">
+                <a href="{% url 'home' %}" class="btn btn-primary">Find a Challenge</a>
+                <a href="mailto:{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}" class="btn btn-link">Cash Out</a>
+            </div>
+        </div>
+    {% elif user.balance < 0 %}
+        <div class="alert alert-danger">
+            <p>You have a negative account balance.  It's time to settle up!  You can do that by following these steps:</p>
+            {% include "inclusions/paypal_instructions.html" %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>You a neutral account balance.</p>
+        </div>
+    {% endif %}
+    <h3>Transactions</h3>
+    <table class="table table-striped">
+        <thead>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount</th>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td title="{{ transaction.date }}">{{ transaction.date|naturalday:"F j, Y" }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ transaction.amount|currency }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

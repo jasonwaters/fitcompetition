@@ -27,6 +27,14 @@ def home(request):
 def profile(request):
     return user(request, attr(request, 'user').id)
 
+@login_required
+def account(request):
+    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+
+    return render(request, 'account.html', {
+        'transactions': transactions
+    })
+
 
 def user(request, id):
     try:
