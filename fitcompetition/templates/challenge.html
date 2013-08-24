@@ -59,7 +59,7 @@
             {% if user.is_authenticated %}
                 <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
             {% else %}
-                <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Join this Challenge</a>
+                <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
             {% endif %}
         {% endif %}
     </div>
