@@ -14,7 +14,7 @@ import pytz
 
 def home(request):
     allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
-    otherChallenges = Challenge.objects.openChallenges(request.user.id).order_by('-enddate')
+    otherChallenges = Challenge.objects.openChallenges(request.user.id)
 
     return render(request, 'home.html', {
         'myChallenges': activeUserChallenges,

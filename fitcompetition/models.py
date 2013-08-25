@@ -1,16 +1,17 @@
 from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
+import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField, Sum, Q, Max
+from django.db.models import BooleanField, Sum, Q, Max, Count
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.templatetags.apptags import toMeters
 from fitcompetition.util import ListUtil
-from fitcompetition.util.ListUtil import createListFromProperty
+from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 from requests import RequestException
 from dateutil import parser
@@ -132,21 +133,23 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def openChallenges(self, userid):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.exclude(players__id=userid).filter(enddate__gt=now)
+        return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by('-num_players')
 
     def userChallenges(self, userid):
+        allUserChallenges = []
         activeUserChallenges = []
         completedUserChallenges = []
 
-        allUserChallenges = Challenge.objects.filter(players__id=userid).order_by('-enddate')
+        if userid is not None:
+            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('-enddate')
 
-        for challenge in allUserChallenges:
-            if challenge.hasEnded:
-                completedUserChallenges.append(challenge)
-            else:
-                activeUserChallenges.append(challenge)
+            for challenge in allUserChallenges:
+                if challenge.hasEnded:
+                    completedUserChallenges.append(challenge)
+                else:
+                    activeUserChallenges.append(challenge)
 
-        return allUserChallenges, activeUserChallenges, completedUserChallenges
+        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'], getter=operator.attrgetter), completedUserChallenges
 
 
 class Challenge(models.Model):
@@ -226,7 +229,11 @@ class Challenge(models.Model):
 
     @property
     def numPlayers(self):
-        return self.challengers.count()
+        np = attr(self, 'num_players', None)
+        if np is not None:
+            return np
+        else:
+            return self.challengers.count()
 
     @property
     def numDays(self):

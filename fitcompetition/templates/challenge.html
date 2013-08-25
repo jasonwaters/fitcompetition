@@ -140,7 +140,8 @@
         var COUNTDOWN_TARGET_DATE = '{{ challenge.enddate|fullDate }}';
         $(".alert").alert();
         var hidePopovers = function(list) {
-            $(list).popover('hide');
+            $(list).popover('destroy');
+            $(list).removeAttr('data-content');
         };
 
         $('body').click(function(evt) {
@@ -149,18 +150,20 @@
             }
         });
 
-        $('a.activities-link').popover({
-            html: true,
-            trigger: 'manual'
-        }).click(function(evt) {
+        $('a.activities-link').popover().click(function(evt) {
             evt.stopPropagation(evt.target);
-            hidePopovers(_.without($('a.activities-link'), evt.target));
 
-            var url = $(this).data('url');
-            $.get(url, function(result) {
-                $(this).attr('data-content', result);
-                $(this).popover('toggle');
-            }.bind(this));
+            if(($(evt.target).attr('data-content')) != null) {
+                //popup already showing
+                hidePopovers($('a.activities-link'));
+            }else {
+                hidePopovers(_.without($('a.activities-link'), evt.target));
+                var url = $(this).data('url');
+                $.get(url, function(result) {
+                    $(this).attr('data-content', result);
+                    $(this).popover('show');
+                }.bind(this));
+            }
         });
 
         $('body').delegate('.show-more-activities', 'click', function(evt) {
