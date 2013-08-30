@@ -10,7 +10,7 @@
     </td>
     <td class="player">
         <span class="name"><a href="{% url "user_details" player.id %}">{{ player.fullname }}</a></span>
-        <span class="flair">
+        <div class="flair">
             {% if player.total_distance|achievedGoal:challenge.distance %}
                 <i class="icon-trophy"></i>
             {% endif %}
@@ -22,7 +22,7 @@
             {% if player.latest_activity_date|isToday %}
                 <i class="icon-heart red" title="Active today"></i>
             {% endif %}
-        </span>
+        </div>
     </td>
     <td>
         <a class="activities-link" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-html='true' data-trigger="manual" data-placement="left" data-title='{{ player.fullname }}' data-container="body">

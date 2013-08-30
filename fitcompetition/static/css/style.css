@@ -99,6 +99,10 @@ a.activities-link {
     display: inline-block;
     margin-left: 5px;
     vertical-align: middle;
+    text-overflow: ellipsis;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .player .flair [class^="icon-"] {

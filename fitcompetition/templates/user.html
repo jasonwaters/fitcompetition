@@ -14,14 +14,12 @@
 {% endblock %}
 
 {% block content %}
+    <h1 class="user-name">{{ userprofile.fullname }}</h1>
     <div>
-        <div class="user-photo">
-            <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />
-        </div>
-        <h4 class="user-name">{{ userprofile.fullname }}</h4>
-        <div>
-            <a href="{{ userprofile.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
-        </div>
+        <a href="{{ userprofile.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
+    </div>
+    <div class="user-photo">
+        <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />
     </div>
 
     <h2>Recent Activities</h2>
