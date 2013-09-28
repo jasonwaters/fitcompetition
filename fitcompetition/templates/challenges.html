@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block head_title %}Challenges{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h2>Challenges <small>Compete. Get Fit. Get Paid.</small></h2>
+    </div>
+
+    <p class="lead">
+        <small><a href="{% url 'faq' %}">What's this all about?</a></small>
+    </p>
+
+
+    {% player_email user %}
+    {% challenges_table user myChallenges "My Challenges" "icon-home" %}
+    {% challenges_table user openChallenges "Open Challenges" "icon-shopping-cart" %}
+    {% challenges_table user pastChallenges "Past Challenges" "icon-flag-checkered" True %}
+{% endblock %}

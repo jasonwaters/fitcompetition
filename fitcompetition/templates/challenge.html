@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ challenge.name }} | Fit Competition{% endblock %}
+{% block head_title %}{{ challenge.name }}{% endblock %}
 
 
 {% block head_scripts %}
@@ -15,54 +15,57 @@
 {% endblock %}
 
 {% block content %}
-    <div class="jumbotron">
+    <div class="page-header">
         <h2>{{ challenge.name }}</h2>
-        <p>{{ challenge.description }}</p>
-        <p>
-            Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-            There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
+    </div>
 
-            {% if competitor %}
-                {% if not challenge.hasEnded %}
-                    {% if userAchievedGoal %}
-                        <strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
-                    {% else %}
-                        <strong class="text-primary">You are competing in this challenge!</strong>
-                    {% endif %}
+
+    <p class="lead">
+        Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
+        There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
+
+        {% if competitor %}
+            {% if not challenge.hasEnded %}
+                {% if userAchievedGoal %}
+                    <strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
                 {% else %}
-                    {% if userAchievedGoal %}
-                        <strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
-                    {% else %}
-                        <strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
-                    {% endif %}
+                    <strong class="text-primary">You are competing in this challenge!</strong>
                 {% endif %}
             {% else %}
-                {% if not challenge.hasEnded %}
-                    It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
+                {% if userAchievedGoal %}
+                    <strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
                 {% else %}
-                    This challenge is history.
+                    <strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
                 {% endif %}
             {% endif %}
-        </p>
-        <p>
-            {% if not challenge.hasStarted %}
-                This Challenge will start in {{ challenge.startdate|timeuntil }}.
-            {% elif challenge.hasEnded %}
-                This Challenge ended {{ challenge.enddate|timesince }} ago.
-            {% else%}
-                <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
-                    This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
-                </span>
-            {% endif %}
-        </p>
-        {% if canJoin %}
-            {% if user.is_authenticated %}
-                <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+        {% else %}
+            {% if not challenge.hasEnded %}
+                It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
             {% else %}
-                <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
+                This challenge is history.
             {% endif %}
         {% endif %}
-    </div>
+    </p>
+    <p>
+        {% if not challenge.hasStarted %}
+            This Challenge will start in {{ challenge.startdate|timeuntil }}.
+        {% elif challenge.hasEnded %}
+            This Challenge ended {{ challenge.enddate|timesince }} ago.
+        {% else%}
+            <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
+                This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
+            </span>
+        {% endif %}
+    </p>
+    <p>{{ challenge.description }}</p>
+
+    {% if canJoin %}
+        {% if user.is_authenticated %}
+            <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+        {% else %}
+            <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
+        {% endif %}
+    {% endif %}
 
     {% player_email user %}
     {% player_ante user challenge competitor %}
@@ -129,7 +132,7 @@
             <div class="tab-pane" id="rules">
                 <ul>
                     <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-                    <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F j, Y" }} and {{ challenge.enddate|date:"F j, Y" }}.</li>
+                    <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
                     <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
                     <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
                 </ul>

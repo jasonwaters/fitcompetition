@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ user.fullname }} | Fit Competition{% endblock %}
+{% block head_title %}{{ user.fullname }}{% endblock %}
 
 {% block head_scripts %}
     {{ block.super }}
@@ -14,8 +14,10 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Account Summary</h2>
-    <h3>Balance: {{ user.balance|currency }}</h3>
+    <div class="page-header">
+        <h2>Account Summary <small>Balance: {{ user.balance|currency }}</small></h2>
+    </div>
+
     {% if user.balance > 0 %}
         <div class="alert alert-info">
             <p>You have a positive account balance.  You may join another challenge or cash out.</p>

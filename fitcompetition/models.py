@@ -135,6 +135,10 @@ class ChallengeManager(models.Manager):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by('-num_players')
 
+    def pastChallenges(self):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.annotate(num_players=Count('players')).filter(enddate__lt=now).order_by('-startdate')
+
     def userChallenges(self, userid):
         allUserChallenges = []
         activeUserChallenges = []

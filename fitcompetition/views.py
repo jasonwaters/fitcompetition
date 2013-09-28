@@ -12,14 +12,15 @@ from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
 
-def home(request):
+def challenges(request):
     allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
-    otherChallenges = Challenge.objects.openChallenges(request.user.id)
+    openChallenges = Challenge.objects.openChallenges(request.user.id)
+    pastChallenges = Challenge.objects.pastChallenges()
 
-    return render(request, 'home.html', {
+    return render(request, 'challenges.html', {
         'myChallenges': activeUserChallenges,
-        'otherChallenges': otherChallenges,
-        'completedChallenges': completedUserChallenges
+        'openChallenges': openChallenges,
+        'pastChallenges': pastChallenges
     })
 
 
@@ -54,6 +55,10 @@ def user(request, id):
         'completedChallenges': completedUserChallenges,
         'recentActivities': recentActivities
     })
+
+
+def faq(request):
+    return render(request, 'faq.html', {})
 
 
 def challenge(request, id):

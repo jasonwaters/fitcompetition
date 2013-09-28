@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ userprofile.fullname }} | Fit Competition{% endblock %}
+{% block head_title %}{{ userprofile.fullname }}{% endblock %}
 
 {% block head_scripts %}
     {{ block.super }}
@@ -14,9 +14,8 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="user-name">{{ userprofile.fullname }}</h1>
-    <div>
-        <a href="{{ userprofile.profile_url }}" target="_blank">View Runkeeper Profile &raquo;</a>
+    <div class="page-header">
+        <h2>{{ userprofile.fullname }} <small><a href="{{ userprofile.profile_url }}" target="_blank">view Runkeeper profile &raquo;</a></small></h2>
     </div>
     <div class="user-photo">
         <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />

@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{% block head_title %}{% endblock %}</title>
+        <title>{% block head_title %}{% endblock %} | Fit Competition</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% compressed_css 'all-css' %}
@@ -28,10 +28,11 @@
 
                 <nav class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
+                        <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
                         {% if user.is_authenticated %}
-                            <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
                             <li><a href="{% url "user_profile" %}">My Profile</a></li>
                         {% endif %}
+                        <li><a href="{% url "faq" %}" title="Frequently Asked Questions">FAQ</a></li>
                     </ul>
                     <ul class="nav navbar-nav pull-right">
                         {% if user.is_authenticated %}
@@ -46,8 +47,7 @@
         </header>
 
         <div class="container main-container">
-            {% block content %}
-            {% endblock %}
+            {% block content %}{% endblock %}
         </div>
         {% if "GOOGLE_ANALYTICS_TRACKING_ID"|fromSettings %}
         <script type="text/javascript">

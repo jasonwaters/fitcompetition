@@ -181,11 +181,12 @@ def times(number):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
-def challenges_table(context, user, challenges, title, iconClass=None):
+def challenges_table(context, user, challenges, title, iconClass=None, brief=False):
     return {'user': user,
             'challenges': challenges,
             'title': title,
-            'iconClass': iconClass}
+            'iconClass': iconClass,
+            'brief': brief}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)
