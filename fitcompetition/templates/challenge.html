@@ -6,8 +6,9 @@
 {% block head_title %}{{ challenge.name }}{% endblock %}
 
 {% block head_misc %}
+    <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
-    <meta property="title" content="{{ challenge.name }} | Fit Competition" />
+    <meta property="og:title" content="{{ challenge.name }} | Fit Competition" />
     <meta property="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
 {% endblock %}
 
