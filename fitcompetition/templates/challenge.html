@@ -8,6 +8,8 @@
 {% block head_misc %}
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
     <meta property="og:title" content="{{ challenge.name }} | Fit Competition" />
     <meta property="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
 {% endblock %}
@@ -77,7 +79,8 @@
             <button type="button" class="close close-callout">&times;</button>
             <h4>It's more fun with friends. <small>Share the love.</small></h4>
             <button type="button" class="btn btn-default btn-share" data-service="twitter"><i class="icon-twitter icon-2x"></i> Tweet</button>
-            <button type="button" class="btn btn-default btn-share" data-service="facebook"><i class="icon-facebook icon-2x"></i> Share</button>
+            <button type="button" class="btn btn-default btn-share" data-service="facebook"><i class="icon-facebook-sign icon-2x"></i> Share</button>
+            <button type="button" class="btn btn-default btn-share" data-service="google"><i class="icon-google-plus-sign icon-2x"></i> Share</button>
         </div>
     {% endif %}
 
@@ -221,12 +224,14 @@
                 service = $this.data('service');
 
             if(service === 'twitter') {
-                var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! '+ location.href + ' #fitcompetition';
+                var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcompetition';
                 window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
             }else if(service === 'facebook') {
-                window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+                window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),
                             'facebook-share-dialog',
                             'width=626,height=436');
+            }else if(service === 'google') {
+                window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
             }
         });
 
