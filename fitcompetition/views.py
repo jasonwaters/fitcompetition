@@ -95,6 +95,7 @@ def challenge(request, id):
             playersWithoutActivities.append(player)
 
     return render(request, 'challenge.html', {
+        'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
         'allPlayers': allPlayers,

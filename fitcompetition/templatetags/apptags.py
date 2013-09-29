@@ -132,6 +132,14 @@ def deltaDate(targetDate, kind):
 
 
 @register.filter
+def hostUrl(request):
+    return '%s://%s' % ('https' if request.is_secure() else 'http', request.get_host())
+
+@register.filter
+def hashtaggify(value):
+    return value.replace(' ', '')
+
+@register.filter
 def fullDate(d):
     return d.isoformat()
 

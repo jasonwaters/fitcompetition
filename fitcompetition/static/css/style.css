@@ -169,6 +169,46 @@ div small.error {
     background-color: #e7f4fb !important;
 }
 
+.btn-default {
+    /* fallback */
+    background-color: fefefe;
+    background-repeat: repeat-x;
+
+    /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fefefe), to(#dedede));
+
+    /* Safari 5.1, Chrome 10+ */
+    background: -webkit-linear-gradient(top, #fefefe, #dedede);
+
+    /* Firefox 3.6+ */
+    background: -moz-linear-gradient(top, #fefefe, #dedede);
+
+    /* IE 10 */
+    background: -ms-linear-gradient(top, #fefefe, #dedede);
+
+    /* Opera 11.10+ */
+    background: -o-linear-gradient(top, #fefefe, #dedede);
+}
+
+.icon-twitter {
+    color: #00adee;
+}
+
+.icon-facebook, .icon-facebook-sign {
+    color: #43609c;
+}
+
+.fc-callout {
+    margin: 20px 0;
+    padding: 15px 30px 15px 15px;
+    border-left: 5px solid #eee;
+}
+
+.fc-callout-info {
+    background-color: #f0f7fd;
+    border-color: #d0e3f0;
+}
+
 @media (max-width: 360px) {
     h1{
         font-size: 30px;

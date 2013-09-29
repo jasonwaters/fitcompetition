@@ -5,6 +5,12 @@
 
 {% block head_title %}{{ challenge.name }}{% endblock %}
 
+{% block head_misc %}
+    <meta name="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta name="title" content="{{ challenge.name }} | Fit Competition" />
+    <meta name="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
+{% endblock %}
+
 
 {% block head_scripts %}
     {{ block.super }}
@@ -18,8 +24,6 @@
     <div class="page-header">
         <h2>{{ challenge.name }}</h2>
     </div>
-
-
     <p class="lead">
         Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
         There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
@@ -65,6 +69,15 @@
         {% else %}
             <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
         {% endif %}
+    {% endif %}
+
+    {% if competitor and show_social %}
+        <div class="fc-callout fc-callout-info" data-calloutid="social-callout-{{ challenge.id }}">
+            <button type="button" class="close close-callout">&times;</button>
+            <h4>It's more fun with friends. <small>Share the love.</small></h4>
+            <button type="button" class="btn btn-default btn-share" data-service="twitter"><i class="icon-twitter icon-2x"></i> Tweet</button>
+            <button type="button" class="btn btn-default btn-share" data-service="facebook"><i class="icon-facebook icon-2x"></i> Share</button>
+        </div>
     {% endif %}
 
     {% player_email user %}
@@ -179,6 +192,41 @@
             evt.preventDefault();
             var win = window.open('http://www.paypal.com', '_blank');
             win.focus();
+        });
+
+        $('.close-callout').click(function(evt) {
+            evt.preventDefault();
+            var $this = $(this),
+                callout = $this.parent('.fc-callout'),
+                calloutid = callout.data('calloutid');
+
+            callout.remove();
+
+            var hiddenCallouts = $.cookie('hidden_callouts') || '';
+
+            hiddenCallouts = hiddenCallouts.length > 0 ? hiddenCallouts.split(',') : [];
+
+            if( hiddenCallouts.indexOf(calloutid) < 0) {
+                hiddenCallouts.push(calloutid);
+            }
+
+            $.cookie('hidden_callouts', hiddenCallouts.join(','));
+            console.log(hiddenCallouts);
+        });
+
+        $('.btn-share').click(function(evt) {
+           evt.preventDefault();
+            var $this = $(this),
+                service = $this.data('service');
+
+            if(service === 'twitter') {
+                var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! '+ location.href + ' #fitcompetition';
+                window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
+            }else if(service === 'facebook') {
+                window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+                            'facebook-share-dialog',
+                            'width=626,height=436');
+            }
         });
 
         $('.join-challenge').click(function(evt) {

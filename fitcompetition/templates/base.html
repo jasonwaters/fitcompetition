@@ -8,6 +8,9 @@
         <title>{% block head_title %}{% endblock %} | Fit Competition</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        {% block head_misc %}{% endblock %}
+
         {% compressed_css 'all-css' %}
         {% block head_css %}{% endblock %}
 
