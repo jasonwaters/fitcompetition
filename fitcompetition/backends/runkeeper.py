@@ -17,6 +17,10 @@ RUNKEEPER_PROFILE_RESOURCE = '/profile'
 class RunkeeperBackend(OAuthBackend):
     name = 'runkeeper'
 
+    EXTRA_DATA = [
+        ('expires', 'expires')
+    ]
+
     def get_user_id(self, details, response):
         return response['user']['userID']
 
@@ -82,7 +86,8 @@ class RunkeeperAuth(BaseOAuth2):
 
         return {
             'user': user_data,
-            'profile': profile_data
+            'profile': profile_data,
+            'expires': 60 * 60 * 24 * 365
         }
 
 
