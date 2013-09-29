@@ -169,6 +169,10 @@ div small.error {
     background-color: #e7f4fb !important;
 }
 
+.btn-share {
+    margin-right: 10px;
+}
+
 .btn-default {
     /* fallback */
     background-color: fefefe;
