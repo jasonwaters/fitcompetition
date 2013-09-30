@@ -143,6 +143,13 @@ def hashtaggify(value):
 def fullDate(d):
     return d.isoformat()
 
+@register.filter
+def notNone(value):
+    if value is None:
+        return ''
+    else:
+        return value
+
 
 @register.filter
 def fromSettings(key):

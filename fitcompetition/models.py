@@ -51,6 +51,9 @@ class FitUserManager(UserManager):
 
 class FitUser(AbstractUser):
     runkeeperToken = models.CharField(max_length=255, blank=True, null=True, default=None)
+    mapmyfitnessToken = models.CharField(max_length=255, blank=True, null=True, default=None)
+    mapmyfitnessTokenSecret = models.CharField(max_length=255, blank=True, null=True, default=None)
+
     fullname = models.CharField(max_length=255, blank=True, null=True, default=None)
     gender = models.CharField(max_length=1, blank=True, null=True, default=None)
     profile_url = models.CharField(max_length=255, blank=True, null=True, default=None)

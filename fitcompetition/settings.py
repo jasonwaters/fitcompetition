@@ -194,6 +194,7 @@ SOUTH_MIGRATION_MODULES = {
 
 AUTHENTICATION_BACKENDS = (
     'fitcompetition.backends.runkeeper.RunkeeperBackend',
+    'fitcompetition.backends.mapmyfitness.MapMyFitnessBackend',
     'django.contrib.auth.backends.ModelBackend'
 )
 

@@ -9,11 +9,11 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="inputEmailAddress">Email address</label>
-                        <input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email">
+                        <input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email" value="{{ user.email|notNone }}">
                     </div>
                     <div class="form-group">
                         <label for="inputPhoneNumber">Phone Number</label>
-                        <input type="text" class="form-control" name="phoneNumber" id="inputPhoneNumber" placeholder="Enter phone number">
+                        <input type="text" class="form-control" name="phoneNumber" id="inputPhoneNumber" placeholder="Enter phone number" value="{{ user.phoneNumber|notNone }}">
                     </div>
                     <button type="submit" class="btn btn-default">Submit</button>
                 </fieldset>
