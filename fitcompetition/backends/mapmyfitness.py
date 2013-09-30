@@ -13,7 +13,6 @@ MAPMYFITNESS_AUTHORIZATION_URL = 'https://%s/oauth/authorize' % MAPMYFITNESS_SER
 
 
 class MapMyFitnessBackend(OAuthBackend):
-    """Twitter OAuth authentication backend"""
     name = 'mapmyfitness'
     EXTRA_DATA = [
         ('id', 'id'),
@@ -21,7 +20,6 @@ class MapMyFitnessBackend(OAuthBackend):
     ]
 
     def get_user_details(self, response):
-        """Return user details from Dropbox account"""
         user = response.get('user').get('result').get('output').get('user')
 
         validToken = re.compile('^oauth_token_secret=(.+)&oauth_token=(.+)$')
@@ -55,7 +53,6 @@ class MapMyFitnessBackend(OAuthBackend):
 
 
 class MapMyFitnessAuth(ConsumerBasedOAuth):
-    """Twitter OAuth authentication mechanism"""
     AUTHORIZATION_URL = MAPMYFITNESS_AUTHORIZATION_URL
     REQUEST_TOKEN_URL = MAPMYFITNESS_REQUEST_TOKEN_URL
     ACCESS_TOKEN_URL = MAPMYFITNESS_ACCESS_TOKEN_URL
