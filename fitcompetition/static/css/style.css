@@ -217,6 +217,11 @@ div small.error {
     border-color: #d0e3f0;
 }
 
+.btn-sign-in {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
 @media (max-width: 360px) {
     h1{
         font-size: 30px;

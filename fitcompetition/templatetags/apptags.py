@@ -212,6 +212,15 @@ def player_row(context, user, player, challenge, rank, offset=0):
             'rank': rank + offset}
 
 
+@register.inclusion_tag('inclusions/social.html', takes_context=True)
+def social(context, user, challenge, competitor):
+    return {
+        'user': user,
+        'challenge': challenge,
+        'competitor': competitor
+    }
+
+
 @register.inclusion_tag('inclusions/player_ante.html', takes_context=True)
 def player_ante(context, user, challenge, competitor):
     return {

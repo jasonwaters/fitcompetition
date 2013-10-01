@@ -68,20 +68,14 @@
 
     {% if canJoin %}
         {% if user.is_authenticated %}
-            <button class="join-challenge vertical-padding btn btn-primary btn-large" type="button">Join this Challenge</button>
+            <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button">Join this Challenge</button>
         {% else %}
-            <a class="vertical-padding btn btn-primary btn-large" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
+            <a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Join the Fun</a>
         {% endif %}
     {% endif %}
 
-    {% if not challenge.hasEnded and show_social %}
-        <div class="fc-callout fc-callout-info" data-calloutid="social-callout-{{ challenge.id }}">
-            <button type="button" class="close close-callout">&times;</button>
-            <h4>It's more fun with friends. <small>Share the love</small></h4>
-            <button type="button" class="btn btn-default btn-share" data-service="twitter"><i class="icon-twitter icon-2x"></i><br/>Tweet</button>
-            <button type="button" class="btn btn-default btn-share" data-service="facebook"><i class="icon-facebook-sign icon-2x"></i><br/>Share</button>
-            <button type="button" class="btn btn-default btn-share" data-service="google"><i class="icon-google-plus icon-2x"></i><br/>Share</button>
-        </div>
+    {% if show_social %}
+        {% social user challenge competitor %}
     {% endif %}
 
     {% player_email user %}
