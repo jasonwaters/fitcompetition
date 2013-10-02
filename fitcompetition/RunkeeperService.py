@@ -1,5 +1,4 @@
 import base64
-from datetime import datetime
 from django.conf import settings
 import pytz
 import requests
@@ -61,18 +60,13 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
         'access_token': user.runkeeperToken,
     }
 
-    secret = base64.b64encode(
-        '%s:%s' % (getattr(settings, 'RUNKEEPER_CLIENT_ID'), getattr(settings, 'RUNKEEPER_CLIENT_SECRET')))
-
-    headers = {
-        # 'Authorization': 'Basic %s' % secret
-    }
+    headers = {}
 
     if modifiedSince is not None:
         headers['If-Modified-Since'] = modifiedSince.replace(tzinfo=pytz.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     if modifiedNoEarlierThan is not None:
-        params['modifiedNoEarlierThan'] = modifiedNoEarlierThan.strftime('%Y-%m-%dT%H:%M:%S') #yyyy-mm-ddThh:mm:ss
+        params['modifiedNoEarlierThan'] = modifiedNoEarlierThan.strftime('%Y-%m-%dT%H:%M:%S')
 
     if modifiedNoLaterThan is not None:
         params['modifiedNoLaterThan'] = modifiedNoLaterThan.strftime('%Y-%m-%dT%H:%M:%S')

@@ -1,4 +1,4 @@
-import re
+import urlparse
 from django.utils import simplejson
 
 from social_auth.backends import ConsumerBasedOAuth, OAuthBackend
@@ -12,6 +12,11 @@ MAPMYFITNESS_ACCESS_TOKEN_URL = 'http://%s/oauth/access_token' % MAPMYFITNESS_AP
 MAPMYFITNESS_AUTHORIZATION_URL = 'https://%s/oauth/authorize' % MAPMYFITNESS_SERVER
 
 
+#request token and secret provided by map my fitness
+#user approves access
+# request an access token and secret from map my fitness to replace the request token and secret
+#use access token to access mmf resources
+
 class MapMyFitnessBackend(OAuthBackend):
     name = 'mapmyfitness'
     EXTRA_DATA = [
@@ -22,14 +27,10 @@ class MapMyFitnessBackend(OAuthBackend):
     def get_user_details(self, response):
         user = response.get('user').get('result').get('output').get('user')
 
-        validToken = re.compile('^oauth_token_secret=(.+)&oauth_token=(.+)$')
-        matches = validToken.match(response.get('access_token'))
-        if matches:
-            token = matches.group(1)
-            tokenSecret = matches.group(2)
-        else:
-            token = None
-            tokenSecret = None
+        token_credentials = urlparse.parse_qs(response.get('access_token'))
+
+        token = token_credentials.get('oauth_token')[0]
+        tokenSecret = token_credentials.get('oauth_token_secret')[0]
 
         result = {
             'username': 'mmf_%s' % user.get('user_id'),
@@ -62,7 +63,7 @@ class MapMyFitnessAuth(ConsumerBasedOAuth):
 
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""
-        url = 'http://' + MAPMYFITNESS_API + '/users/get_user'
+        url = 'http://' + MAPMYFITNESS_API + '/users/get_user?o=json'
         request = self.oauth_request(access_token, url)
         response = self.fetch_response(request)
 
@@ -87,8 +88,7 @@ class MapMyFitnessAuth(ConsumerBasedOAuth):
     def enabled(cls):
         """Return backend enabled status by checking basic settings"""
 
-        return setting('MAPMYFITNESS_CLIENT_ID') \
-            and setting('MAPMYFITNESS_CLIENT_SECRET')
+        return setting('MAPMYFITNESS_CLIENT_ID') and setting('MAPMYFITNESS_CLIENT_SECRET')
 
 
 # Backend definition
