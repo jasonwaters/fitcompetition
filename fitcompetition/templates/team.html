@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block head_title %}{{ team.name }}{% endblock %}
+
+{% block head_scripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block head_css %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h2>{{ team.name }} <small></small></h2>
+    </div>
+
+    <h3>Team Members</h3>
+    <ul>
+        {% for member in teamMembers %}
+            <li>{{ member.fullname }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

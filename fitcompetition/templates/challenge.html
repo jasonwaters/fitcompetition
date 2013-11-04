@@ -116,12 +116,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for player in playersWithActivities %}
-                            {% player_row user player challenge forloop.counter %}
-                        {% endfor %}
-                        {% for player in playersWithoutActivities %}
-                            {% player_row user player challenge forloop.counter playersWithActivities|length %}
-                        {% endfor %}
+                        {% if teams %}
+                            {% for team in teams %}
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td><span class="name"><a href="{% url "team_details" team.id %}">{{ team.name }}</a></span></td>
+                                    <td>{{ team.distance|toMiles|twoDecimals }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            {% for player in playersWithActivities %}
+                                {% player_row user player challenge forloop.counter %}
+                            {% endfor %}
+                            {% for player in playersWithoutActivities %}
+                                {% player_row user player challenge forloop.counter playersWithActivities|length %}
+                            {% endfor %}
+                        {% endif %}
                         </tbody>
                     </table>
                     <ul class="list-inline">

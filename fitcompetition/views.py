@@ -1,11 +1,12 @@
 from datetime import datetime
 import json
+import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Q, Max
 from django.http import HttpResponse
 from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction
+from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
@@ -57,6 +58,20 @@ def user(request, id):
     })
 
 
+def team(request, id):
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        team = None
+
+    members = team.members.all()
+
+    return render(request, 'team.html', {
+        'team': team,
+        'teamMembers': members
+    })
+
+
 def faq(request):
     return render(request, 'faq.html', {})
 
@@ -82,6 +97,8 @@ def challenge(request, id):
 
     approvedTypes = challenge.approvedActivities.all()
 
+    teams = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
+
     playersWithActivities = challenge.getChallengersWithActivities()
     playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
 
@@ -98,6 +115,7 @@ def challenge(request, id):
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
+        'teams': teams,
         'allPlayers': allPlayers,
         'playersWithActivities': playersWithActivities,
         'playersWithoutActivities': playersWithoutActivities,

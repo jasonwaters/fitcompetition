@@ -12,7 +12,7 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 2.7.3 virtualenv at ~/Development/runkeeper/env" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 2.7.5 virtualenv at ~/Development/runkeeper/env" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">

@@ -178,6 +178,10 @@ class Challenge(models.Model):
     def challengers(self):
         return FitUser.objects.filter(challenge=self).order_by('fullname')
 
+    @property
+    def teams(self):
+        return Team.objects.filter(challenge=self).order_by('name')
+
     def getAchievedGoal(self, fituser):
         if not fituser.is_authenticated():
             return False
@@ -206,24 +210,33 @@ class Challenge(models.Model):
         value = self.moneyInThePot / self.numAchieved
         return value.quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
+    def getActivitiesFilter(self, generic=False):
+        def fieldName(name):
+            if generic:
+                return name
+            else:
+                return 'fitnessactivity__%s' % name
+
+        approvedTypes = self.approvedActivities.all()
+
+        dateFilter = Q(**{fieldName('date__gte'): self.startdate})
+        dateFilter = dateFilter & Q(**{fieldName('date__lte'): self.enddate})
+        typeFilter = Q()
+
+        for type in approvedTypes:
+            typeFilter |= Q(**{fieldName('type'): type})
+
+        return dateFilter & typeFilter
+
     def getChallengersWithActivities(self, achieversOnly=False):
         now = datetime.utcnow().replace(tzinfo=pytz.utc)
-        approvedTypes = self.approvedActivities.all()
 
         result = []
         if self.startdate <= now:
-            dateFilter = Q(fitnessactivity__date__gte=self.startdate) & Q(fitnessactivity__date__lte=self.enddate)
-            typeFilter = Q()
-
-            for type in approvedTypes:
-                typeFilter |= Q(fitnessactivity__type=type)
-
-            activitiesFilter = dateFilter & typeFilter
-
             if achieversOnly:
-                result = self.challengers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
+                result = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
             else:
-                result = self.challengers.filter(activitiesFilter).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+                result = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
 
         return result
 
@@ -257,6 +270,30 @@ class Challenge(models.Model):
     def clean(self):
         if self.startdate > self.enddate:
             raise ValidationError("Start Date must be before End Date")
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=256)
+    challenge = models.ForeignKey(Challenge)
+    members = models.ManyToManyField(FitUser)
+
+
+    @property
+    def distance(self):
+        filter = self.challenge.getActivitiesFilter(generic=True)
+
+        userFilter = Q()
+
+        for member in self.members.all():
+            userFilter |= Q(user=member)
+
+        filter = filter & userFilter
+
+        result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
+        return result.get('distance__sum')
+
+    def __unicode__(self):
+        return self.name
 
 
 class Challenger(models.Model):
