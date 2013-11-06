@@ -12,15 +12,15 @@
         <span class="name"><a href="{% url "user_details" player.id %}">{{ player.fullname }}</a></span>
         <div class="flair">
             {% if player.total_distance|achievedGoal:challenge.distance %}
-                <i class="icon-trophy"></i>
+                <i class="fa fa-trophy"></i>
             {% endif %}
 
             {% if player.total_distance|overAchiever:challenge.distance %}
-                <i class="icon-star {% if player.total_distance|tripledGoal:challenge.distance %}gold{% elif player.total_distance|doubledGoal:challenge.distance %}silver{% else %}bronze{% endif %}"></i>
+                <i class="fa fa-star {% if player.total_distance|tripledGoal:challenge.distance %}gold{% elif player.total_distance|doubledGoal:challenge.distance %}silver{% else %}bronze{% endif %}"></i>
             {% endif %}
 
             {% if player.latest_activity_date|isToday %}
-                <i class="icon-heart red" title="Active today"></i>
+                <i class="fa fa-heart red" title="Active today"></i>
             {% endif %}
         </div>
     </td>

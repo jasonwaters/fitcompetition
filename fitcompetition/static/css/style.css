@@ -169,6 +169,17 @@ div small.error {
     background-color: #e7f4fb !important;
 }
 
+.table > tbody > tr.team td {
+    background-color: #fcf8e3 !important;
+    font-weight: bold;
+    padding: 15px 8px;
+}
+
+tr.team .team-rank {
+    margin-left: 5px;
+    color: #c09853;
+}
+
 .btn-share {
     margin-right: 10px;
 }
@@ -194,15 +205,15 @@ div small.error {
     background: -o-linear-gradient(top, #fefefe, #dedede);
 }
 
-.icon-twitter {
+.fa-twitter {
     color: #00adee;
 }
 
-.icon-facebook, .icon-facebook-sign {
+.fa-facebook, .fa-facebook-square {
     color: #43609c;
 }
 
-.icon-google-plus, .icon-google-plus-sign {
+.fa-google-plus, .fa-google-plus-square {
     color: #da4835;
 }
 

@@ -92,39 +92,30 @@ def challenge(request, id):
         except Challenger.DoesNotExist:
             competitor = None
 
-    allPlayers = challenge.challengers
+    if competitor and challenge.startdate <= now <= challenge.enddate:
+        request.user.syncRunkeeperData()
+
     canJoin = not challenge.hasEnded and not competitor
 
     approvedTypes = challenge.approvedActivities.all()
 
-    teams = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
-
-    playersWithActivities = challenge.getChallengersWithActivities()
-    playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
-
-    if competitor and challenge.startdate <= now <= challenge.enddate:
-        request.user.syncRunkeeperData()
-
-    playersWithoutActivities = []
-
-    for player in allPlayers:
-        if playersWithActivitiesMap.get(player.id) is None:
-            playersWithoutActivities.append(player)
-
-    return render(request, 'challenge.html', {
+    params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'teams': teams,
-        'allPlayers': allPlayers,
-        'playersWithActivities': playersWithActivities,
-        'playersWithoutActivities': playersWithoutActivities,
         'canJoin': canJoin,
         'competitor': competitor,
-        'numPlayers': len(allPlayers),
-        'userAchievedGoal': challenge.getAchievedGoal(request.user),
-        'approvedActivities': createListFromProperty(approvedTypes, 'name')
-    })
+        'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
+        'approvedActivities': createListFromProperty(approvedTypes, 'name'),
+        'numPlayers': challenge.numPlayers,
+    }
+
+    if challenge.isTypeSimple:
+        params['players'] = challenge.getChallengersWithActivities()
+    elif challenge.isTypeTeam:
+        params['teams'] = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
+
+    return render(request, 'challenge.html', params)
 
 
 @login_required
@@ -132,50 +123,41 @@ def join_challenge(request, id):
     try:
         challenge = Challenge.objects.get(id=id)
     except Challenge.DoesNotExist:
-        challenge = None
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
-    try:
-        challenge.challenger_set.get(fituser=request.user)
-    except Challenger.DoesNotExist:
-        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        Challenger.objects.create(challenge=challenge,
-                                  fituser=request.user,
-                                  date_joined=now)
-
-        Transaction.objects.create(date=now,
-                                   user=request.user,
-                                   description="Joined '%s' competition." % challenge.name,
-                                   amount=challenge.ante * -1,
-                                   challenge=challenge)
+    challenge.addChallenger(request.user)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
+@login_required
+def join_team(request, challenge_id, team_id):
+    try:
+        challenge = Challenge.objects.get(id=challenge_id)
+        challenge.addChallenger(request.user)
+    except Challenge.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+
+    try:
+        team = Team.objects.get(id=team_id)
+        team.members.add(request.user)
+    except Team.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
 def withdraw_challenge(request, id):
     try:
         challenge = Challenge.objects.get(id=id)
+        challenge.removeChallenger(request.user)
     except Challenge.DoesNotExist:
-        challenge = None
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
-    try:
-        challenger = Challenger.objects.get(challenge=challenge, fituser=request.user)
-        if not challenge.hasEnded:
-            challenger.delete()
-            now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    teams = Team.objects.all()
+    for team in teams:
+        team.members.remove(request.user)
 
-            Transaction.objects.create(date=now,
-                                       user=request.user,
-                                       description="Withdrew from '%s' competition." % challenge.name,
-                                       amount=challenge.ante,
-                                       challenge=challenge)
-            success = True
-
-    except Challenger.DoesNotExist:
-        success = False
-
-    return HttpResponse(json.dumps({'success': success}), content_type="application/json")
-
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
 def user_details_update(request):

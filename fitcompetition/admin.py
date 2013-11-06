@@ -13,7 +13,7 @@ class TeamInline(admin.TabularInline):
         return super(TeamInline, self).get_formset(request, obj, **kwargs)
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
-        if db_field.name == 'members':
+        if db_field.name == 'members' and self.parent_obj is not None:
             kwargs['queryset'] = self.parent_obj.challengers.all()
 
         return super(TeamInline, self).formfield_for_manytomany(db_field, request, **kwargs)

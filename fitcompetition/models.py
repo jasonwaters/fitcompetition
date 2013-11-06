@@ -133,7 +133,8 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def openChallenges(self, userid):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by('-num_players')
+        return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by(
+            '-num_players')
 
     def pastChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -145,7 +146,8 @@ class ChallengeManager(models.Manager):
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('-enddate')
+            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by(
+                '-enddate')
 
             for challenge in allUserChallenges:
                 if challenge.hasEnded:
@@ -153,11 +155,41 @@ class ChallengeManager(models.Manager):
                 else:
                     activeUserChallenges.append(challenge)
 
-        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'], getter=operator.attrgetter), completedUserChallenges
+        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'],
+                                                        getter=operator.attrgetter), completedUserChallenges
+
+
+def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilter):
+    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+
+    users_with_activities = []
+    activitySet = set()
+
+    if challenge.startdate <= now:
+        users_with_activities = challengers.filter(activitiesFilter).annotate(
+            total_distance=Sum('fitnessactivity__distance', distinct=True),
+            latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+
+        activitySet = set(user.id for user in users_with_activities)
+
+        users_with_activities = list(users_with_activities)
+
+    users_with_no_activities = filter(lambda x: x.id not in activitySet, challengers)
+    users = users_with_activities + users_with_no_activities
+
+    return users
+
+
+CHALLENGE_TYPES = (
+    ('SIMP', 'Simple - Complete the challenge and get paid.'),
+    ('WINR', 'Winner Takes All - First place takes the pot.'),
+    ('TEAM', 'Teams - The pot is shared between members of the winning team.')
+)
 
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
+    type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='SIMP')
     description = models.TextField(blank=True)
     distance = models.DecimalField(max_digits=16, decimal_places=2)
 
@@ -171,12 +203,56 @@ class Challenge(models.Model):
     objects = ChallengeManager()
 
     @property
+    def isTypeSimple(self):
+        return self.type == 'SIMP'
+
+    @property
+    def isTypeWinnerTakesAll(self):
+        return self.type == 'WINR'
+
+    @property
+    def isTypeTeam(self):
+        return self.type == 'TEAM'
+
+    @property
     def approvedActivityNames(self):
         return createListFromProperty(self.approvedActivities.all(), 'name')
 
     @property
     def challengers(self):
         return FitUser.objects.filter(challenge=self).order_by('fullname')
+
+    def addChallenger(self, user):
+        try:
+            self.challenger_set.get(fituser=user)
+        except Challenger.DoesNotExist:
+            now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+            Challenger.objects.create(challenge=self,
+                                      fituser=user,
+                                      date_joined=now)
+
+            Transaction.objects.create(date=now,
+                                       user=user,
+                                       description="Joined '%s' competition." % self.name,
+                                       amount=self.ante * -1,
+                                       challenge=self)
+
+    def removeChallenger(self, user):
+        try:
+            challenger = Challenger.objects.get(challenge=self, fituser=user)
+            if not self.hasEnded:
+                challenger.delete()
+                now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+                Transaction.objects.create(date=now,
+                                           user=user,
+                                           description="Withdrew from '%s' competition." % self.name,
+                                           amount=self.ante,
+                                           challenge=self)
+                return True
+        except Challenger.DoesNotExist:
+            return False
+
 
     @property
     def teams(self):
@@ -201,7 +277,10 @@ class Challenge(models.Model):
 
     @property
     def numAchieved(self):
-        return len(self.getChallengersWithActivities(achieversOnly=True))
+        return self.challengers.filter(self.getActivitiesFilter()).annotate(
+            total_distance=Sum('fitnessactivity__distance', distinct=True),
+            latest_activity_date=Max('fitnessactivity__date')).exclude(
+            total_distance__lt=toMeters(self.distance)).count()
 
     @property
     def achievedValue(self):
@@ -228,17 +307,8 @@ class Challenge(models.Model):
 
         return dateFilter & typeFilter
 
-    def getChallengersWithActivities(self, achieversOnly=False):
-        now = datetime.utcnow().replace(tzinfo=pytz.utc)
-
-        result = []
-        if self.startdate <= now:
-            if achieversOnly:
-                result = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).order_by('-total_distance')
-            else:
-                result = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True), latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
-
-        return result
+    def getChallengersWithActivities(self):
+        return getAnnotatedUserListWithActivityData(self, self.challengers, self.getActivitiesFilter())
 
     @property
     def moneyInThePot(self):
@@ -275,8 +345,12 @@ class Challenge(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=256)
     challenge = models.ForeignKey(Challenge)
-    members = models.ManyToManyField(FitUser)
+    members = models.ManyToManyField(FitUser, blank=True, null=True, default=None)
 
+    def getMembersWithActivities(self):
+        return getAnnotatedUserListWithActivityData(self.challenge,
+                                                    self.members.all(),
+                                                    self.challenge.getActivitiesFilter())
 
     @property
     def distance(self):
