@@ -123,8 +123,6 @@ INSTALLED_APPS = (
     # 'brabeion',
 )
 
-PIPELINE_DISABLE_WRAPPER=True
-
 PIPELINE_CSS = {
     'all-css': {
         'source_filenames': (
