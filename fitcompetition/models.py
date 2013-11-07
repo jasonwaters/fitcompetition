@@ -133,8 +133,10 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def openChallenges(self, userid):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by(
-            '-num_players')
+        if userid is not None:
+            return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by('-num_players')
+        else:
+            return self.annotate(num_players=Count('players')).filter(enddate__gt=now).order_by('-num_players')
 
     def pastChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -345,7 +347,8 @@ class Challenge(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=256)
     challenge = models.ForeignKey(Challenge)
-    members = models.ManyToManyField(FitUser, blank=True, null=True, default=None)
+    members = models.ManyToManyField(FitUser, blank=True, null=True, default=None, related_name='members')
+    captain = models.ForeignKey(FitUser, blank=True, null=True, default=None, related_name='captain')
 
     def getMembersWithActivities(self):
         return getAnnotatedUserListWithActivityData(self.challenge,

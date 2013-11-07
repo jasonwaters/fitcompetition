@@ -19,6 +19,7 @@ urlpatterns = patterns('',
                        url(r'^update-user-details/$', 'fitcompetition.views.user_details_update', name="user_details_update"),
                        url(r'^c/join/(?P<id>\d+)/$', 'fitcompetition.views.join_challenge', name="join_challenge"),
                        url(r'^c/join/(?P<challenge_id>\d+)/team/(?P<team_id>\d+)/$', 'fitcompetition.views.join_team', name="join_team"),
+                       url(r'^c/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.views.create_team', name="create_team"),
 
                        url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.views.withdraw_challenge', name="withdraw_challenge"),
                        url(r'^c/refresh-user-activities/$', 'fitcompetition.views.refresh_user_activities', name="refresh_user_activities"),

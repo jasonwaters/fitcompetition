@@ -3,7 +3,7 @@ import json
 import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q, Max
+from django.db.models import Sum, Q, Max, Count
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
@@ -113,6 +113,7 @@ def challenge(request, id):
     if challenge.isTypeSimple:
         params['players'] = challenge.getChallengersWithActivities()
     elif challenge.isTypeTeam:
+        params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(num_members__lt=5)
         params['teams'] = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
 
     return render(request, 'challenge.html', params)
@@ -146,6 +147,22 @@ def join_team(request, challenge_id, team_id):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
+def create_team(request, challenge_id):
+    try:
+        challenge = Challenge.objects.get(id=challenge_id)
+        challenge.addChallenger(request.user)
+    except Challenge.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+
+    team, created = Team.objects.get_or_create(challenge=challenge, captain=request.user)
+    team.name = "%s's Team" % request.user.first_name
+    team.members.add(request.user)
+    team.save()
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required
 def withdraw_challenge(request, id):
     try:
         challenge = Challenge.objects.get(id=id)
@@ -156,6 +173,8 @@ def withdraw_challenge(request, id):
     teams = Team.objects.all()
     for team in teams:
         team.members.remove(request.user)
+
+    Team.objects.filter(captain=request.user).annotate(num_members=Count('members')).filter(num_members=0).delete()
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 

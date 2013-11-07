@@ -74,10 +74,14 @@
                         Join this Challenge <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        {% for team in teams %}
+                        {% for team in open_teams %}
                             <li><a href="#" class="join-team" data-id="{{ team.id }}">Join Team "{{ team.name }}"</a></li>
                         {% endfor %}
-                    </ul>
+						{% if open_teams|length > 0 %}
+							<li role="presentation" class="divider"></li>
+						{% endif %}
+						<li><a href="#" class="create-team">Start a new Team</a></li>
+					</ul>
                 </div>
             {% else %}
                 <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button">Join this Challenge</button>
@@ -172,12 +176,23 @@
                 {% endif %}
             </div>
             <div class="tab-pane" id="rules">
-                <ul>
-                    <li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-                    <li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
-                    <li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
-                    <li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
-                </ul>
+				{% if challenge.isTypeSimple %}
+					<ul>
+						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
+						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
+						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
+						<li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+					</ul>
+				{% elif challenge.isTypeTeam %}
+					<ul>
+						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
+						<li>Join a team.  Teams can have a maximum of 5 players.</li>
+						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
+						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
+						<li>A team can only win if everyone on the team has completed the {{ challenge.distance|floatformat:"-1" }} mile challenge.</li>
+						<li>Get Paid. The team with the most miles wins the challenge.  The money pot is dispersed evenly to members of that team.</li>
+					</ul>
+				{% endif %}
             </div>
         </div>
     </div>
@@ -275,6 +290,13 @@
                 window.location.reload();
             });
         });
+
+		$('.create-team').click(function(evt) {
+			evt.preventDefault();
+			$.get('{% url 'create_team' challenge.id %}', function(result) {
+				window.location.reload();
+			});
+		});
 
         $('.withdraw-challenge').click(function(evt) {
             evt.preventDefault();
