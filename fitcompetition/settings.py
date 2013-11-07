@@ -147,7 +147,7 @@ PIPELINE_JS = {
             'js/moment.js',
             'js/lodash.js',
             'js/countdown.js',
-            'js/script.js'
+            'js/script.js',
         ),
         'output_filename': 'js/all.js',
     }
