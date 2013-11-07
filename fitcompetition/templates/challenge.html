@@ -75,7 +75,7 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         {% for team in open_teams %}
-                            <li><a href="#" class="join-team" data-id="{{ team.id }}">Join Team "{{ team.name }}"</a></li>
+                            <li><a href="#" class="join-team" data-id="{{ team.id }}">Join "{{ team.name }}"</a></li>
                         {% endfor %}
 						{% if open_teams|length > 0 %}
 							<li role="presentation" class="divider"></li>
@@ -89,9 +89,24 @@
         {% else %}
             <a class="vertical-padding btn btn-primary btn-lg" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
         {% endif %}
+	{% elif canSwitchTeams %}
+		<div class="btn-group vertical-padding ">
+			<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
+				Switch  to a different team <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				{% for team in open_teams %}
+					<li><a href="#" class="join-team" data-id="{{ team.id }}">Switch to "{{ team.name }}"</a></li>
+				{% endfor %}
+				{% if open_teams|length > 0 %}
+					<li role="presentation" class="divider"></li>
+				{% endif %}
+				<li><a href="#" class="create-team">Start a new Team</a></li>
+			</ul>
+		</div>
     {% endif %}
 
-    {% if not challenge.hasEnded and show_social %}
+    {% if competitor and not challenge.hasEnded and show_social %}
         <div class="fc-callout fc-callout-info" data-calloutid="social-callout-{{ challenge.id }}">
             <button type="button" class="close close-callout">&times;</button>
             <h4>It's more fun with friends. <small>Share the love</small></h4>

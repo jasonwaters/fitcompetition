@@ -114,7 +114,16 @@ def challenge(request, id):
         params['players'] = challenge.getChallengersWithActivities()
     elif challenge.isTypeTeam:
         params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(num_members__lt=5)
+
+        if request.user.is_authenticated():
+            try:
+                team = Team.objects.get(challenge=challenge, members__id__exact=request.user.id)
+                params['open_teams'] = params['open_teams'].exclude(id=team.id)
+            except Team.DoesNotExist:
+                pass
+
         params['teams'] = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
+        params['canSwitchTeams'] = competitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)
 
@@ -140,7 +149,7 @@ def join_team(request, challenge_id, team_id):
 
     try:
         team = Team.objects.get(id=team_id)
-        team.members.add(request.user)
+        withdraw_all_teams(request.user, except_for=team)
     except Team.DoesNotExist:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
@@ -154,12 +163,25 @@ def create_team(request, challenge_id):
     except Challenge.DoesNotExist:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
+    withdraw_all_teams(request.user)
+
     team, created = Team.objects.get_or_create(challenge=challenge, captain=request.user)
     team.name = "%s's Team" % request.user.first_name
     team.members.add(request.user)
     team.save()
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+def withdraw_all_teams(user, except_for=None):
+    teams = Team.objects.exclude(id=except_for.id) if except_for is not None else Team.objects.all()
+    for team in teams:
+            team.members.remove(user)
+
+    if except_for is not None:
+        except_for.members.add(user)
+
+    Team.objects.filter(captain=user).annotate(num_members=Count('members')).filter(num_members=0).delete()
 
 
 @login_required
@@ -170,12 +192,7 @@ def withdraw_challenge(request, id):
     except Challenge.DoesNotExist:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
-    teams = Team.objects.all()
-    for team in teams:
-        team.members.remove(request.user)
-
-    Team.objects.filter(captain=request.user).annotate(num_members=Count('members')).filter(num_members=0).delete()
-
+    withdraw_all_teams(request.user)
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
