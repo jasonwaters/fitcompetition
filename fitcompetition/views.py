@@ -3,15 +3,16 @@ import json
 import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q, Max, Count
+from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
-from fitcompetition.settings import TIME_ZONE
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
+
+TEAM_MEMBER_MAXIMUM = 5
 
 def challenges(request):
     allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
@@ -95,15 +96,13 @@ def challenge(request, id):
     if competitor and challenge.startdate <= now <= challenge.enddate:
         request.user.syncRunkeeperData()
 
-    canJoin = not challenge.hasEnded and not competitor
-
     approvedTypes = challenge.approvedActivities.all()
 
     params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'canJoin': canJoin,
+        'canJoin': not challenge.hasStarted and not competitor,
         'competitor': competitor,
         'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
@@ -113,7 +112,7 @@ def challenge(request, id):
     if challenge.isTypeSimple:
         params['players'] = challenge.getChallengersWithActivities()
     elif challenge.isTypeTeam:
-        params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(num_members__lt=5)
+        params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(num_members__lt=TEAM_MEMBER_MAXIMUM)
 
         if request.user.is_authenticated():
             try:
@@ -130,45 +129,46 @@ def challenge(request, id):
 
 @login_required
 def join_challenge(request, id):
-    try:
-        challenge = Challenge.objects.get(id=id)
-    except Challenge.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
-
-    challenge.addChallenger(request.user)
-
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+    added_challenger, challenge = addChallenger(id, request.user)
+    return HttpResponse(json.dumps({'success': added_challenger}), content_type="application/json")
 
 @login_required
 def join_team(request, challenge_id, team_id):
-    try:
-        challenge = Challenge.objects.get(id=challenge_id)
-        challenge.addChallenger(request.user)
-    except Challenge.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
-
-    try:
-        team = Team.objects.get(id=team_id)
-        withdraw_all_teams(request.user, except_for=team)
-    except Team.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+    added_challenger, challenge = addChallenger(challenge_id, request.user)
+    if added_challenger:
+        try:
+            teams = list(Team.objects.filter(id=team_id).annotate(num_members=Count('members')).filter(num_members__lt=TEAM_MEMBER_MAXIMUM)[:1])
+            if teams:
+                withdraw_all_teams(request.user, except_for=teams[0])
+        except Team.DoesNotExist:
+            return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
-@login_required
-def create_team(request, challenge_id):
+
+def addChallenger(challenge_id, user):
     try:
         challenge = Challenge.objects.get(id=challenge_id)
-        challenge.addChallenger(request.user)
+        if challenge.hasStarted:
+            raise Exception('Challenge Already Started')
+        challenge.addChallenger(user)
+        return True, challenge
     except Challenge.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+        return False, None
+    except Exception:
+        return False, None
 
-    withdraw_all_teams(request.user)
+@login_required
+def create_team(request, challenge_id):
+    added_challenger, challenge = addChallenger(challenge_id, request.user)
 
-    team, created = Team.objects.get_or_create(challenge=challenge, captain=request.user)
-    team.name = "%s's Team" % request.user.first_name
-    team.members.add(request.user)
-    team.save()
+    if added_challenger:
+        withdraw_all_teams(request.user)
+
+        team, created = Team.objects.get_or_create(challenge=challenge, captain=request.user)
+        team.name = "%s's Team" % request.user.first_name
+        team.members.add(request.user)
+        team.save()
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 

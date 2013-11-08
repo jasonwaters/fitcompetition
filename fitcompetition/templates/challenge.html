@@ -46,9 +46,9 @@
                 {% endif %}
             {% endif %}
         {% else %}
-            {% if not challenge.hasEnded %}
+            {% if not challenge.hasStarted %}
                 It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
-            {% else %}
+            {% elif challenge.hasEnded %}
                 This challenge is history.
             {% endif %}
         {% endif %}
