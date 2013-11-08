@@ -180,6 +180,11 @@ tr.team .team-rank {
     color: #c09853;
 }
 
+tr.team .team-total {
+	margin-left: 5px;
+
+}
+
 .btn-share {
     margin-right: 10px;
 }

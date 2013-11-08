@@ -121,7 +121,7 @@ def challenge(request, id):
             except Team.DoesNotExist:
                 pass
 
-        params['teams'] = ListUtil.multikeysort(challenge.teams, ['-distance'], getter=operator.attrgetter)
+        params['teams'] = ListUtil.multikeysort(challenge.teams, ['-averageDistance'], getter=operator.attrgetter)
         params['canSwitchTeams'] = competitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)

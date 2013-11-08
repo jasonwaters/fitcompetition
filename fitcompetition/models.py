@@ -367,7 +367,12 @@ class Team(models.Model):
         filter = filter & userFilter
 
         result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
-        return result.get('distance__sum')
+        return result.get('distance__sum') if result.get('distance__sum') is not None else 0
+
+    @property
+    def averageDistance(self):
+        num_players = max(self.members.count(), 1)
+        return self.distance / num_players
 
     def __unicode__(self):
         return self.name

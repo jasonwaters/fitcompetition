@@ -155,7 +155,12 @@
                                         <span class="name">{{ team.name }}</span>
                                         <span class="team-rank">{{ forloop.counter|ordinal }} Place</span>
                                     </td>
-                                    <td>{{ team.distance|toMiles|twoDecimals }}</td>
+                                    <td><a href="#" class="popover-link team-total-link" data-toggle="popover" data-html="true" data-trigger="manual" data-placement="left" data-title="{{ team.name }}" data-container="body" data-content='{% spaceless %}
+                                    <table class="table table-condensed no-margin-bottom">
+                                    	<tr><td>Total Miles</td><td>{{ team.distance|toMiles|twoDecimals }}</td></tr>
+										<tr><td> Average Miles</td><td>{{ team.averageDistance|toMiles|twoDecimals }}</td></tr>
+									</table>
+                                    {% endspaceless %}'>{{ team.averageDistance|toMiles|twoDecimals }}</a></td>
                                 </tr>
                                 {% for player in team.getMembersWithActivities %}
                                     {% player_row user player challenge forloop.counter %}
@@ -205,7 +210,7 @@
 						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>
 						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
 						<li>A team can only win if everyone on the team has completed the {{ challenge.distance|floatformat:"-1" }} mile challenge.</li>
-						<li>Get Paid. The team with the most miles wins the challenge.  The money pot is dispersed evenly to members of that team.</li>
+						<li>Get Paid. The team with the highest average miles per player wins the challenge.  The money pot is dispersed evenly to members of that team.</li>
 					</ul>
 				{% endif %}
             </div>
@@ -214,25 +219,43 @@
     <script type="text/javascript">
         var COUNTDOWN_TARGET_DATE = '{{ challenge.enddate|fullDate }}';
         $(".alert").alert();
+
         var hidePopovers = function(list) {
             $(list).popover('destroy');
             $(list).removeAttr('data-content');
-        };
+			$(list).removeAttr('data-showing-now');
+		};
 
         $('body').click(function(evt) {
             if($(evt.target).parents('.popover').length == 0) {
-                hidePopovers($('a.activities-link'));
+                hidePopovers($('a.popover-link'));
             }
         });
 
-        $('a.activities-link').popover().click(function(evt) {
+        $('a.team-total-link').popover().click(function(evt) {
+			evt.preventDefault();
+			evt.stopPropagation(evt.target);
+
+			if(($(evt.target).attr('data-showing-now')) != null) {
+				//popup already showing
+				hidePopovers($('a.popover-link'));
+			}else {
+				hidePopovers(_.without($('a.popover-link'), evt.target));
+				$(this).popover('show');
+				$(this).attr('data-showing-now','true');
+			}
+
+		})
+
+		$('a.activities-link').popover().click(function(evt) {
+			evt.preventDefault();
             evt.stopPropagation(evt.target);
 
             if(($(evt.target).attr('data-content')) != null) {
                 //popup already showing
-                hidePopovers($('a.activities-link'));
+                hidePopovers($('a.popover-link'));
             }else {
-                hidePopovers(_.without($('a.activities-link'), evt.target));
+                hidePopovers(_.without($('a.popover-link'), evt.target));
                 var url = $(this).data('url');
                 $.get(url, function(result) {
                     $(this).attr('data-content', result);
