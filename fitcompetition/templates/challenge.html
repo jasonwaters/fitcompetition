@@ -64,7 +64,7 @@
             </span>
         {% endif %}
     </p>
-    <p>{{ challenge.description }}</p>
+    <p>{{ challenge.description|safe }}</p>
 
     {% if canJoin %}
         {% if user.is_authenticated %}
