@@ -27,44 +27,52 @@
     <div class="page-header">
         <h2>{{ challenge.name }}</h2>
     </div>
-    <p class="lead">
-        Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-        There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
 
-        {% if competitor %}
-            {% if not challenge.hasEnded %}
-                {% if userAchievedGoal %}
-                    <strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
-                {% else %}
-                    <strong class="text-primary">You are competing in this challenge!</strong>
-                {% endif %}
-            {% else %}
-                {% if userAchievedGoal %}
-                    <strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
-                {% else %}
-                    <strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
-                {% endif %}
-            {% endif %}
-        {% else %}
-            {% if not challenge.hasStarted %}
-                It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
-            {% elif challenge.hasEnded %}
-                This challenge is history.
-            {% endif %}
-        {% endif %}
-    </p>
+	<p class="lead">
+		{% if challenge.isTypeTeam %}
+			Complete at least {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
+			There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot. The team with the highest average miles per player takes the crown and the pot is split evenly between it's members.
+		{% else %}
+			Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
+			There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
+
+			{% if competitor %}
+				{% if not challenge.hasEnded %}
+					{% if userAchievedGoal %}
+						<strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
+					{% else %}
+						<strong class="text-primary">You are competing in this challenge!</strong>
+					{% endif %}
+				{% else %}
+					{% if userAchievedGoal %}
+						<strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
+					{% else %}
+						<strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
+					{% endif %}
+				{% endif %}
+			{% else %}
+				{% if not challenge.hasStarted %}
+					It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
+				{% elif challenge.hasEnded %}
+					This challenge is history.
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	</p>
+
+	<p>{{ challenge.description|safe }}</p>
+
     <p>
         {% if not challenge.hasStarted %}
             This Challenge will start in {{ challenge.startdate|timeuntil }}.
         {% elif challenge.hasEnded %}
-            This Challenge ended {{ challenge.enddate|timesince }} ago.
+            This Challenge ended {{ challenge.enddate|timesince }} ago. {% if challenge.numAchieved > 0 %}{{ challenge.numAchieved }} people earned {{ challenge.achievedValue|currency }}!{% endif %}
         {% else%}
             <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
                 This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
             </span>
         {% endif %}
     </p>
-    <p>{{ challenge.description|safe }}</p>
 
     {% if canJoin %}
         {% if user.is_authenticated %}
@@ -217,158 +225,170 @@
         </div>
     </div>
     <script type="text/javascript">
-        var COUNTDOWN_TARGET_DATE = '{{ challenge.enddate|fullDate }}';
-        $(".alert").alert();
-
-        var hidePopovers = function(list) {
-            $(list).popover('destroy');
-            $(list).removeAttr('data-content');
-			$(list).removeAttr('data-showing-now');
-		};
-
-        $('body').click(function(evt) {
-            if($(evt.target).parents('.popover').length == 0) {
-                hidePopovers($('a.popover-link'));
-            }
-        });
-
-        $('a.team-total-link').popover().click(function(evt) {
-			evt.preventDefault();
-			evt.stopPropagation(evt.target);
-
-			if(($(evt.target).attr('data-showing-now')) != null) {
-				//popup already showing
-				hidePopovers($('a.popover-link'));
-			}else {
-				hidePopovers(_.without($('a.popover-link'), evt.target));
-				$(this).popover('show');
-				$(this).attr('data-showing-now','true');
+		(function() {
+			function round(value) {
+				return Math.ceil(value * 100) / 100
 			}
 
-		})
+			$(".alert").alert();
 
-		$('a.activities-link').popover().click(function(evt) {
-			evt.preventDefault();
-            evt.stopPropagation(evt.target);
+			var hidePopovers = function(list) {
+				$(list).popover('destroy');
+				$(list).removeAttr('data-content');
+				$(list).removeAttr('data-showing-now');
+			};
 
-            if(($(evt.target).attr('data-content')) != null) {
-                //popup already showing
-                hidePopovers($('a.popover-link'));
-            }else {
-                hidePopovers(_.without($('a.popover-link'), evt.target));
-                var url = $(this).data('url');
-                $.get(url, function(result) {
-                    $(this).attr('data-content', result);
-                    $(this).popover('show');
-                }.bind(this));
-            }
-        });
-
-        $('body').delegate('.show-more-activities', 'click', function(evt) {
-            var link = $(evt.target);
-            $('.activities-list tr.hidden').removeClass('hidden');
-            link.addClass('hidden');
-        });
-
-        $('.btn.settle-up').click(function(evt) {
-            evt.preventDefault();
-            var win = window.open('http://www.paypal.com', '_blank');
-            win.focus();
-        });
-
-        $('.close-callout').click(function(evt) {
-            evt.preventDefault();
-            var $this = $(this),
-                callout = $this.parent('.fc-callout'),
-                calloutid = callout.data('calloutid');
-
-            callout.remove();
-
-            var hiddenCallouts = $.cookie('hidden_callouts') || '';
-
-            hiddenCallouts = hiddenCallouts.length > 0 ? hiddenCallouts.split(',') : [];
-
-            if( hiddenCallouts.indexOf(calloutid) < 0) {
-                hiddenCallouts.push(calloutid);
-            }
-
-            $.cookie('hidden_callouts', hiddenCallouts.join(','));
-        });
-
-        $('.btn-share').click(function(evt) {
-           evt.preventDefault();
-            var $this = $(this),
-                service = $this.data('service');
-
-            if(service === 'twitter') {
-                var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcompetition';
-                window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
-            }else if(service === 'facebook') {
-                window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),
-                            'facebook-share-dialog',
-                            'width=626,height=436');
-            }else if(service === 'google') {
-                window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
-            }
-        });
-
-        $('.join-challenge').click(function(evt) {
-            evt.preventDefault();
-            $.get("{% url 'join_challenge' challenge.id %}", function(result) {
-                window.location.reload();
-            });
-        });
-
-        $('.join-team').click(function(evt) {
-            evt.preventDefault();
-            var teamID = $(this).data('id');
-
-            var url = "{% url 'join_team' challenge.id '000000' %}".replace(/000000/, teamID.toString());
-            $.get(url, function(result) {
-                window.location.reload();
-            });
-        });
-
-		$('.create-team').click(function(evt) {
-			evt.preventDefault();
-			$.get('{% url 'create_team' challenge.id %}', function(result) {
-				window.location.reload();
+			$('body').click(function(evt) {
+				if($(evt.target).parents('.popover').length == 0) {
+					hidePopovers($('a.popover-link'));
+				}
 			});
-		});
 
-        $('.withdraw-challenge').click(function(evt) {
-            evt.preventDefault();
-            $.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
-                window.location.reload();
-            });
-        });
+			$('a.team-total-link').popover().click(function(evt) {
+				evt.preventDefault();
+				evt.stopPropagation(evt.target);
 
-        $('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
-            var text = $(this).text();
-            $(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
-        });
+				if(($(evt.target).attr('data-showing-now')) != null) {
+					//popup already showing
+					hidePopovers($('a.popover-link'));
+				}else {
+					hidePopovers(_.without($('a.popover-link'), evt.target));
+					$(this).popover('show');
+					$(this).attr('data-showing-now','true');
+				}
+			})
 
-        $('a#disqus_count').click(function(evt) {
-            evt.preventDefault();
-            $('#challenge_tabs a[href="#disqus"]').tab('show');
-        });
+			$('a.activities-link').popover().click(function(evt) {
+				evt.preventDefault();
+				evt.stopPropagation(evt.target);
 
-        {% if "DISQUS_SHORTNAME"|fromSettings %}
-            //disqus instantiation javascript.
-            var disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}'; // required: replace example with your forum shortname
-            var disqus_identifier = '{{ disqus_identifier }}';
+				if(($(evt.target).attr('data-content')) != null) {
+					//popup already showing
+					hidePopovers($('a.popover-link'));
+				}else {
+					hidePopovers(_.without($('a.popover-link'), evt.target));
+					var url = $(this).data('url');
+					$.get(url, function(result) {
+						$(this).attr('data-content', result);
+						$(this).popover('show');
+					}.bind(this));
+				}
+			});
 
-            (function () {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			$('body').delegate('.show-more-activities', 'click', function(evt) {
+				var link = $(evt.target);
+				$('.activities-list tr.hidden').removeClass('hidden');
+				link.addClass('hidden');
+			});
+
+			$('.btn.settle-up').click(function(evt) {
+				evt.preventDefault();
+				var win = window.open('http://www.paypal.com', '_blank');
+				win.focus();
+			});
+
+			$('.close-callout').click(function(evt) {
+				evt.preventDefault();
+				var $this = $(this),
+					callout = $this.parent('.fc-callout'),
+					calloutid = callout.data('calloutid');
+
+				callout.remove();
+
+				var hiddenCallouts = $.cookie('hidden_callouts') || '';
+
+				hiddenCallouts = hiddenCallouts.length > 0 ? hiddenCallouts.split(',') : [];
+
+				if( hiddenCallouts.indexOf(calloutid) < 0) {
+					hiddenCallouts.push(calloutid);
+				}
+
+				$.cookie('hidden_callouts', hiddenCallouts.join(','));
+			});
+
+			$('.btn-share').click(function(evt) {
+			   evt.preventDefault();
+				var $this = $(this),
+					service = $this.data('service');
+
+				if(service === 'twitter') {
+					var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcompetition';
+					window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
+				}else if(service === 'facebook') {
+					window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),
+								'facebook-share-dialog',
+								'width=626,height=436');
+				}else if(service === 'google') {
+					window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
+				}
+			});
+
+			{% if fetchLatest %}
+				$.get("{% url 'fetch_latest_activities' challenge.id %}", function(result) {
+					if(result && result.success) {
+						$('tr.current-player a.distance-enclave').text(round(result.distance));
+					}
+				});
+			{% endif %}
+
+			$('.join-challenge').click(function(evt) {
+				evt.preventDefault();
+				$.get("{% url 'join_challenge' challenge.id %}", function(result) {
+					window.location.reload();
+				});
+			});
+
+			$('.join-team').click(function(evt) {
+				evt.preventDefault();
+				var teamID = $(this).data('id');
+
+				var url = "{% url 'join_team' challenge.id '000000' %}".replace(/000000/, teamID.toString());
+				$.get(url, function(result) {
+					window.location.reload();
+				});
+			});
+
+			$('.create-team').click(function(evt) {
+				evt.preventDefault();
+				$.get('{% url 'create_team' challenge.id %}', function(result) {
+					window.location.reload();
+				});
+			});
+
+			$('.withdraw-challenge').click(function(evt) {
+				evt.preventDefault();
+				$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
+					window.location.reload();
+				});
+			});
+
+			$('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
+				var text = $(this).text();
+				$(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
+			});
+
+			$('a#disqus_count').click(function(evt) {
+				evt.preventDefault();
+				$('#challenge_tabs a[href="#disqus"]').tab('show');
+			});
+
+			{% if "DISQUS_SHORTNAME"|fromSettings %}
+				//disqus instantiation javascript.
+				var disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}'; // required: replace example with your forum shortname
+				var disqus_identifier = '{{ disqus_identifier }}';
+
+				(function () {
+					var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+					dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+					(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 
 
-                var s = document.createElement('script'); s.async = true;
-                s.type = 'text/javascript';
-                s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-                (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-            }());
-        {% endif %}
-    </script>
+					var s = document.createElement('script'); s.async = true;
+					s.type = 'text/javascript';
+					s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+					(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+				}());
+			{% endif %}
+		})();
+	</script>
 {% endblock %}

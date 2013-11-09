@@ -3,10 +3,11 @@ import json
 import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
+from fitcompetition.templatetags.apptags import toMiles
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
@@ -107,6 +108,7 @@ def challenge(request, id):
         'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
+        'fetchLatest': False,
     }
 
     if challenge.isTypeSimple:
@@ -125,6 +127,17 @@ def challenge(request, id):
         params['canSwitchTeams'] = competitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)
+
+@login_required
+def fetch_latest_activities(request, challenge_id):
+    request.user.syncRunkeeperData()
+
+    try:
+        challenge = Challenge.objects.get(id=challenge_id)
+        distance = request.user.getDistance(challenge)
+        return HttpResponse(json.dumps({'success': True, 'distance': toMiles(distance)}), content_type="application/json")
+    except Challenge.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 
 @login_required

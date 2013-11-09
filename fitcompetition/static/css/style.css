@@ -84,6 +84,12 @@ a.activities-link {
     height: 18px;
 }
 
+.activity-icon.elliptical {
+    background: url('/static/img/icon-elliptical-small.png') no-repeat -2px 4px;;
+    /*width: 18px;*/
+    height: 18px;
+}
+
 .player .name {
     display: inline-block;
     margin-left: 5px;

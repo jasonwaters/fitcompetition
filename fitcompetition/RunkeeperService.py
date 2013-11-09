@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 import pytz
 import requests
@@ -41,6 +41,7 @@ def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSin
     headers = {}
 
     if modifiedSince is not None:
+        modifiedSince = modifiedSince-timedelta(days=1)
         headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     url = "%s%s" % (RUNKEEPER_API_URL, FITNESS_ACTIVITIES)
@@ -69,6 +70,7 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
     }
 
     if modifiedSince is not None:
+        modifiedSince = modifiedSince-timedelta(days=1)
         headers['If-Modified-Since'] = modifiedSince.replace(tzinfo=pytz.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     if modifiedNoEarlierThan is not None:

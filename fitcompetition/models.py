@@ -68,6 +68,11 @@ class FitUser(AbstractUser):
     def delinquent(self):
         return self.balance < 0
 
+    def getDistance(self, challenge):
+        filter = challenge.getActivitiesFilter(generic=True) & Q(user=self)
+        result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
+        return result.get('distance__sum') if result.get('distance__sum') is not None else 0
+
     @property
     def balance(self):
         result = Transaction.objects.filter(user=self).aggregate(balance=Sum('amount'))
