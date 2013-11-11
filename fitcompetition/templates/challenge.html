@@ -373,9 +373,8 @@
 			});
 
 			{% if "DISQUS_SHORTNAME"|fromSettings %}
-				//disqus instantiation javascript.
-				var disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}'; // required: replace example with your forum shortname
-				var disqus_identifier = '{{ disqus_identifier }}';
+				window.disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}';
+				window.disqus_identifier = '{{ disqus_identifier }}';
 
 				(function () {
 					var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
