@@ -81,11 +81,11 @@ class FitUser(AbstractUser):
     def is_authenticated(self):
         return True
 
-    def syncRunkeeperData(self, activityTypesMap=None):
+    def syncRunkeeperData(self, activityTypesMap=None, syncProfile=True):
         if activityTypesMap is None:
             activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
 
-        successful = self.syncProfileWithRunkeeper()
+        successful = self.syncProfileWithRunkeeper() if syncProfile else True
         successful = successful and FitnessActivity.objects.pruneActivities(self)
         successful = successful and FitnessActivity.objects.syncActivities(self, activityTypesMap)
 

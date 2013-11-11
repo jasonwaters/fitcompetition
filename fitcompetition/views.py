@@ -95,7 +95,7 @@ def challenge(request, id):
             competitor = None
 
     if competitor and challenge.startdate <= now <= challenge.enddate:
-        request.user.syncRunkeeperData()
+        request.user.syncRunkeeperData(syncProfile=False)
 
     approvedTypes = challenge.approvedActivities.all()
 
