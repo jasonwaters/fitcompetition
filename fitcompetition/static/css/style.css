@@ -100,7 +100,7 @@ a.activities-link {
     overflow: hidden;
 }
 
-.player .flair [class^="icon-"] {
+.player .flair [class^="fa-"] {
     padding-left: 2px;
 }
 
