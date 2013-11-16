@@ -447,9 +447,19 @@ class FitnessActivity(models.Model):
     objects = FitnessActivityManager()
 
 
+class Account(models.Model):
+    description = models.CharField(max_length=255)
+    user = models.ForeignKey(FitUser, blank=True, null=True, default=None)
+    challenge = models.ForeignKey(Challenge, blank=True, null=True, default=None)
+
+    @property
+    def balance(self):
+        result = Transaction.objects.filter(account=self).aggregate(balance=Sum('amount'))
+        return ListUtil.attr(result, 'balance', 0.0)
+
+
 class Transaction(models.Model):
     date = models.DateField(blank=True)
-    user = models.ForeignKey(FitUser)
+    account = models.ForeignKey(Account)
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
-    challenge = models.ForeignKey(Challenge, blank=True, null=True, default=None)
