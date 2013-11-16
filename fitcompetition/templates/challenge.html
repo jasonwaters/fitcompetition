@@ -110,6 +110,8 @@
 					<li role="presentation" class="divider"></li>
 				{% endif %}
 				<li><a href="#" class="create-team">Start a new Team</a></li>
+				<li role="presentation" class="divider"></li>
+				<li><a href="#" class="withdraw-challenge">Withdraw from this challenge.</a></li>
 			</ul>
 		</div>
     {% endif %}
@@ -357,9 +359,13 @@
 
 			$('.withdraw-challenge').click(function(evt) {
 				evt.preventDefault();
-				$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
-					window.location.reload();
-				});
+				var withdraw = window.confirm("Are you sure you want to withdraw from this challenge?")
+
+				if(withdraw) {
+					$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
+						window.location.reload();
+					});
+				}
 			});
 
 			$('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
