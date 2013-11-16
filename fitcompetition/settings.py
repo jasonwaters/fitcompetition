@@ -221,6 +221,8 @@ SOCIAL_AUTH_PIPELINE = (
     'fitcompetition.pipeline.persistHealthgraphData',
 )
 
+TEAM_MEMBER_MAXIMUM = 5
+
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_ERROR_URL = "/login-error/"

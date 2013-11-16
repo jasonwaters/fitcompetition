@@ -15,6 +15,7 @@ from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 from requests import RequestException
 from dateutil import parser
+import signals
 
 
 class CurrencyField(models.DecimalField):
@@ -153,8 +154,7 @@ class ChallengeManager(models.Manager):
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by(
-                '-enddate')
+            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('-enddate')
 
             for challenge in allUserChallenges:
                 if challenge.hasEnded:
@@ -162,8 +162,7 @@ class ChallengeManager(models.Manager):
                 else:
                     activeUserChallenges.append(challenge)
 
-        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'],
-                                                        getter=operator.attrgetter), completedUserChallenges
+        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'], getter=operator.attrgetter), completedUserChallenges
 
 
 def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilter):
@@ -238,25 +237,11 @@ class Challenge(models.Model):
                                       fituser=user,
                                       date_joined=now)
 
-            Transaction.objects.create(date=now,
-                                       user=user,
-                                       description="Joined '%s' competition." % self.name,
-                                       amount=self.ante * -1,
-                                       challenge=self)
-
     def removeChallenger(self, user):
         try:
             challenger = Challenger.objects.get(challenge=self, fituser=user)
-            if not self.hasEnded:
+            if not self.hasStarted:
                 challenger.delete()
-                now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-
-                Transaction.objects.create(date=now,
-                                           user=user,
-                                           description="Withdrew from '%s' competition." % self.name,
-                                           amount=self.ante,
-                                           challenge=self)
-                return True
         except Challenger.DoesNotExist:
             return False
 
@@ -286,8 +271,7 @@ class Challenge(models.Model):
     def numAchieved(self):
         return self.challengers.filter(self.getActivitiesFilter()).annotate(
             total_distance=Sum('fitnessactivity__distance', distinct=True),
-            latest_activity_date=Max('fitnessactivity__date')).exclude(
-            total_distance__lt=toMeters(self.distance)).count()
+            latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).count()
 
     @property
     def achievedValue(self):
@@ -349,11 +333,26 @@ class Challenge(models.Model):
             raise ValidationError("Start Date must be before End Date")
 
 
+class TeamManager(models.Manager):
+    def withdrawAll(self, challenge_id, user, except_for=None):
+        teams = self.filter(challenge_id=challenge_id).exclude(id=except_for.id) if except_for is not None else self.filter(challenge_id=challenge_id)
+
+        for team in teams:
+            team.members.remove(user)
+
+        if except_for is not None:
+            except_for.members.add(user)
+
+        Team.objects.filter(captain=user).annotate(num_members=Count('members')).filter(num_members=0).delete()
+
+
 class Team(models.Model):
     name = models.CharField(max_length=256)
     challenge = models.ForeignKey(Challenge)
     members = models.ManyToManyField(FitUser, blank=True, null=True, default=None, related_name='members')
     captain = models.ForeignKey(FitUser, blank=True, null=True, default=None, related_name='captain')
+
+    objects = TeamManager()
 
     def getMembersWithActivities(self):
         return getAnnotatedUserListWithActivityData(self.challenge,
