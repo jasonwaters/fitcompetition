@@ -108,6 +108,7 @@ def challenge(request, id):
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
         'fetchLatest': False,
+        'canWithdraw': competitor and not challenge.hasStarted,
     }
 
     if challenge.isTypeSimple:

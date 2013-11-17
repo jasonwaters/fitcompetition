@@ -239,6 +239,10 @@ tr.team .team-total {
     border-color: #d0e3f0;
 }
 
+.tooltip-inner {
+	max-width: 300px;
+}
+
 @media (max-width: 360px) {
     h1{
         font-size: 30px;

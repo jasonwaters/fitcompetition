@@ -74,7 +74,7 @@ class FitUser(AbstractUser):
 
     @property
     def delinquent(self):
-        return self.balance < 0
+        return self.account.balance < 0
 
     def getDistance(self, challenge):
         filter = challenge.getActivitiesFilter(generic=True) & Q(user=self)

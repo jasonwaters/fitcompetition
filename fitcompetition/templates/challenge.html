@@ -92,7 +92,7 @@
 					</ul>
                 </div>
             {% else %}
-                <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button">Join this Challenge</button>
+                <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button" data-toggle="tooltip" data-placement="top" data-html="true" data-title="Go ahead, take the plunge.<br/>You can always change your mind later.">Join this Challenge</button>
             {% endif %}
         {% else %}
             <a class="vertical-padding btn btn-primary btn-lg" href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}">Sign In with Runkeeper to Play</a>
@@ -115,6 +115,10 @@
 			</ul>
 		</div>
     {% endif %}
+
+	{% if canWithdraw %}
+		<p><small>Having second thoughts?  You can <a href="#" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
+	{% endif %}
 
     {% if competitor and not challenge.hasEnded and show_social %}
         <div class="fc-callout fc-callout-info" data-calloutid="social-callout-{{ challenge.id }}">
@@ -233,6 +237,7 @@
 			}
 
 			$(".alert").alert();
+			$("[data-toggle=tooltip]").tooltip();
 
 			var hidePopovers = function(list) {
 				$(list).popover('destroy');
