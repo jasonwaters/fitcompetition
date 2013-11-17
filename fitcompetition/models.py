@@ -66,6 +66,13 @@ class FitUser(AbstractUser):
         return self.fullname or "Unnamed User"
 
     @property
+    def account(self):
+        try:
+            return Account.objects.get(user=self)
+        except Account.DoesNotExist:
+            return None
+
+    @property
     def delinquent(self):
         return self.balance < 0
 
@@ -209,6 +216,13 @@ class Challenge(models.Model):
     objects = ChallengeManager()
 
     @property
+    def account(self):
+        try:
+            return Account.objects.get(challenge=self)
+        except Account.DoesNotExist:
+            return None
+
+    @property
     def isTypeSimple(self):
         return self.type == 'SIMP'
 
@@ -237,10 +251,10 @@ class Challenge(models.Model):
                                       fituser=user,
                                       date_joined=now)
 
-    def removeChallenger(self, user):
+    def removeChallenger(self, user, force=False):
         try:
             challenger = Challenger.objects.get(challenge=self, fituser=user)
-            if not self.hasStarted:
+            if not self.hasStarted or force:
                 challenger.delete()
         except Challenger.DoesNotExist:
             return False

@@ -31,7 +31,7 @@ def profile(request):
 
 @login_required
 def account(request):
-    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+    transactions = Transaction.objects.filter(account=request.user.account).order_by('-date')
 
     return render(request, 'account.html', {
         'transactions': transactions

@@ -12,6 +12,27 @@ def getModel(name):
     return get_model('fitcompetition', name)
 
 
+@receiver(post_save, sender=getModel('Challenge'))
+def save_new_challenge(sender, **kwargs):
+    if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Challenge')):
+        challenge = kwargs['instance']
+        account, created = getModel('Account').objects.get_or_create(challenge=challenge)
+        if created:
+            account.description = "Challenge Account: %s" % challenge.name
+            account.save()
+
+
+@receiver(post_save, sender=getModel('FitUser'))
+def save_new_user(sender, **kwargs):
+    if kwargs.get('created') and isinstance(kwargs['instance'], getModel('FitUser')):
+        user = kwargs['instance']
+        account, created = getModel('Account').objects.get_or_create(user=user)
+
+        if created:
+            account.description = "User Account: %s" % user.fullname
+            account.save()
+
+
 @receiver(post_save, sender=getModel('Challenger'))
 def save_new_challenger(sender, **kwargs):
     if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Challenger')):
@@ -19,11 +40,16 @@ def save_new_challenger(sender, **kwargs):
         challenge = kwargs['instance'].challenge
 
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
         getModel('Transaction').objects.create(date=now,
-                                               user=user,
+                                               account=user.account,
                                                description="Joined '%s' competition." % challenge.name,
-                                               amount=challenge.ante * -1,
-                                               challenge=challenge)
+                                               amount=challenge.ante * -1)
+
+        getModel('Transaction').objects.create(date=now,
+                                               account=challenge.account,
+                                               description="%s Joined" % user.fullname,
+                                               amount=challenge.ante)
 
 
 @receiver(post_delete, sender=getModel('Challenger'))
@@ -34,10 +60,14 @@ def delete_existing_challenger(sender, **kwargs):
 
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         getModel('Transaction').objects.create(date=now,
-                                               user=user,
+                                               account=user.account,
                                                description="Withdrew from '%s' competition." % challenge.name,
-                                               amount=challenge.ante,
-                                               challenge=challenge)
+                                               amount=challenge.ante)
+
+        getModel('Transaction').objects.create(date=now,
+                                               account=challenge.account,
+                                               description="%s Withdrew" % user.fullname,
+                                               amount=challenge.ante*-1)
 
         #remove membership on any teams too
         getModel('Team').objects.withdrawAll(challenge.id, user)
