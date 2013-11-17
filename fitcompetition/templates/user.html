@@ -42,6 +42,7 @@
     </table>
 
     <h2>Challenges</h2>
-    {% challenges_table user activeChallenges "Active Challenges" "fa fa-heart" %}
-    {% challenges_table user completedChallenges "Past Challenges" "fa fa-flag-checkered" %}
+    {% challenges_table user activeChallenges "Competing Now" "fa fa-location-arrow" %}
+    {% challenges_table user upcomingUserChallenges "Competing Soon" "fa fa-clock-o" %}
+    {% challenges_table user completedChallenges "Ended" "fa fa-flag-checkered" %}
 {% endblock %}

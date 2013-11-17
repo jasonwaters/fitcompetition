@@ -14,9 +14,8 @@
         <small><a href="{% url 'faq' %}">What's this all about?</a></small>
     </p>
 
-
     {% player_email user %}
-    {% challenges_table user myChallenges "My Challenges" "fa fa-home" %}
-    {% challenges_table user openChallenges "Open Challenges" "fa fa-shopping-cart" %}
-    {% challenges_table user pastChallenges "Past Challenges" "fa fa-flag-checkered" True %}
+    {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
+    {% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
+    {% challenges_table user pastChallenges "Recently Ended" "fa fa-flag-checkered" True %}
 {% endblock %}

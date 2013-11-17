@@ -144,32 +144,39 @@ class ActivityType(models.Model):
 
 
 class ChallengeManager(models.Manager):
-    def openChallenges(self, userid):
+    def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        if userid is not None:
-            return self.annotate(num_players=Count('players')).exclude(players__id=userid).filter(enddate__gt=now).order_by('-num_players')
-        else:
-            return self.annotate(num_players=Count('players')).filter(enddate__gt=now).order_by('-num_players')
+        return self.annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-num_players')
+
+    def currentChallenges(self):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('-startdate')
 
     def pastChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         return self.annotate(num_players=Count('players')).filter(enddate__lt=now).order_by('-startdate')
 
+    def activeChallenges(self, userid=None):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now).order_by('-startdate')
+
     def userChallenges(self, userid):
-        allUserChallenges = []
         activeUserChallenges = []
+        upcomingUserChallenges = []
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('-enddate')
+            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('startdate')
 
             for challenge in allUserChallenges:
                 if challenge.hasEnded:
                     completedUserChallenges.append(challenge)
-                else:
+                elif challenge.hasStarted:
                     activeUserChallenges.append(challenge)
+                else:
+                    upcomingUserChallenges.append(challenge)
 
-        return allUserChallenges, ListUtil.multikeysort(activeUserChallenges, ['startdate'], getter=operator.attrgetter), completedUserChallenges
+        return activeUserChallenges, upcomingUserChallenges, ListUtil.multikeysort(completedUserChallenges, ['-enddate'], getter=operator.attrgetter)
 
 
 def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilter):

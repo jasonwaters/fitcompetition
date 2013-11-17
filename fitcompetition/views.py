@@ -13,13 +13,13 @@ import pytz
 
 
 def challenges(request):
-    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
-    openChallenges = Challenge.objects.openChallenges(request.user.id)
+    currentChallenges = Challenge.objects.currentChallenges()
+    upcomingChallenges = Challenge.objects.upcomingChallenges()
     pastChallenges = Challenge.objects.pastChallenges()
 
     return render(request, 'challenges.html', {
-        'myChallenges': activeUserChallenges,
-        'openChallenges': openChallenges,
+        'currentChallenges': currentChallenges,
+        'upcomingChallenges': upcomingChallenges,
         'pastChallenges': pastChallenges
     })
 
@@ -44,7 +44,7 @@ def user(request, id):
     except FitUser.DoesNotExist:
         user = None
 
-    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(id)
+    activeUserChallenges, upcomingUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(id)
 
     thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
 
@@ -53,6 +53,7 @@ def user(request, id):
     return render(request, 'user.html', {
         'userprofile': user,
         'activeChallenges': activeUserChallenges,
+        'upcomingUserChallenges': upcomingUserChallenges,
         'completedChallenges': completedUserChallenges,
         'recentActivities': recentActivities
     })
