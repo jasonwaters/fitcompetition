@@ -39,17 +39,11 @@ def save_new_challenger(sender, **kwargs):
         user = kwargs['instance'].fituser
         challenge = kwargs['instance'].challenge
 
-        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-
-        getModel('Transaction').objects.create(date=now,
-                                               account=user.account,
-                                               description="Joined '%s' competition." % challenge.name,
-                                               amount=challenge.ante * -1)
-
-        getModel('Transaction').objects.create(date=now,
-                                               account=challenge.account,
-                                               description="%s Joined" % user.fullname,
-                                               amount=challenge.ante)
+        getModel('Transaction').objects.transact(user.account,
+                                                 challenge.account,
+                                                 challenge.ante,
+                                                 "Joined '%s' competition." % challenge.name,
+                                                 "%s Joined" % user.fullname)
 
 
 @receiver(post_delete, sender=getModel('Challenger'))
@@ -58,16 +52,11 @@ def delete_existing_challenger(sender, **kwargs):
         user = kwargs['instance'].fituser
         challenge = kwargs['instance'].challenge
 
-        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        getModel('Transaction').objects.create(date=now,
-                                               account=user.account,
-                                               description="Withdrew from '%s' competition." % challenge.name,
-                                               amount=challenge.ante)
-
-        getModel('Transaction').objects.create(date=now,
-                                               account=challenge.account,
-                                               description="%s Withdrew" % user.fullname,
-                                               amount=challenge.ante*-1)
+        getModel('Transaction').objects.transact(challenge.account,
+                                                 user.account,
+                                                 challenge.ante,
+                                                 "%s Withdrew" % user.fullname,
+                                                 "Withdrew from '%s' competition." % challenge.name)
 
         #remove membership on any teams too
         getModel('Team').objects.withdrawAll(challenge.id, user)

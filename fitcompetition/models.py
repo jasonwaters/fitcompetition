@@ -201,15 +201,20 @@ def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilte
 
 
 CHALLENGE_TYPES = (
-    ('SIMP', 'Simple - Complete the challenge and get paid.'),
-    ('WINR', 'Winner Takes All - First place takes the pot.'),
-    ('TEAM', 'Teams - The pot is shared between members of the winning team.')
+    ('INDV', 'Individual - Each player is on their own to complete the challenge within the time period.'),
+    ('TEAM', 'Team - Players team up and their miles are pooled together to reach the goal.'),
+)
+
+CHALLENGE_STYLES = (
+    ('ALL', 'All Can Win - Every player or team that completes the challenge shares the pot evenly at the end.'),
+    ('ONE', 'Winner Takes All - The individual or team at the top of the leaderboard wins the pot.'),
 )
 
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
-    type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='SIMP')
+    type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='INDV')
+    style = models.CharField(max_length=6, choices=CHALLENGE_STYLES, default='ALL')
     description = models.TextField(blank=True)
     distance = models.DecimalField(max_digits=16, decimal_places=2)
 
@@ -232,16 +237,35 @@ class Challenge(models.Model):
             return None
 
     @property
-    def isTypeSimple(self):
-        return self.type == 'SIMP'
-
-    @property
-    def isTypeWinnerTakesAll(self):
-        return self.type == 'WINR'
+    def isTypeIndividual(self):
+        return self.type == 'INDV'
 
     @property
     def isTypeTeam(self):
         return self.type == 'TEAM'
+
+    @property
+    def isStyleAllCanWin(self):
+        return self.style == 'ALL'
+
+    @property
+    def isStyleWinnerTakesAll(self):
+        return self.style == 'ONE'
+
+    def performReconciliation(self):
+        if self.reconciled:
+            return
+
+        if self.isTypeIndividual and self.isStyleAllCanWin:
+            for challenger in self.getAchievers():
+                if ListUtil.attr(challenger, 'total_distance') >= self.distance:
+                    Transaction.objects.transact(self.account,
+                                                 challenger.account,
+                                                 self.achievedValue,
+                                                 'Disbursement to %s' % challenger.fullname,
+                                                 'Disbursement for "%s"' % self.name)
+            self.reconciled = True
+            self.save()
 
     @property
     def approvedActivityNames(self):
@@ -289,6 +313,11 @@ class Challenge(models.Model):
 
         dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_distance=Sum('distance'))
         return dbo.get('total_distance') >= toMeters(self.distance)
+
+    def getAchievers(self):
+        return self.challengers.filter(self.getActivitiesFilter()).annotate(
+            total_distance=Sum('fitnessactivity__distance', distinct=True),
+            latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
 
     @property
     def numAchieved(self):
@@ -490,8 +519,33 @@ class Account(models.Model):
         return ListUtil.attr(result, 'balance', 0.0)
 
 
+class TransactionManager(models.Manager):
+    def transact(self, fromAccount, toAccount, amount, fromMemo, toMemo):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+        self.create(date=now,
+                    account=fromAccount,
+                    description=fromMemo,
+                    amount=amount*-1)
+
+        self.create(date=now,
+                    account=toAccount,
+                    description=toMemo,
+                    amount=amount)
+
+    def deposit(self, account, amount):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+        self.create(date=now,
+                    account=account,
+                    description="Deposit",
+                    amount=amount)
+
+
 class Transaction(models.Model):
     date = models.DateField(blank=True)
     account = models.ForeignKey(Account)
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
+
+    objects = TransactionManager()

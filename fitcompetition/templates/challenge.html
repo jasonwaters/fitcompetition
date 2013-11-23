@@ -180,7 +180,7 @@
                                     {% player_row user player challenge forloop.counter %}
                                 {% endfor %}
                             {% endfor %}
-                        {% elif challenge.isTypeSimple %}
+                        {% elif challenge.isTypeIndividual %}
                             {% for player in players %}
                                 {% player_row user player challenge forloop.counter %}
                             {% endfor %}
@@ -210,7 +210,7 @@
                 {% endif %}
             </div>
             <div class="tab-pane" id="rules">
-				{% if challenge.isTypeSimple %}
+				{% if challenge.isTypeIndividual %}
 					<ul>
 						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
 						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper.</a></li>

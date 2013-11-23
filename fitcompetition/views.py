@@ -111,7 +111,7 @@ def challenge(request, id):
         'canWithdraw': competitor and not challenge.hasStarted,
     }
 
-    if challenge.isTypeSimple:
+    if challenge.isTypeIndividual:
         params['players'] = challenge.getChallengersWithActivities()
     elif challenge.isTypeTeam:
         params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(

@@ -4,8 +4,9 @@ Run "manage.py test".
 import datetime
 
 from django.test import TestCase
-from fitcompetition.models import FitUser, Account, Challenge, ActivityType, Transaction
+from fitcompetition.models import FitUser, Account, Challenge, ActivityType, Transaction, FitnessActivity
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.templatetags.apptags import toMeters
 import pytz
 
 
@@ -30,7 +31,8 @@ class AccountCreationTests(TestCase):
 
     def test_challenge_account(self):
         challenge = Challenge.objects.create(name="Marathon",
-                                             type="SIMP",
+                                             type="INDV",
+                                             style="ALL",
                                              distance=100,
                                              startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                              enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -55,7 +57,8 @@ class TransactionTests(TestCase):
                                            fullname="Alf")
 
         self.challenge = Challenge.objects.create(name="Marathon",
-                                                  type="SIMP",
+                                                  type="INDV",
+                                                  style="ALL",
                                                   distance=100,
                                                   startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                   enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -83,3 +86,98 @@ class TransactionTests(TestCase):
 
         self.assertEqual(0, self.challenge.account.balance, "Transaction for challenge was not created on user withdrawal.")
         self.assertEqual(25, self.user.account.balance, "Transaction for user was not created on user withdrawal.")
+
+
+class ReconciliationTests(TestCase):
+    def setUp(self):
+        self.running, created = ActivityType.objects.get_or_create(name='Running')
+
+        self.user1 = FitUser.objects.create(username='user1',
+                                            first_name='user',
+                                            last_name='one',
+                                            email='a@a.net',
+                                            is_staff=False,
+                                            fullname="user one")
+
+        self.user2 = FitUser.objects.create(username='user2',
+                                            first_name='user',
+                                            last_name='two',
+                                            email='b@a.net',
+                                            is_staff=False,
+                                            fullname="user two")
+
+        self.user3 = FitUser.objects.create(username='user3',
+                                            first_name='user',
+                                            last_name='three',
+                                            email='c@a.net',
+                                            is_staff=False,
+                                            fullname="user three")
+
+        self.user4 = FitUser.objects.create(username='user4',
+                                            first_name='user',
+                                            last_name='four',
+                                            email='d@a.net',
+                                            is_staff=False,
+                                            fullname="user four")
+
+        FitnessActivity.objects.create(user=self.user1,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
+                                       calories=0,
+                                       distance=toMeters(50))
+
+        FitnessActivity.objects.create(user=self.user1,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
+                                       calories=0,
+                                       distance=toMeters(60))
+
+        FitnessActivity.objects.create(user=self.user2,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
+                                       calories=0,
+                                       distance=toMeters(10))
+
+    def tearDown(self):
+        pass
+
+    def testIndividualAllCanWin(self):
+        challenge = Challenge.objects.create(name="Marathon",
+                                             type="INDV",
+                                             style="ALL",
+                                             distance=100,
+                                             startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                             enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                             ante=25)
+
+        challenge.approvedActivities.add(self.running)
+
+        challenge.addChallenger(self.user1)
+        challenge.addChallenger(self.user2)
+
+        Transaction.objects.deposit(self.user1.account, 25)
+        Transaction.objects.deposit(self.user2.account, 25)
+
+        self.assertEqual(50, challenge.account.balance)
+
+        challenge.performReconciliation()
+
+        self.assertEqual(0, challenge.account.balance)
+
+        self.assertEqual(50, self.user1.account.balance)
+        self.assertEqual(0, self.user2.account.balance)
+
+    def testIndividualWinnerTakesAll(self):
+        pass
+
+    def testTeamAllCanWin(self):
+        pass
+
+    def testTeamWinnerTakesAll(self):
+        pass
