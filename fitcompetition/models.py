@@ -220,6 +220,8 @@ class Challenge(models.Model):
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
     players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
 
+    reconciled = models.BooleanField(default=False)
+
     objects = ChallengeManager()
 
     @property
@@ -318,6 +320,15 @@ class Challenge(models.Model):
             typeFilter |= Q(**{fieldName('type'): type})
 
         return dateFilter & typeFilter
+
+    def getRecentActivities(self):
+        now = datetime.now(tz=pytz.utc)
+        yesterday = now + relativedelta(days=-1)
+
+        filter = self.getActivitiesFilter(generic=True)
+        filter = filter & Q(date__gt=yesterday.date()) & Q(user__in=self.challengers)
+
+        return FitnessActivity.objects.filter(filter).order_by('-date')
 
     def getChallengersWithActivities(self):
         return getAnnotatedUserListWithActivityData(self, self.challengers, self.getActivitiesFilter())

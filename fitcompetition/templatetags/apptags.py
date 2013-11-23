@@ -135,9 +135,11 @@ def deltaDate(targetDate, kind):
 def hostUrl(request):
     return '%s://%s' % ('https' if request.is_secure() else 'http', request.get_host())
 
+
 @register.filter
 def hashtaggify(value):
     return value.replace(' ', '')
+
 
 @register.filter
 def fullDate(d):
@@ -164,9 +166,11 @@ def currency(value):
     locale.setlocale(locale.LC_ALL, getattr(settings, 'LOCALE'))
     return locale.currency(value)
 
+
 @register.filter
 def userAchievedChallenge(challenge, user):
     return challenge.getAchievedGoal(user)
+
 
 @register.filter
 def commaSeparated(list, word="or"):
@@ -186,6 +190,26 @@ def times(number):
         return range(0)
 
     return range(number)
+
+
+@register.filter
+def pastTense(value):
+    return {
+        'Running': 'ran',
+        'Cycling': 'cycled',
+        'Mountain Biking': 'mountain biked',
+        'Walking': 'walked',
+        'Hiking': 'hiked',
+        'Downhill Skiing': 'downhill skied',
+        'Cross-Country Skiing': 'cross-country skied',
+        'Snowboarding': 'snowboarded',
+        'Skating': 'skated',
+        'Swimming': 'swam',
+        'Wheelchair': 'wheeled',
+        'Rowing': 'rowed',
+        'Elliptical': 'ellipticaled',
+        'Other': '',
+    }[value]
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
