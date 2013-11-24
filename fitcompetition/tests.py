@@ -188,8 +188,51 @@ class ReconciliationTests(TestCase):
         #bert 110 miles
         #ernie 65 miles
 
-    def tearDown(self):
-        pass
+    def testChallengeNotEnded(self):
+        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+        start = now - datetime.timedelta(days=7)
+        end = now + datetime.timedelta(days=30)
+
+        challenge = Challenge.objects.create(name="Marathon",
+                                             type="INDV",
+                                             style="ALL",
+                                             distance=100,
+                                             startdate=start,
+                                             enddate=end,
+                                             ante=25)
+
+        challenge.approvedActivities.add(self.running)
+
+        challenge.addChallenger(self.elmo)
+        challenge.addChallenger(self.count)
+        challenge.addChallenger(self.bert)
+        challenge.addChallenger(self.ernie)
+
+        Transaction.objects.deposit(self.elmo.account, 25)
+        Transaction.objects.deposit(self.count.account, 25)
+        Transaction.objects.deposit(self.bert.account, 25)
+        Transaction.objects.deposit(self.ernie.account, 25)
+
+        self.assertEqual(100, challenge.account.balance)
+
+        self.assertEqual(0, self.elmo.account.balance)
+        self.assertEqual(0, self.count.account.balance)
+        self.assertEqual(0, self.bert.account.balance)
+        self.assertEqual(0, self.ernie.account.balance)
+
+        challenge.performReconciliation()
+
+        self.assertEqual(100, challenge.account.balance)
+
+        self.assertEqual(0, self.elmo.account.balance)
+        self.assertEqual(0, self.count.account.balance)
+        self.assertEqual(0, self.bert.account.balance)
+        self.assertEqual(0, self.ernie.account.balance)
+
+        self.assertEqual(challenge.numWinners, 0)
+        self.assertAlmostEqual(challenge.disbursementAmount, 0, 2)
+        self.assertFalse(challenge.reconciled)
 
     def testIndividualAllCanWin(self):
         challenge = Challenge.objects.create(name="Marathon",

@@ -255,7 +255,7 @@ class Challenge(models.Model):
         return self.style == 'ONE'
 
     def performReconciliation(self):
-        if self.reconciled:
+        if self.reconciled or not self.hasEnded:
             return
 
         achievers = self.getAchievers()
