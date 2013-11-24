@@ -1,10 +1,9 @@
+import json
+
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team
-import json
 from fitcompetition.templatetags.apptags import toMiles
-from fitcompetition.views import TEAM_MEMBER_MAXIMUM
 
 
 def addChallenger(challenge_id, user):
@@ -41,11 +40,11 @@ def join_challenge(request, id):
 @login_required
 def join_team(request, challenge_id, team_id):
     added_challenger, challenge = addChallenger(challenge_id, request.user)
+
     if added_challenger:
         try:
-            teams = list(Team.objects.filter(id=team_id).annotate(num_members=Count('members')).filter(num_members__lt=TEAM_MEMBER_MAXIMUM)[:1])
-            if teams:
-                Team.objects.withdrawAll(challenge_id, request.user, except_for=teams[0])
+            team = Team.objects.get(id=team_id)
+            team.addChallenger(request.user)
         except Team.DoesNotExist:
             return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
@@ -57,12 +56,7 @@ def create_team(request, challenge_id):
     added_challenger, challenge = addChallenger(challenge_id, request.user)
 
     if added_challenger:
-        Team.objects.withdrawAll(challenge_id, request.user)
-
-        team, created = Team.objects.get_or_create(challenge=challenge, captain=request.user)
-        team.name = "%s's Team" % request.user.first_name
-        team.members.add(request.user)
-        team.save()
+        Team.objects.startTeam(challenge, request.user)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
@@ -72,7 +66,7 @@ def withdraw_challenge(request, id):
     try:
         challenge = Challenge.objects.get(id=id)
         challenge.removeChallenger(request.user)
-        Team.objects.withdrawAll(challenge.id, request.user)
+        Team.objects.withdrawAll(challenge, request.user)
     except Challenge.DoesNotExist:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 

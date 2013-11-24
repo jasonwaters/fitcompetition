@@ -39,13 +39,13 @@
 			{% if competitor %}
 				{% if not challenge.hasEnded %}
 					{% if userAchievedGoal %}
-						<strong class="text-success">You are competing in this challenge and have met the goal!  You could get paid up to {{ challenge.achievedValue|currency }} when it ends!</strong>
+						<strong class="text-success">You are competing in this challenge and have met the goal!</strong>
 					{% else %}
 						<strong class="text-primary">You are competing in this challenge!</strong>
 					{% endif %}
 				{% else %}
 					{% if userAchievedGoal %}
-						<strong class="text-success">You competed in this challenge and earned {{ challenge.achievedValue|currency }}!</strong>
+						<strong class="text-success">You completed this challenge and got paid!</strong>
 					{% else %}
 						<strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
 					{% endif %}
@@ -66,7 +66,7 @@
         {% if not challenge.hasStarted %}
             This Challenge will start in {{ challenge.startdate|timeuntil }}.
         {% elif challenge.hasEnded %}
-            This Challenge ended {{ challenge.enddate|timesince }} ago. {% if challenge.numAchieved > 0 %}{{ challenge.numAchieved }} people earned {{ challenge.achievedValue|currency }}!{% endif %}
+            This Challenge ended {{ challenge.enddate|timesince }} ago.
         {% else%}
             <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
                 This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!

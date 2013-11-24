@@ -1,5 +1,4 @@
 from datetime import datetime
-import operator
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count
@@ -7,7 +6,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
-from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
@@ -124,7 +122,7 @@ def challenge(request, id):
             except Team.DoesNotExist:
                 pass
 
-        params['teams'] = ListUtil.multikeysort(challenge.teams, ['-averageDistance'], getter=operator.attrgetter)
+        params['teams'] = challenge.rankedTeams
         params['canSwitchTeams'] = competitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)

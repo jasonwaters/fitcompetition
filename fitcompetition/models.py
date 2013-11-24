@@ -8,8 +8,8 @@ from django.db import models
 from django.db.models import BooleanField, Sum, Q, Max, Count
 from fitcompetition import RunkeeperService
 from fitcompetition.RunkeeperService import RunkeeperException
-from fitcompetition.settings import TIME_ZONE
-from fitcompetition.templatetags.apptags import toMeters
+from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
+from fitcompetition.templatetags.apptags import toMeters, toMiles
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
@@ -226,6 +226,8 @@ class Challenge(models.Model):
     players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
 
     reconciled = models.BooleanField(default=False)
+    disbursementAmount = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
+    numWinners = models.IntegerField(blank=True, null=True, default=0)
 
     objects = ChallengeManager()
 
@@ -256,16 +258,21 @@ class Challenge(models.Model):
         if self.reconciled:
             return
 
-        if self.isTypeIndividual and self.isStyleAllCanWin:
-            for challenger in self.getAchievers():
-                if ListUtil.attr(challenger, 'total_distance') >= self.distance:
-                    Transaction.objects.transact(self.account,
-                                                 challenger.account,
-                                                 self.achievedValue,
-                                                 'Disbursement to %s' % challenger.fullname,
-                                                 'Disbursement for "%s"' % self.name)
-            self.reconciled = True
-            self.save()
+        achievers = self.getAchievers()
+
+        dollars = (self.moneyInThePot / max(1, len(achievers))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+
+        for user in achievers:
+            Transaction.objects.transact(self.account,
+                                         user.account,
+                                         dollars,
+                                         'Disbursement to %s' % user.fullname,
+                                         'Disbursement for "%s"' % self.name)
+
+        self.numWinners = len(achievers)
+        self.disbursementAmount = dollars if self.numWinners > 0 else 0
+        self.reconciled = True
+        self.save()
 
     @property
     def approvedActivityNames(self):
@@ -295,7 +302,11 @@ class Challenge(models.Model):
 
     @property
     def teams(self):
-        return Team.objects.filter(challenge=self).order_by('name')
+        return Team.objects.filter(challenge=self).annotate(num_members=Count('members'))
+
+    @property
+    def rankedTeams(self):
+        return ListUtil.multikeysort(self.teams, ['-averageDistance'], getter=operator.attrgetter)
 
     def getAchievedGoal(self, fituser):
         if not fituser.is_authenticated():
@@ -315,22 +326,31 @@ class Challenge(models.Model):
         return dbo.get('total_distance') >= toMeters(self.distance)
 
     def getAchievers(self):
-        return self.challengers.filter(self.getActivitiesFilter()).annotate(
-            total_distance=Sum('fitnessactivity__distance', distinct=True),
-            latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
+        if self.isTypeIndividual:
+            winners = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
+                                                                         latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
 
-    @property
-    def numAchieved(self):
-        return self.challengers.filter(self.getActivitiesFilter()).annotate(
-            total_distance=Sum('fitnessactivity__distance', distinct=True),
-            latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance)).count()
+            if self.isStyleWinnerTakesAll:
+                return winners[:1]
+            elif self.isStyleAllCanWin:
+                return winners
+        elif self.isTypeTeam:
+            teams = self.rankedTeams
 
-    @property
-    def achievedValue(self):
-        if self.numAchieved == 0:
-            return Decimal(0)
-        value = self.moneyInThePot / self.numAchieved
-        return value.quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+            if self.isStyleWinnerTakesAll:
+                topTeam = list(teams[:1])[0]
+
+                if toMiles(topTeam.averageDistance) > self.distance:
+                    return topTeam.members.all()
+
+                return list()
+            elif self.isStyleAllCanWin:
+                winners = list()
+                for team in teams:
+                    if toMiles(team.averageDistance) > self.distance:
+                        winners += list(team.members.all())
+
+                return winners
 
     def getActivitiesFilter(self, generic=False):
         def fieldName(name):
@@ -395,8 +415,8 @@ class Challenge(models.Model):
 
 
 class TeamManager(models.Manager):
-    def withdrawAll(self, challenge_id, user, except_for=None):
-        teams = self.filter(challenge_id=challenge_id).exclude(id=except_for.id) if except_for is not None else self.filter(challenge_id=challenge_id)
+    def withdrawAll(self, challenge, user, except_for=None):
+        teams = self.filter(challenge=challenge).exclude(id=except_for.id) if except_for is not None else self.filter(challenge_id=challenge)
 
         for team in teams:
             team.members.remove(user)
@@ -405,6 +425,16 @@ class TeamManager(models.Manager):
             except_for.members.add(user)
 
         Team.objects.filter(captain=user).annotate(num_members=Count('members')).filter(num_members=0).delete()
+
+    def startTeam(self, challenge, user):
+        self.withdrawAll(challenge, user)
+
+        team, created = self.get_or_create(challenge=challenge, captain=user)
+        team.name = "%s's Team" % user.first_name
+        team.members.add(user)
+        team.save()
+
+        return team
 
 
 class Team(models.Model):
@@ -419,6 +449,13 @@ class Team(models.Model):
         return getAnnotatedUserListWithActivityData(self.challenge,
                                                     self.members.all(),
                                                     self.challenge.getActivitiesFilter())
+
+    def addChallenger(self, user):
+        if self.members.count() < TEAM_MEMBER_MAXIMUM:
+            Team.objects.withdrawAll(self.challenge, user, except_for=self)
+
+    def removeChallenger(self, user, force=False):
+        pass
 
     @property
     def distance(self):
@@ -436,8 +473,8 @@ class Team(models.Model):
 
     @property
     def averageDistance(self):
-        num_players = max(self.members.count(), 1)
-        return self.distance / num_players
+        num_players = attr(self, 'num_members') if attr(self, 'num_members') is not None else self.members.count()
+        return self.distance / max(num_players, 1)
 
     def __unicode__(self):
         return self.name
