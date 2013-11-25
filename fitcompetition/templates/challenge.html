@@ -28,39 +28,70 @@
         <h2>{{ challenge.name }}</h2>
     </div>
 
-	<p class="lead">
-		{% if challenge.isTypeTeam %}
-			Complete at least {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-			There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot. The team with the highest average miles per player takes the crown and the pot is split evenly between it's members.
-		{% else %}
-			Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between <strong>{{ challenge.startdate|date:"F j, Y" }}</strong> and <strong>{{ challenge.enddate|date:"F j, Y" }}</strong>.
-			There's <strong>${{ challenge.moneyInThePot|intcomma }}</strong> in the pot and <strong>{{ numPlayers }}</strong> Competitor{{ numPlayers|pluralize }}.
+	<p class="lead">{{ challenge.description|safe }}</p>
 
-			{% if competitor %}
-				{% if not challenge.hasEnded %}
-					{% if userAchievedGoal %}
-						<strong class="text-success">You are competing in this challenge and have met the goal!</strong>
-					{% else %}
-						<strong class="text-primary">You are competing in this challenge!</strong>
-					{% endif %}
-				{% else %}
-					{% if userAchievedGoal %}
-						<strong class="text-success">You completed this challenge and got paid!</strong>
-					{% else %}
-						<strong class="text-danger">You competed in this challenge, but failed to complete it.</strong>
-					{% endif %}
-				{% endif %}
-			{% else %}
+	<h4>Challenge Details</h4>
+	<div class="challenge-header">
+		<div class="row">
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Distance</div>
+				<div class="challenge-value">{{ challenge.distance|floatformat:"-1" }} miles</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Activities</div>
+				<div class="challenge-value">{{ approvedActivities|activityIcons }}</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Duration</div>
+				<div class="challenge-value">{{ challenge.numDays }} Days</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 				{% if not challenge.hasStarted %}
-					It's not too late to join this challenge.  Get in on the fun! Once you join, the <strong>ante is just ${{ challenge.ante|intcomma }}</strong>.
-				{% elif challenge.hasEnded %}
-					This challenge is history.
+					<div class="challenge-label">Starts on</div>
+					<div class="challenge-value">{{ challenge.startdate|date:"N j" }}</div>
+				{% elif not challenge.hasEnded %}
+					<div class="challenge-label">Ends on</div>
+					<div class="challenge-value">{{ challenge.enddate|date:"N j" }}</div>
+				{% else %}
+					<div class="challenge-label">Ended on</div>
+					<div class="challenge-value">{{ challenge.enddate|date:"N j, y" }}</div>
 				{% endif %}
-			{% endif %}
-		{% endif %}
-	</p>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Bet</div>
+				<div class="challenge-value">${{ challenge.ante|intcomma }}</div>
+			</div>
 
-	<p>{{ challenge.description|safe }}</p>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">In the pot</div>
+				<div class="challenge-value">${{ challenge.moneyInThePot|intcomma }}</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Players</div>
+				<div class="challenge-value">{{ challenge.numPlayers }}</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Type</div>
+				<div class="challenge-value">
+					{% if challenge.isTypeIndividual %}
+						<i class="fa fa-user"></i> Solo
+					{% elif challenge.isTypeTeam %}
+						<i class="fa fa-users"></i> Teams
+					{% endif %}
+				</div>
+			</div>
+			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+				<div class="challenge-label">Style</div>
+				<div class="challenge-value">
+					{% if challenge.isStyleAllCanWin %}
+						All Can Win
+					{% elif challenge.isStyleWinnerTakesAll %}
+						Winner Takes All
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
 
     <p>
         {% if not challenge.hasStarted %}
@@ -74,7 +105,10 @@
         {% endif %}
     </p>
 
-    {% if canJoin %}
+	{% player_email user %}
+	{% player_ante user challenge competitor %}
+
+	{% if canJoin %}
         {% if user.is_authenticated %}
             {% if challenge.isTypeTeam %}
                 <div class="btn-group vertical-padding ">
@@ -129,9 +163,6 @@
             <button type="button" class="btn btn-default btn-share" data-service="google"><i class="fa fa-google-plus fa-2x"></i><br/>Share</button>
         </div>
     {% endif %}
-
-    {% player_email user %}
-    {% player_ante user challenge competitor %}
 
     <div class="tabbable">
         <ul class="nav nav-tabs" id="challenge_tabs">

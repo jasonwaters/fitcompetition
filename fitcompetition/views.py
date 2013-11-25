@@ -106,7 +106,7 @@ def challenge(request, id):
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
         'fetchLatest': False,
-        'canWithdraw': competitor and not challenge.hasStarted,
+        'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
     }
 
     if challenge.isTypeIndividual:
@@ -123,7 +123,7 @@ def challenge(request, id):
                 pass
 
         params['teams'] = challenge.rankedTeams
-        params['canSwitchTeams'] = competitor and not challenge.hasStarted
+        params['canSwitchTeams'] = competitor and not competitor.user.delinquent and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)
 

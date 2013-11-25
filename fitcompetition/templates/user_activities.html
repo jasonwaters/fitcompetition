@@ -11,7 +11,7 @@
         <tbody>
         {% for activity in activities %}
             <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
-                <td class="activity-icon {{ activity.type.name|slugify }}"></td>
+                <td><span class="activity-icon {{ activity.type.name|slugify }}"></span></td>
                 <td>{{ activity.date|naturalday:"M j" }}</td>
                 <td>{{ activity.distance|toMiles|twoDecimals }}</td>
                 <td>{{ activity.duration|duration }}</td>

@@ -4,6 +4,8 @@ from math import floor
 import math
 from django.template.defaultfilters import register
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.utils.text import slugify
 from fitcompetition.settings import STATIC_URL, TIME_ZONE
 from django.conf import settings
 import pytz
@@ -208,6 +210,13 @@ def commaSeparated(list, word="or"):
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
 
+@register.filter(is_safe=True)
+def activityIcons(activities):
+    result = ""
+    for activity in activities:
+        result += "<span class='activity-icon %s' title='%s'></span>" % (slugify(activity), activity)
+
+    return mark_safe(result)
 
 @register.filter
 def times(number):

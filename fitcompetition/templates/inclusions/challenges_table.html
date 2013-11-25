@@ -12,7 +12,7 @@
 					<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 					<div class="challenge-stats">${{ challenge.ante|intcomma }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
 					<div class="challenge-stats-other">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
-					<div class="challenge-stats-other">{{ challenge.approvedActivityNames|commaSeparated:"or" }}</div>
+					<div class="challenge-stats-other">{{ challenge.approvedActivityNames|activityIcons }}</div>
 				</div>
 
 				<div class="hidden-xs col-sm-1">
