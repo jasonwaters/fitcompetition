@@ -95,6 +95,17 @@ def duration(secs):
     h, m = divmod(m, 60)
     return "%d:%02d:%02d" % (h, m, s)
 
+@register.filter
+def daysUntil(targetdate):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    delta = targetdate - now
+    return "%s days" % delta.days
+
+@register.filter
+def daysSince(targetdate):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    delta = now - targetdate
+    return "%s days" % delta.days
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -171,6 +182,20 @@ def currency(value):
 def userAchievedChallenge(challenge, user):
     return challenge.getAchievedGoal(user)
 
+
+@register.filter
+def challengeType(challenge):
+    if challenge.isTypeIndividual:
+        return "Individual Challenge"
+    elif challenge.isTypeTeam:
+        return 'Team Challenge'
+
+@register.filter
+def challengeStyle(challenge):
+    if challenge.isStyleAllCanWin:
+        return "All Can Win"
+    elif challenge.isStyleWinnerTakesAll:
+        return 'Winner Takes All'
 
 @register.filter
 def commaSeparated(list, word="or"):

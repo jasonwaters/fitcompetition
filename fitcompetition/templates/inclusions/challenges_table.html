@@ -5,25 +5,36 @@
         {% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
         {{ title }}
     </h3>
-    <div class="list-group">
+    <div class="list-group list-challenges">
         {% for challenge in challenges %}
-            <a href="{% url "challenge_details" challenge.id %}" class="list-group-item">
-                {% if brief %}
-                    {{ challenge.name }}
-                    <div class="dimmed-text">Ended {{ challenge.enddate|date:"F jS Y" }}</div>
-                {% else %}
-                    <h4 class="list-group-item-heading">{{ challenge.name }}</h4>
-                    <p class="list-group-item-text">
-                        Complete {{ challenge.distance|floatformat:"-1" }} miles by {{ challenge.approvedActivityNames|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS" }} and {{ challenge.enddate|date:"M jS Y" }}.
-                        {% if challenge.ante == 0 %}
-                            FREE to join;
-                        {% else %}
-                            ${{ challenge.ante|intcomma }} to join, ${{ challenge.moneyInThePot|intcomma }} in the pot;
-                        {% endif %}
-                        {{ challenge.numPlayers }} Competitor{{ challenge.numPlayers|pluralize }}.<br/>
-                    </p>
-                {% endif %}
-            </a>
+			<div class="list-group-item row">
+				<div class="col-xs-6 col-sm-5">
+					<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
+					<div class="challenge-stats">${{ challenge.ante|intcomma }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
+					<div class="challenge-stats-other">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
+					<div class="challenge-stats-other">{{ challenge.approvedActivityNames|commaSeparated:"or" }}</div>
+				</div>
+
+				<div class="hidden-xs col-sm-4">
+					<div class="challenge-label">In the pot</div>
+					<div class="challenge-value">${{ challenge.moneyInThePot|intcomma }}</div>
+				</div>
+
+				<div class="col-xs-6 col-sm-3">
+					{% if challenge.hasStarted %}
+						{% if not challenge.hasEnded %}
+							<div class="challenge-label">{{ challenge.enddate|daysUntil }} left</div>
+						{% else %}
+							<div class="challenge-label">Ended {{ challenge.enddate|date:"m.d.y" }}</div>
+						{% endif %}
+						<a href="{% url "challenge_details" challenge.id %}" class="btn btn-primary">View Challenge</a>
+					{% else %}
+						<div class="challenge-label">Starts in {{ challenge.startdate|daysUntil }}</div>
+
+						<a href="{% url "challenge_details" challenge.id %}" class="btn btn-primary">Join Challenge</a>
+					{% endif %}
+				</div>
+		</div>
         {% endfor %}
     </div>
 {% endif %}

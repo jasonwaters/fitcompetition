@@ -454,8 +454,8 @@ class Team(models.Model):
         if self.members.count() < TEAM_MEMBER_MAXIMUM:
             Team.objects.withdrawAll(self.challenge, user, except_for=self)
 
-    def removeChallenger(self, user, force=False):
-        pass
+    def removeChallenger(self, user):
+        self.members.remove(user)
 
     @property
     def distance(self):
