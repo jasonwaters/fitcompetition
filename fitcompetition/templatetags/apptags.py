@@ -247,12 +247,12 @@ def pastTense(value):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
-def challenges_table(context, user, challenges, title, iconClass=None, brief=False):
+def challenges_table(context, user, challenges, title, iconClass=None, deemphasize=False):
     return {'user': user,
             'challenges': challenges,
             'title': title,
             'iconClass': iconClass,
-            'brief': brief}
+            'deemphasize': deemphasize}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)

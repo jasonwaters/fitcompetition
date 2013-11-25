@@ -5,13 +5,13 @@
         {% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
         {{ title }}
     </h3>
-    <div class="list-group list-challenges">
+    <div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
         {% for challenge in challenges %}
 			<div class="list-group-item row">
 				<div class="col-xs-4 col-sm-4">
 					<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 					<div class="challenge-stats">${{ challenge.ante|intcomma }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
-					<div class="challenge-stats-other">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
+					<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
 					<div class="challenge-stats-other">{{ challenge.approvedActivityNames|activityIcons }}</div>
 				</div>
 
@@ -37,11 +37,11 @@
 						{% else %}
 							<div class="challenge-label">Ended {{ challenge.enddate|date:"m.d.y" }}</div>
 						{% endif %}
-						<a href="{% url "challenge_details" challenge.id %}" class="btn btn-primary">View Challenge</a>
+						<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 					{% else %}
 						<div class="challenge-label">Starts in {{ challenge.startdate|daysUntil }}</div>
 
-						<a href="{% url "challenge_details" challenge.id %}" class="btn btn-primary">Join Challenge</a>
+						<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
 					{% endif %}
 				</div>
 		</div>

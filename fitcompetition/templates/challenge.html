@@ -74,9 +74,9 @@
 				<div class="challenge-label">Type</div>
 				<div class="challenge-value">
 					{% if challenge.isTypeIndividual %}
-						<i class="fa fa-user"></i> Solo
+						<i class="fa fa-user"></i> Individual
 					{% elif challenge.isTypeTeam %}
-						<i class="fa fa-users"></i> Teams
+						<i class="fa fa-users"></i> Team
 					{% endif %}
 				</div>
 			</div>
@@ -350,7 +350,7 @@
 					service = $this.data('service');
 
 				if(service === 'twitter') {
-					var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcompetition';
+					var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcrown';
 					window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
 				}else if(service === 'facebook') {
 					window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),

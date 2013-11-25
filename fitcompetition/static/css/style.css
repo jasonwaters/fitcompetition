@@ -203,8 +203,8 @@ tr.team .team-total {
     margin-right: 10px;
 }
 
-.btn-default {
-    /* fallback */
+.btn-share {
+     /*fallback */
     background-color: fefefe;
     background-repeat: repeat-x;
 
@@ -249,6 +249,14 @@ tr.team .team-total {
 
 .tooltip-inner {
 	max-width: 300px;
+}
+
+.list-challenges.dimmed {
+	color: #a9a9a9;
+}
+
+.list-challenges.dimmed a, .list-challenges.dimmed a:visited, .list-challenges.dimmed a:active, .list-challenges.dimmed a:hover {
+	color: #515151;
 }
 
 .challenge-stats {
@@ -303,7 +311,8 @@ tr.team .team-total {
         font-size: 10px;
     }
 
-	.challenge-stats, .challenge-stats-other {
+
+	.challenge-label, .challenge-stats, .challenge-stats-other {
 		font-size: 11px;
 	}
 
