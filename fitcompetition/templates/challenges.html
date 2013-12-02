@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}Challenges{% endblock %}
+{% block head_title %}Running, Walking, Cycling, Biking, Hiking and Elliptical Fitness Challenges{% endblock %}
 
 {% block content %}
     <div class="page-header">
@@ -11,10 +11,11 @@
     </div>
 
     <p class="lead">
-        <small><a href="{% url 'faq' %}">What's this all about?</a></small>
+		Fit Crown is a fitness game you play with your friends.  Join a challenge and put some cash in the pot.  Then, log your miles with Runkeeper.  If you go the distance before the challenge ends you get a piece the pot when it ends!
     </p>
+	<p>Read the details in <a href="{% url 'faq' %}">Frequently Asked Questions.</a></p>
 
-    {% player_email user %}
+	{% player_email user %}
 	{% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
     {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
     {% challenges_table user pastChallenges "Recently Ended" "fa fa-flag-checkered" True %}

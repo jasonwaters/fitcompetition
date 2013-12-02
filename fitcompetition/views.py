@@ -1,7 +1,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum, Avg
 from django.http import HttpResponse
 from django.shortcuts import render
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
@@ -111,6 +111,7 @@ def challenge(request, id):
 
     if challenge.isTypeIndividual:
         params['players'] = challenge.getChallengersWithActivities()
+        params['teams'] = []
     elif challenge.isTypeTeam:
         params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(
             num_members__lt=TEAM_MEMBER_MAXIMUM)

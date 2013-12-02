@@ -30,6 +30,21 @@
 
 	<p class="lead">{{ challenge.description|safe }}</p>
 
+	<p class="lead">
+		{% if not challenge.hasStarted %}
+			This Challenge will start in {{ challenge.startdate|timeuntil }}.
+		{% elif challenge.hasEnded %}
+			This Challenge ended {{ challenge.enddate|timesince }} ago.
+			{% if challenge.reconciled and challenge.disbursementAmount > 0 %}
+				<strong>{{ challenge.numWinners }} players won ${{ challenge.disbursementAmount }} each.</strong>
+			{% endif %}
+		{% else%}
+			<span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
+                This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
+            </span>
+		{% endif %}
+	</p>
+
 	<h4>Challenge Details</h4>
 	<div class="challenge-header">
 		<div class="row">
@@ -92,18 +107,6 @@
 			</div>
 		</div>
 	</div>
-
-    <p>
-        {% if not challenge.hasStarted %}
-            This Challenge will start in {{ challenge.startdate|timeuntil }}.
-        {% elif challenge.hasEnded %}
-            This Challenge ended {{ challenge.enddate|timesince }} ago.
-        {% else%}
-            <span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
-                This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
-            </span>
-        {% endif %}
-    </p>
 
 	{% player_email user %}
 	{% player_ante user challenge competitor %}
