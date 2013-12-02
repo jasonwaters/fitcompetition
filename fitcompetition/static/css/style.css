@@ -285,6 +285,14 @@ tr.team .team-total {
 .challenge-header .challenge-info {
 }
 
+.challenges-table {
+	margin-bottom: 35px;
+	margin-top: 35px;
+}
+
+.text-centered {
+	text-align: center;
+}
 
 @media (max-width: 360px) {
     h1{

@@ -15,10 +15,14 @@ def challenges(request):
     upcomingChallenges = Challenge.objects.upcomingChallenges()
     pastChallenges = Challenge.objects.pastChallenges()
 
+    challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'), totalWinnerCount=Sum('numWinners'))
+
     return render(request, 'challenges.html', {
         'currentChallenges': currentChallenges,
         'upcomingChallenges': upcomingChallenges,
-        'pastChallenges': pastChallenges
+        'pastChallenges': pastChallenges,
+        'totalPaid': attr(challengeStats, 'grandTotalDisbursed'),
+        'averagePaid': attr(challengeStats, 'grandTotalDisbursed') / attr(challengeStats, 'totalWinnerCount')
     })
 
 

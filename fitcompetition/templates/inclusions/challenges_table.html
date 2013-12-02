@@ -1,50 +1,52 @@
 {% load apptags %}
 {% load humanize %}
 {% if challenges and challenges|length > 0 %}
-    <h3>
-        {% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
-        {{ title }}
-    </h3>
-    <div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
-        {% for challenge in challenges %}
-			<div class="list-group-item row">
-				<div class="col-xs-4 col-sm-4">
-					<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
-					<div class="challenge-stats">${{ challenge.ante|intcomma }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
-					<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
-					<div class="challenge-stats-other">{{ challenge.approvedActivityNames|activityIcons }}</div>
-				</div>
+	<div class="challenges-table">
+		<h3>
+			{% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
+			{{ title }}
+		</h3>
+		<div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
+			{% for challenge in challenges %}
+				<div class="list-group-item row">
+					<div class="col-xs-4 col-sm-4">
+						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
+						<div class="challenge-stats">${{ challenge.ante|intcomma }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
+						<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
+						<div class="challenge-stats-other">{{ challenge.approvedActivityNames|activityIcons }}</div>
+					</div>
 
-				<div class="hidden-xs col-sm-1">
-					<div class="challenge-label">Miles</div>
-					<div class="challenge-value">{{ challenge.distance|floatformat:"-1" }}</div>
-				</div>
+					<div class="hidden-xs col-sm-1">
+						<div class="challenge-label">Miles</div>
+						<div class="challenge-value">{{ challenge.distance|floatformat:"-1" }}</div>
+					</div>
 
-				<div class="hidden-xs col-sm-1">
-					<div class="challenge-label">Days</div>
-					<div class="challenge-value">{{ challenge.numDays }}</div>
-				</div>
+					<div class="hidden-xs col-sm-1">
+						<div class="challenge-label">Days</div>
+						<div class="challenge-value">{{ challenge.numDays }}</div>
+					</div>
 
-				<div class="col-xs-3 col-sm-2">
-					<div class="challenge-label">In the pot</div>
-					<div class="challenge-value">${{ challenge.moneyInThePot|intcomma }}</div>
-				</div>
+					<div class="col-xs-3 col-sm-2">
+						<div class="challenge-label">In the pot</div>
+						<div class="challenge-value">${{ challenge.moneyInThePot|intcomma }}</div>
+					</div>
 
-				<div class="col-xs-4 col-sm-4">
-					{% if challenge.hasStarted %}
-						{% if not challenge.hasEnded %}
-							<div class="challenge-label">{{ challenge.enddate|daysUntil }} left</div>
+					<div class="col-xs-4 col-sm-4">
+						{% if challenge.hasStarted %}
+							{% if not challenge.hasEnded %}
+								<div class="challenge-label">{{ challenge.enddate|daysUntil }} left</div>
+							{% else %}
+								<div class="challenge-label">Ended {{ challenge.enddate|date:"m.d.y" }}</div>
+							{% endif %}
+							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 						{% else %}
-							<div class="challenge-label">Ended {{ challenge.enddate|date:"m.d.y" }}</div>
-						{% endif %}
-						<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
-					{% else %}
-						<div class="challenge-label">Starts in {{ challenge.startdate|daysUntil }}</div>
+							<div class="challenge-label">Starts in {{ challenge.startdate|daysUntil }}</div>
 
-						<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
-					{% endif %}
-				</div>
+							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
+						{% endif %}
+					</div>
+			</div>
+			{% endfor %}
 		</div>
-        {% endfor %}
-    </div>
+	</div>
 {% endif %}

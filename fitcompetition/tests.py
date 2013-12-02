@@ -273,6 +273,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 3)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(33.33), 2)
+        self.assertAlmostEqual(challenge.totalDisbursed, Decimal(99.99), 2)
 
     def testIndividualAllCanWin2(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -313,6 +314,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 1)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(100), 2)
+        self.assertEqual(challenge.totalDisbursed, 100)
 
 
     def testIndividualAllCanWin3(self):
@@ -354,6 +356,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 0)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(0), 2)
+        self.assertEqual(challenge.totalDisbursed, 0)
 
 
     def testIndividualWinnerTakesAll(self):
@@ -387,6 +390,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 1)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(75), 2)
+        self.assertEqual(challenge.totalDisbursed, 75)
 
     def testIndividualWinnerTakesAll2(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -419,6 +423,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 0)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(0), 2)
+        self.assertEqual(challenge.totalDisbursed, 0)
 
     def testTeamAllCanWin(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -460,6 +465,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 4)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(25), 2)
+        self.assertEqual(challenge.totalDisbursed, 100)
 
     def testTeamAllCanWin2(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -501,6 +507,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 2)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(50), 2)
+        self.assertEqual(challenge.totalDisbursed, 100)
 
     def testTeamAllCanWin3(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -542,7 +549,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 0)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(0), 2)
-
+        self.assertEqual(challenge.totalDisbursed, 0)
 
     def testTeamWinnerTakesAll(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -584,6 +591,7 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 2)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(50), 2)
+        self.assertEqual(challenge.totalDisbursed, 100)
 
     def testTeamWinnerTakesAll2(self):
         challenge = Challenge.objects.create(name="Marathon",
@@ -625,3 +633,4 @@ class ReconciliationTests(TestCase):
 
         self.assertEqual(challenge.numWinners, 0)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(0), 2)
+        self.assertEqual(challenge.totalDisbursed, 0)

@@ -228,6 +228,7 @@ class Challenge(models.Model):
     reconciled = models.BooleanField(default=False)
     disbursementAmount = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
     numWinners = models.IntegerField(blank=True, null=True, default=0)
+    totalDisbursed = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
 
     objects = ChallengeManager()
 
@@ -271,6 +272,8 @@ class Challenge(models.Model):
 
         self.numWinners = len(achievers)
         self.disbursementAmount = dollars if self.numWinners > 0 else 0
+        self.totalDisbursed = self.disbursementAmount * self.numWinners
+
         self.reconciled = True
         self.save()
 
