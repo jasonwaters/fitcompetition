@@ -74,7 +74,7 @@ def toMiles(meters):
 
 @register.filter
 def toMeters(miles):
-    return miles / Decimal(0.00062137)
+    return Decimal(miles) / Decimal(0.00062137)
 
 
 @register.filter
