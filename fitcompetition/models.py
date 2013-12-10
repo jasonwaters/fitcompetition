@@ -127,9 +127,6 @@ class FitUser(AbstractUser):
         if self.email is None or self.email == '':
             return True
 
-        if self.phoneNumber is None or self.phoneNumber == '':
-            return True
-
         return False
 
     class Meta:

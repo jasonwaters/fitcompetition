@@ -1,9 +1,12 @@
 import json
+from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team
 from fitcompetition.templatetags.apptags import toMiles
+from django.conf import settings
+import mailchimp
 
 
 def addChallenger(challenge_id, user):
@@ -73,11 +76,30 @@ def withdraw_challenge(request, id):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
+def subscribeToMailingList(user):
+    api_key = getattr(settings, 'MAILCHIMP_API_KEY')
+    list_id = getattr(settings, 'MAILCHIMP_LIST_ID')
+
+    if api_key is not None and list_id is not None:
+        m = mailchimp.Mailchimp(api_key)
+
+        try:
+            m.lists.subscribe(list_id, {
+                'email': user.email
+            }, {
+                'FNAME': user.first_name,
+                'LNAME': user.last_name
+            }, double_optin=False, update_existing=True)
+        except mailchimp.Error, e:
+            pass
+
 @login_required
 def user_details_update(request):
     request.user.email = request.POST.get('emailAddress')
     request.user.phoneNumber = request.POST.get('phoneNumber')
     request.user.save()
+
+    subscribeToMailingList(request.user)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
