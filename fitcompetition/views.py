@@ -95,7 +95,7 @@ def challenge(request, id):
         except Challenger.DoesNotExist:
             competitor = None
 
-    if competitor and challenge.startdate <= now <= challenge.enddate:
+    if competitor and challenge.startdate <= now <= challenge.enddate and request.user.healthGraphStale():
         request.user.syncRunkeeperData(syncProfile=False)
 
     approvedTypes = challenge.approvedActivities.all()

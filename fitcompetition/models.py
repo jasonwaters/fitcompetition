@@ -89,16 +89,13 @@ class FitUser(AbstractUser):
     def is_authenticated(self):
         return True
 
-    def syncRunkeeperData(self, activityTypesMap=None, syncProfile=True):
-        if activityTypesMap is None:
-            activityTypesMap = ListUtil.mappify(ActivityType.objects.all(), 'name')
-
+    def syncRunkeeperData(self, syncProfile=True):
         successful = self.syncProfileWithRunkeeper() if syncProfile else True
         successful = successful and FitnessActivity.objects.pruneActivities(self)
-        successful = successful and FitnessActivity.objects.syncActivities(self, activityTypesMap)
+        successful = successful and FitnessActivity.objects.syncActivities(self)
 
         if successful:
-            self.lastHealthGraphUpdate = datetime.utcnow().replace(tzinfo=pytz.utc)
+            self.lastHealthGraphUpdate = datetime.now(tz=pytz.utc)
             self.save()
 
     def syncProfileWithRunkeeper(self):
@@ -119,7 +116,7 @@ class FitUser(AbstractUser):
         if self.lastHealthGraphUpdate is None:
             return True
 
-        timeago = datetime.now(tz=pytz.timezone(TIME_ZONE)) + relativedelta(minutes=-20)
+        timeago = datetime.now(tz=pytz.utc) + relativedelta(minutes=-5)
         return self.lastHealthGraphUpdate < timeago
 
     @property
@@ -143,11 +140,11 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-num_players')
+        return self.annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', '-num_players')
 
     def currentChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('-startdate')
+        return self.annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('startdate', '-num_players')
 
     def pastChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -155,7 +152,8 @@ class ChallengeManager(models.Manager):
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now).order_by('-startdate')
+        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now).order_by('-startdate',
+                                                                                                                                     '-num_players')
 
     def userChallenges(self, userid):
         activeUserChallenges = []
@@ -328,7 +326,7 @@ class Challenge(models.Model):
     def getAchievers(self):
         if self.isTypeIndividual:
             winners = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
-                                                                         latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
+                                                                                   latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
 
             if self.isStyleWinnerTakesAll:
                 return winners[:1]
@@ -513,13 +511,13 @@ class FitnessActivityManager(models.Manager):
 
         return successful
 
-    def syncActivities(self, user, activityTypesMap):
+    def syncActivities(self, user):
         successful = True
         #populate the database with activities from the health graph
         try:
             activities = RunkeeperService.getFitnessActivities(user, modifiedSince=user.lastHealthGraphUpdate)
             for activity in activities:
-                type = activityTypesMap.get(activity.get('type'), None)
+                type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
                 dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
                 dbo.type = type
                 dbo.duration = activity.get('duration')
@@ -563,7 +561,7 @@ class TransactionManager(models.Manager):
         self.create(date=now,
                     account=fromAccount,
                     description=fromMemo,
-                    amount=amount*-1)
+                    amount=amount * -1)
 
         self.create(date=now,
                     account=toAccount,
