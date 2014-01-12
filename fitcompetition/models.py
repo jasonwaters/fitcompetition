@@ -116,7 +116,7 @@ class FitUser(AbstractUser):
         if self.lastHealthGraphUpdate is None:
             return True
 
-        timeago = datetime.now(tz=pytz.utc) + relativedelta(minutes=-5)
+        timeago = datetime.now(tz=pytz.utc) + relativedelta(minutes=-20)
         return self.lastHealthGraphUpdate < timeago
 
     @property
