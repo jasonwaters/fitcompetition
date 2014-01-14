@@ -74,12 +74,12 @@
 			</div>
 			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 				<div class="challenge-label">Bet</div>
-				<div class="challenge-value">${{ challenge.ante|intcomma }}</div>
+				<div class="challenge-value">${{ challenge.ante|floatformat:"-2"|intcomma }}</div>
 			</div>
 
 			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 				<div class="challenge-label">In the pot</div>
-				<div class="challenge-value">${{ challenge.moneyInThePot|intcomma }}</div>
+				<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
 			</div>
 			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 				<div class="challenge-label">Players</div>

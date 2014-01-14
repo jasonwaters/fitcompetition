@@ -175,7 +175,7 @@ class ChallengeManager(models.Manager):
 
 
 def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilter):
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.now(tz=pytz.utc)
 
     users_with_activities = []
     activitySet = set()
