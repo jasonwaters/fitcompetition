@@ -24,6 +24,10 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+AWS_ACCESS_KEY_ID = ''
+AWS_SECRET_ACCESS_KEY = ''
+AWS_STORAGE_BUCKET_NAME = ''
+
 #this is used in the instructions for putting money in the pot.
 PAYPAL_ACCOUNT_EMAIL = ''
 

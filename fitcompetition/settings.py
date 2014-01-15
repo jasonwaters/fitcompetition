@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'social_auth',
     'south',
     'pipeline',
+    'storages',
     # 'brabeion',
 )
 
@@ -147,6 +148,9 @@ PIPELINE_JS = {
             'js/bootstrap.js',
             'js/moment.js',
             'js/lodash.js',
+            "js/binaryajax.js",
+            "js/exif.js",
+            "js/canvasResize.js",
             'js/countdown.js',
             'js/script.js',
         ),
@@ -238,6 +242,16 @@ try:
     from local_settings import *
 except:
     pass
+
+AWS_HEADERS = {
+    'Expires': 'access plus 1 year',
+    'Cache-Control': 'max-age=86400',
+}
+
+DEFAULT_FILE_STORAGE = 'fitcompetition.s3utils.MediaS3BotoStorage'
+S3_URL = 'http://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+MEDIA_DIRECTORY = '/media/'
+MEDIA_URL = S3_URL + MEDIA_DIRECTORY
 
 TEMPLATE_DEBUG = DEBUG
 #a virutalenv should be created and located in a folder named "env" at the project root.

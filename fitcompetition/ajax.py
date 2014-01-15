@@ -1,9 +1,11 @@
+import base64
 import json
-from django.contrib import messages
+from django.core.files.base import ContentFile
+import re
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from fitcompetition.models import Challenge, Team
+from fitcompetition.models import Challenge, Team, FitnessActivity
 from fitcompetition.templatetags.apptags import toMiles
 from django.conf import settings
 import mailchimp
@@ -21,6 +23,34 @@ def addChallenger(challenge_id, user):
     except Exception:
         return False, None
 
+
+@login_required
+def upload_activity_image(request, activity_id):
+    activity = FitnessActivity.objects.get(pk=activity_id)
+
+    if request.method == 'POST' and activity.user == request.user:
+        if activity.photo:
+            activity.photo.delete()
+
+        dataUrlPattern = re.compile('data:image/(png|jpeg);base64,(.*)$')
+        image_data = request.POST.get('base64image')
+        image_data = dataUrlPattern.match(image_data).group(2)
+
+        # If none or len 0, means illegal image data
+        if image_data is None or len(image_data) == 0:
+            return HttpResponse(json.dumps({'success': False}))
+
+        # Decode the 64 bit string into 32 bit
+        image_data = base64.b64decode(image_data)
+
+        activity.photo.save(request.POST.get('filename'), ContentFile(image_data))
+        activity.save()
+
+        return HttpResponse(json.dumps({
+            'success': True,
+            'photoUrl': activity.photo.url
+        }))
+    return HttpResponse(json.dumps({'success': False}))
 
 @login_required
 def fetch_latest_activities(request, challenge_id):

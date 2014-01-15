@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
 import operator
+import uuid
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
@@ -12,6 +13,7 @@ from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
 from fitcompetition.templatetags.apptags import toMeters, toMiles
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
+import os
 import pytz
 from requests import RequestException
 from dateutil import parser
@@ -531,6 +533,12 @@ class FitnessActivityManager(models.Manager):
         return successful
 
 
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return os.path.join('activity_images', filename)
+
+
 class FitnessActivity(models.Model):
     user = models.ForeignKey(FitUser)
     type = models.ForeignKey(ActivityType, blank=True, null=True, default=None)
@@ -539,6 +547,7 @@ class FitnessActivity(models.Model):
     date = models.DateTimeField(blank=True, null=True, default=None)
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
+    photo = models.ImageField(upload_to=get_file_path, default=None, null=True)
 
     objects = FitnessActivityManager()
 

@@ -32,6 +32,7 @@ urlpatterns = patterns('',
                        url(r'^update-user-details/$', 'fitcompetition.ajax.user_details_update', name="user_details_update"),
                        url(r'^c/refresh-user-activities/$', 'fitcompetition.ajax.refresh_user_activities', name="refresh_user_activities"),
 
+                       url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.ajax.upload_activity_image', name="activity_upload_photo"),
 
                        #OTHER
                        url(r'^grappelli/', include('grappelli.urls')),

@@ -14,6 +14,25 @@
 {% endblock %}
 
 {% block content %}
+	<!-- Button trigger modal -->
+	<!-- Modal -->
+	<div class="modal fade" id="photoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">Activity Image</h4>
+				</div>
+				<div class="modal-body">
+					<img id="activity-image-preview"/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
     <div class="page-header">
         <h2>{{ userprofile.fullname }} <small><a href="{{ userprofile.profile_url }}" target="_blank">view Runkeeper profile &raquo;</a></small></h2>
     </div>
@@ -28,18 +47,84 @@
             <th>Type</th>
             <th>Miles</th>
             <th>Duration</th>
+			<th></th>
         </thead>
         <tbody>
             {% for activity in recentActivities %}
-                <tr>
+                <tr data-id="{{ activity.id }}">
                     <td>{{ activity.date|naturalday:"F j, Y" }}</td>
                     <td>{{ activity.type.name }}</td>
                     <td>{{ activity.distance|toMiles|twoDecimals }}</td>
                     <td>{{ activity.duration|duration }}</td>
+					<td>
+						{% if activity.photo %}
+							<i title="View Image" class="fa fa-picture-o show-activity-image" data-imgurl="{{ activity.photo.url }}"></i>
+						{% else %}
+							<i title="View Image" class="fa fa-picture-o show-activity-image hide"></i>
+						{% endif %}
+						{% if user == userprofile %}
+							<span class="pull-right">
+								<input name="activity-image" type="file">
+								<i title="Upload Image" class="fa fa-upload upload-activity-image"></i>
+							</span>
+						{% endif %}
+					</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+	<script type="text/javascript">
+		$('.show-activity-image').click(function() {
+			$("#activity-image-preview").attr('src', $(this).data('imgurl'));
+			$('#photoModal').modal('toggle');
+		});
+
+		$('.upload-activity-image').click(function() {
+			var $this = $(this);
+
+			$this.removeClass('fa-cloud');
+			$this.addClass('fa-upload');
+
+			$(this).prev('input[type=file]').trigger('click');
+		});
+
+
+		$('input[name=activity-image]').change(function () {
+			var $this = $(this),
+				file = this.files[0],
+				row = $this.closest('tr'),
+				showIco = row.find('.show-activity-image'),
+				uploadIco = row.find('.upload-activity-image'),
+				activityID = row.data('id');
+
+				canvasResize(file, {
+					width: 640,
+					quality: 80,
+					callback: function (data, width, height) {
+						var url = "{% url 'activity_upload_photo' '000000' %}".replace(/000000/, activityID.toString());
+						$.ajax({
+							'url': url,
+							'type': 'POST',
+							'data': {
+								'base64image': data,
+								'filename': file.name,
+								'type': file.type
+							}
+						}).done(function(response) {
+							response = JSON.parse(response);
+							if(response.success) {
+								uploadIco.removeClass('fa-upload');
+								uploadIco.addClass('fa-cloud');
+
+								showIco.removeClass('hide');
+								showIco.data('imgurl', response.photoUrl);
+							}
+						});
+					}
+				});
+		});
+	</script>
 
     <h2>Challenges</h2>
     {% challenges_table user activeChallenges "Competing Now" "fa fa-location-arrow" %}
