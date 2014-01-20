@@ -183,7 +183,9 @@
         <div class="tab-content">
             <div class="tab-pane active" id="leaderboard">
 				{% if "DISQUS_SHORTNAME"|fromSettings %}
-                    <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+					<div>
+                    	<a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+					</div>
                 {% endif %}
 
 			    {% if numPlayers > 0 or teams|length > 0 %}
