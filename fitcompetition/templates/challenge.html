@@ -182,10 +182,24 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="leaderboard">
-                {% if "DISQUS_SHORTNAME"|fromSettings %}
+				{% if "DISQUS_SHORTNAME"|fromSettings %}
                     <a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
                 {% endif %}
-                {% if numPlayers > 0 or teams|length > 0 %}
+
+			    {% if numPlayers > 0 or teams|length > 0 %}
+					<ul class="list-unstyled">
+						{% for activity in recentActivities %}
+							<li>
+								<a href="{% url "user_details" activity.user.id %}">{{ activity.user.fullname }}</a> {{ activity.type.name|pastTense }} {{ activity.distance|toMiles|twoDecimals }} miles.
+								{% if activity.photo %}
+									<a href="{{ activity.photo.url }}" target="_blank"><i title="View Image" class="fa fa-picture-o show-activity-image"></i></a>
+								{% endif %}
+								<div class="dimmed-text">{{ activity.date|naturaltime|capfirst }} </div>
+								<br/>
+							</li>
+						{% endfor %}
+					</ul>
+
                     <table class="table table-striped leaderboard">
                         <thead>
                             <tr>

@@ -111,6 +111,7 @@ def challenge(request, id):
         'numPlayers': challenge.numPlayers,
         'fetchLatest': False,
         'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
+        'recentActivities': challenge.getRecentActivities(),
     }
 
     if challenge.isTypeIndividual:

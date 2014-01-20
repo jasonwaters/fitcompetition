@@ -14,25 +14,6 @@
 {% endblock %}
 
 {% block content %}
-	<!-- Button trigger modal -->
-	<!-- Modal -->
-	<div class="modal fade" id="photoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Activity Image</h4>
-				</div>
-				<div class="modal-body">
-					<img id="activity-image-preview"/>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
-
     <div class="page-header">
         <h2>{{ userprofile.fullname }} <small><a href="{{ userprofile.profile_url }}" target="_blank">view Runkeeper profile &raquo;</a></small></h2>
     </div>
@@ -76,8 +57,10 @@
 
 	<script type="text/javascript">
 		$('.show-activity-image').click(function() {
-			$("#activity-image-preview").attr('src', $(this).data('imgurl'));
-			$('#photoModal').modal('toggle');
+			var url = $(this).data('imgurl');
+			if(url && url.length > 0) {
+				window.open(url, '_blank');
+			}
 		});
 
 		$('.upload-activity-image').click(function() {
