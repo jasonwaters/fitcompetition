@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum, Avg
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
@@ -80,12 +80,12 @@ def faq(request):
 
 
 def challenge(request, id):
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.now(tz=pytz.utc)
 
     try:
         challenge = Challenge.objects.get(id=id)
     except Challenge.DoesNotExist:
-        challenge = None
+        return redirect('challenges')
 
     competitor = None
 
