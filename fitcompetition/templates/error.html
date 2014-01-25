@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load humanize %}
+
+{% block head_title %}Error{% endblock %}
+
+{% block content %}
+	<div class="page-header">
+		<h2>Oops! <small>An error occurred.</small></h2>
+	</div>
+
+	{% block error_content %}
+		{% if errorMessage %}
+			<p class="lead">{{ errorMessage }}</p>
+		{% endif %}
+		{% if errorDetails %}
+			<blockquote>
+				<p>{{ errorDetails }}</p>
+			</blockquote>
+		{% endif %}
+	{% endblock %}
+{% endblock %}

@@ -70,18 +70,32 @@ a.activities-link {
 
 .activity-icon {
     width: 18px;
+	height: 18px;
+	display: inline-block;
+}
+
+.activity-icon.cycling {
+    background: url('/static/img/icon-cycling-small.png') no-repeat;
+}
+
+.activity-icon.mountain-biking {
+    background: url('/static/img/icon-mountainbiking-small.png') no-repeat;
 }
 
 .activity-icon.running {
-    background: url('/static/img/icon-running-small.png') no-repeat -2px 4px;
-    /*width: 18px;*/
-    height: 18px;
+    background: url('/static/img/icon-running-small.png') no-repeat;
 }
 
 .activity-icon.walking {
-    background: url('/static/img/icon-walking-small.png') no-repeat -2px 4px;;
-    /*width: 18px;*/
-    height: 18px;
+    background: url('/static/img/icon-walking-small.png') no-repeat;
+}
+
+.activity-icon.hiking {
+    background: url('/static/img/icon-hiking-small.png') no-repeat;
+}
+
+.activity-icon.elliptical {
+    background: url('/static/img/icon-elliptical-small.png') no-repeat;
 }
 
 .player .name {
@@ -94,7 +108,7 @@ a.activities-link {
     overflow: hidden;
 }
 
-.player .flair [class^="icon-"] {
+.player .flair [class^="fa"] {
     padding-left: 2px;
 }
 
@@ -112,6 +126,10 @@ a.activities-link {
 
 .top-padding {
     margin-top: 20px;
+}
+
+.bottom-padding {
+    margin-bottom: 20px;
 }
 
 .vertical-padding {
@@ -169,12 +187,28 @@ div small.error {
     background-color: #e7f4fb !important;
 }
 
+.table > tbody > tr.team td {
+    background-color: #fcf8e3 !important;
+    font-weight: bold;
+    padding: 15px 8px;
+}
+
+tr.team .team-rank {
+    margin-left: 5px;
+    color: #c09853;
+}
+
+tr.team .team-total {
+	margin-left: 5px;
+
+}
+
 .btn-share {
     margin-right: 10px;
 }
 
-.btn-default {
-    /* fallback */
+.btn-standard {
+     /*fallback */
     background-color: fefefe;
     background-repeat: repeat-x;
 
@@ -194,15 +228,15 @@ div small.error {
     background: -o-linear-gradient(top, #fefefe, #dedede);
 }
 
-.icon-twitter {
+.fa-twitter {
     color: #00adee;
 }
 
-.icon-facebook, .icon-facebook-sign {
+.fa-facebook, .fa-facebook-square {
     color: #43609c;
 }
 
-.icon-google-plus, .icon-google-plus-sign {
+.fa-google-plus, .fa-google-plus-square {
     color: #da4835;
 }
 
@@ -217,9 +251,56 @@ div small.error {
     border-color: #d0e3f0;
 }
 
+.tooltip-inner {
+	max-width: 300px;
+}
+
 .btn-sign-in {
-    margin-right: 10px;
-    margin-bottom: 10px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.list-challenges.dimmed {
+	color: #a9a9a9;
+}
+
+.list-challenges.dimmed a, .list-challenges.dimmed a:visited, .list-challenges.dimmed a:active, .list-challenges.dimmed a:hover {
+	color: #515151;
+}
+
+.challenge-stats {
+	font-weight: bold;
+}
+
+.challenge-label {
+	color: #999999;
+	text-align: left;
+	margin: 10px 0;
+}
+
+.challenge-value {
+	text-align: left;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.challenge-header {
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+.challenge-header .challenge-info {
+}
+
+.challenges-table {
+	margin-bottom: 35px;
+	margin-top: 35px;
+}
+
+.text-centered {
+	text-align: center;
 }
 
 @media (max-width: 360px) {
@@ -247,7 +328,12 @@ div small.error {
         font-size: 10px;
     }
 
-    .page-header {
+
+	.challenge-label, .challenge-stats, .challenge-stats-other {
+		font-size: 11px;
+	}
+
+	.page-header {
         margin: 10px 0 10px;
     }
 
@@ -279,4 +365,13 @@ div small.error {
         width: 100%;
         height: auto;
     }
+}
+
+.show-activity-image, .upload-activity-image {
+	cursor: pointer;
+}
+
+input[name=activity-image] {
+	display: none;
+	height: 0;
 }

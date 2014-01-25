@@ -18,8 +18,21 @@ DATABASES = {
 #run 'locale -a' in terminal and select one.
 LOCALE = 'en_US.utf8'
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+AWS_ACCESS_KEY_ID = ''
+AWS_SECRET_ACCESS_KEY = ''
+AWS_STORAGE_BUCKET_NAME = ''
+
 #this is used in the instructions for putting money in the pot.
 PAYPAL_ACCOUNT_EMAIL = ''
+
+MAILCHIMP_API_KEY = ''
+MAILCHIMP_LIST_ID = ''
 
 RUNKEEPER_CLIENT_ID = ''
 RUNKEEPER_CLIENT_SECRET = ''

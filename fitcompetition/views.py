@@ -1,26 +1,28 @@
 from datetime import datetime
-import json
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q, Max
+from django.db.models import Q, Count, Sum, Avg
 from django.http import HttpResponse
-from django.shortcuts import render
-from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction
-from fitcompetition.settings import TIME_ZONE
-from fitcompetition.util import ListUtil
+from django.shortcuts import render, redirect
+from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
+from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
 
 def challenges(request):
-    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(request.user.id)
-    openChallenges = Challenge.objects.openChallenges(request.user.id)
+    currentChallenges = Challenge.objects.currentChallenges()
+    upcomingChallenges = Challenge.objects.upcomingChallenges()
     pastChallenges = Challenge.objects.pastChallenges()
 
+    challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'), totalWinnerCount=Sum('numWinners'))
+
     return render(request, 'challenges.html', {
-        'myChallenges': activeUserChallenges,
-        'openChallenges': openChallenges,
-        'pastChallenges': pastChallenges
+        'currentChallenges': currentChallenges,
+        'upcomingChallenges': upcomingChallenges,
+        'pastChallenges': pastChallenges,
+        'totalPaid': attr(challengeStats, 'grandTotalDisbursed'),
+        'averagePaid': attr(challengeStats, 'grandTotalDisbursed') / attr(challengeStats, 'totalWinnerCount')
     })
 
 
@@ -28,9 +30,10 @@ def challenges(request):
 def profile(request):
     return user(request, attr(request, 'user').id)
 
+
 @login_required
 def account(request):
-    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+    transactions = Transaction.objects.filter(account=request.user.account).order_by('-date')
 
     return render(request, 'account.html', {
         'transactions': transactions
@@ -43,7 +46,7 @@ def user(request, id):
     except FitUser.DoesNotExist:
         user = None
 
-    allUserChallenges, activeUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(id)
+    activeUserChallenges, upcomingUserChallenges, completedUserChallenges = Challenge.objects.userChallenges(id)
 
     thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
 
@@ -52,8 +55,23 @@ def user(request, id):
     return render(request, 'user.html', {
         'userprofile': user,
         'activeChallenges': activeUserChallenges,
+        'upcomingUserChallenges': upcomingUserChallenges,
         'completedChallenges': completedUserChallenges,
         'recentActivities': recentActivities
+    })
+
+
+def team(request, id):
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        team = None
+
+    members = team.members.all()
+
+    return render(request, 'team.html', {
+        'team': team,
+        'teamMembers': members
     })
 
 
@@ -62,12 +80,12 @@ def faq(request):
 
 
 def challenge(request, id):
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.now(tz=pytz.utc)
 
     try:
         challenge = Challenge.objects.get(id=id)
     except Challenge.DoesNotExist:
-        challenge = None
+        return redirect('challenges')
 
     competitor = None
 
@@ -77,101 +95,43 @@ def challenge(request, id):
         except Challenger.DoesNotExist:
             competitor = None
 
-    allPlayers = challenge.challengers
-    canJoin = not challenge.hasEnded and not competitor
+    if competitor and challenge.startdate <= now <= challenge.enddate and request.user.healthGraphStale():
+        request.user.syncRunkeeperData(syncProfile=False)
 
     approvedTypes = challenge.approvedActivities.all()
 
-    playersWithActivities = challenge.getChallengersWithActivities()
-    playersWithActivitiesMap = ListUtil.mappify(playersWithActivities, 'id')
-
-    if competitor and challenge.startdate <= now <= challenge.enddate:
-        request.user.syncRunkeeperData()
-
-    playersWithoutActivities = []
-
-    for player in allPlayers:
-        if playersWithActivitiesMap.get(player.id) is None:
-            playersWithoutActivities.append(player)
-
-    return render(request, 'challenge.html', {
+    params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'allPlayers': allPlayers,
-        'playersWithActivities': playersWithActivities,
-        'playersWithoutActivities': playersWithoutActivities,
-        'canJoin': canJoin,
+        'canJoin': not challenge.hasStarted and not competitor,
         'competitor': competitor,
-        'numPlayers': len(allPlayers),
-        'userAchievedGoal': challenge.getAchievedGoal(request.user),
-        'approvedActivities': createListFromProperty(approvedTypes, 'name')
-    })
+        'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
+        'approvedActivities': createListFromProperty(approvedTypes, 'name'),
+        'numPlayers': challenge.numPlayers,
+        'fetchLatest': False,
+        'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
+        'recentActivities': challenge.getRecentActivities(),
+    }
 
+    if challenge.isTypeIndividual:
+        params['players'] = challenge.getChallengersWithActivities()
+        params['teams'] = []
+    elif challenge.isTypeTeam:
+        params['open_teams'] = Team.objects.filter(challenge=challenge).annotate(num_members=Count('members')).filter(
+            num_members__lt=TEAM_MEMBER_MAXIMUM)
 
-@login_required
-def join_challenge(request, id):
-    try:
-        challenge = Challenge.objects.get(id=id)
-    except Challenge.DoesNotExist:
-        challenge = None
+        if request.user.is_authenticated():
+            try:
+                team = Team.objects.get(challenge=challenge, members__id__exact=request.user.id)
+                params['open_teams'] = params['open_teams'].exclude(id=team.id)
+            except Team.DoesNotExist:
+                pass
 
-    try:
-        challenge.challenger_set.get(fituser=request.user)
-    except Challenger.DoesNotExist:
-        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        Challenger.objects.create(challenge=challenge,
-                                  fituser=request.user,
-                                  date_joined=now)
+        params['teams'] = challenge.rankedTeams
+        params['canSwitchTeams'] = competitor and not competitor.user.delinquent and not challenge.hasStarted
 
-        Transaction.objects.create(date=now,
-                                   user=request.user,
-                                   description="Joined '%s' competition." % challenge.name,
-                                   amount=challenge.ante * -1,
-                                   challenge=challenge)
-
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
-
-
-@login_required
-def withdraw_challenge(request, id):
-    try:
-        challenge = Challenge.objects.get(id=id)
-    except Challenge.DoesNotExist:
-        challenge = None
-
-    try:
-        challenger = Challenger.objects.get(challenge=challenge, fituser=request.user)
-        if not challenge.hasEnded:
-            challenger.delete()
-            now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-
-            Transaction.objects.create(date=now,
-                                       user=request.user,
-                                       description="Withdrew from '%s' competition." % challenge.name,
-                                       amount=challenge.ante,
-                                       challenge=challenge)
-            success = True
-
-    except Challenger.DoesNotExist:
-        success = False
-
-    return HttpResponse(json.dumps({'success': success}), content_type="application/json")
-
-
-@login_required
-def user_details_update(request):
-    request.user.email = request.POST.get('emailAddress')
-    request.user.phoneNumber = request.POST.get('phoneNumber')
-    request.user.save()
-
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
-
-
-@login_required
-def refresh_user_activities(request):
-    request.user.syncRunkeeperData()
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+    return render(request, 'challenge.html', params)
 
 
 def user_activities(request, userID, challengeID):

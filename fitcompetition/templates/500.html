@@ -1,13 +1,7 @@
-{% extends 'base.html' %}
-{% load apptags %}
-{% load humanize %}
+{% extends 'error.html' %}
 
-{% block head_title %}Error{% endblock %}
+{% block head_title %}500 Error{% endblock %}
 
-
-{% block content %}
-    <div class="row">
-        <h3>Well, this is embarrassing&hellip;</h3>
-        <p>There was an unexpected error.  So sorry about that!  Will you <a href="mailto:jason@myheck.net">send us an email</a> and tell us what you were trying to do so we can fix the problem?</p>
-    </div>
+{% block error_content %}
+	<p class="lead">We're sorry!  There was an unexpected error.  Please <a href="mailto:contact@fitcrown.com">send us an email</a> and tell us what you were trying to do so we can fix the problem.</p>
 {% endblock %}

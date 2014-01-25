@@ -1,5 +1,4 @@
-import base64
-from django.conf import settings
+from datetime import timedelta
 import pytz
 import requests
 
@@ -28,7 +27,7 @@ class RunkeeperException(Exception):
 def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSince=None):
     params = {
         'access_token': user.runkeeperToken,
-        'pageSize': 100,
+        'pageSize': 1000,
     }
 
     if noEarlierThan is not None:
@@ -40,6 +39,7 @@ def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSin
     headers = {}
 
     if modifiedSince is not None:
+        modifiedSince = modifiedSince-timedelta(days=1)
         headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     url = "%s%s" % (RUNKEEPER_API_URL, FITNESS_ACTIVITIES)
@@ -63,6 +63,7 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
     headers = {}
 
     if modifiedSince is not None:
+        modifiedSince = modifiedSince-timedelta(days=1)
         headers['If-Modified-Since'] = modifiedSince.replace(tzinfo=pytz.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     if modifiedNoEarlierThan is not None:

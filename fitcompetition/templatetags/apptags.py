@@ -4,6 +4,8 @@ from math import floor
 import math
 from django.template.defaultfilters import register
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.utils.text import slugify
 from fitcompetition.settings import STATIC_URL, TIME_ZONE
 from django.conf import settings
 import pytz
@@ -72,7 +74,7 @@ def toMiles(meters):
 
 @register.filter
 def toMeters(miles):
-    return miles / Decimal(0.00062137)
+    return Decimal(miles) / Decimal(0.00062137)
 
 
 @register.filter
@@ -95,6 +97,17 @@ def duration(secs):
     h, m = divmod(m, 60)
     return "%d:%02d:%02d" % (h, m, s)
 
+@register.filter
+def daysUntil(targetdate):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    delta = targetdate - now
+    return "%s days" % delta.days
+
+@register.filter
+def daysSince(targetdate):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+    delta = now - targetdate
+    return "%s days" % delta.days
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -135,9 +148,11 @@ def deltaDate(targetDate, kind):
 def hostUrl(request):
     return '%s://%s' % ('https' if request.is_secure() else 'http', request.get_host())
 
+
 @register.filter
 def hashtaggify(value):
     return value.replace(' ', '')
+
 
 @register.filter
 def fullDate(d):
@@ -171,9 +186,25 @@ def currency(value):
     locale.setlocale(locale.LC_ALL, getattr(settings, 'LOCALE'))
     return locale.currency(value)
 
+
 @register.filter
 def userAchievedChallenge(challenge, user):
     return challenge.getAchievedGoal(user)
+
+
+@register.filter
+def challengeType(challenge):
+    if challenge.isTypeIndividual:
+        return "Individual Challenge"
+    elif challenge.isTypeTeam:
+        return 'Team Challenge'
+
+@register.filter
+def challengeStyle(challenge):
+    if challenge.isStyleAllCanWin:
+        return "All Can Win"
+    elif challenge.isStyleWinnerTakesAll:
+        return 'Winner Takes All'
 
 @register.filter
 def commaSeparated(list, word="or"):
@@ -186,6 +217,13 @@ def commaSeparated(list, word="or"):
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
 
+@register.filter(is_safe=True)
+def activityIcons(activities):
+    result = ""
+    for activity in activities:
+        result += "<span class='activity-icon %s' title='%s'></span>" % (slugify(activity), activity)
+
+    return mark_safe(result)
 
 @register.filter
 def times(number):
@@ -195,13 +233,33 @@ def times(number):
     return range(number)
 
 
+@register.filter
+def pastTense(value):
+    return {
+        'Running': 'ran',
+        'Cycling': 'cycled',
+        'Mountain Biking': 'mountain biked',
+        'Walking': 'walked',
+        'Hiking': 'hiked',
+        'Downhill Skiing': 'downhill skied',
+        'Cross-Country Skiing': 'cross-country skied',
+        'Snowboarding': 'snowboarded',
+        'Skating': 'skated',
+        'Swimming': 'swam',
+        'Wheelchair': 'wheeled',
+        'Rowing': 'rowed',
+        'Elliptical': 'ellipticaled',
+        'Other': '',
+    }[value]
+
+
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
-def challenges_table(context, user, challenges, title, iconClass=None, brief=False):
+def challenges_table(context, user, challenges, title, iconClass=None, deemphasize=False):
     return {'user': user,
             'challenges': challenges,
             'title': title,
             'iconClass': iconClass,
-            'brief': brief}
+            'deemphasize': deemphasize}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=True)

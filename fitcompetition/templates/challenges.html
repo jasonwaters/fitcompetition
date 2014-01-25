@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}Challenges{% endblock %}
+{% block head_title %}Social Exercise Challenges{% endblock %}
 
 {% block content %}
     <div class="page-header">
@@ -11,12 +11,12 @@
     </div>
 
     <p class="lead">
-        <small><a href="{% url 'faq' %}">What's this all about?</a></small>
-    </p>
-
-
-    {% player_email user %}
-    {% challenges_table user myChallenges "My Challenges" "icon-home" %}
-    {% challenges_table user openChallenges "Open Challenges" "icon-shopping-cart" %}
-    {% challenges_table user pastChallenges "Past Challenges" "icon-flag-checkered" True %}
+		Fit Crown is a social fitness game you play with your friends.  Join an exercise challenge and put some cash in the pot.  Then, log your miles with Runkeeper.  If you go the distance before the challenge ends you get a piece of the pot!
+	</p>
+	<p><a href="{% url 'faq' %}">What's this all about?</a></p>
+	{% player_email user %}
+	{% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
+    {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
+	<h3 class="text-centered">${{ totalPaid|intcomma }} paid out to winners!</h3>
+    {% challenges_table user pastChallenges "Recently Ended" "fa fa-flag-checkered" True %}
 {% endblock %}
