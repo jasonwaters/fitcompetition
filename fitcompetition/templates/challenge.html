@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ challenge.name }} : {{ challenge.distance|floatformat:"-1" }} mile challenge, {{ approvedActivities|commaSeparated}}{% endblock %}
+{% block head_title %}{{ challenge.name }} : {{ challenge.distance|floatformat:"-1" }} mile exercise challenge: {{ approvedActivities|commaSeparated}}{% endblock %}
 
 {% block head_misc %}
     <meta property="og:type" content="website" />

@@ -18,6 +18,9 @@ import pytz
 from requests import RequestException
 from dateutil import parser
 
+#DO NOT REMOVE signals import
+import signals
+
 
 class CurrencyField(models.DecimalField):
     __metaclass__ = models.SubfieldBase

@@ -19,7 +19,8 @@ class RunkeeperOauth2(BaseOAuth2):
         return response['user']['userID']
 
     def get_user_details(self, response):
-        username = response['user']['userID']
+        username = 'rkpr_%s' % str(response['user']['userID'])
+
         fullname = response['profile'].get('name', '')
 
         if fullname:

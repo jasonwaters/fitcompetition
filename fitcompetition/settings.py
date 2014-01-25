@@ -204,7 +204,7 @@ SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 255
 
 AUTHENTICATION_BACKENDS = (
     'fitcompetition.backends.runkeeper.RunkeeperOauth2',
-    'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
+    # 'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
     'django.contrib.auth.backends.ModelBackend'
 )
 
@@ -236,9 +236,9 @@ SOCIAL_AUTH_PIPELINE = (
 
 TEAM_MEMBER_MAXIMUM = 5
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
-LOGIN_ERROR_URL = "/login-error/"
+LOGIN_ERROR_URL = '/'
 
 PYTHON_FOLDER_NAME = 'python2.7'
 

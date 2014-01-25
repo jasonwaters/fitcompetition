@@ -1,10 +1,6 @@
-from django.db.models.signals import post_save, pre_delete, m2m_changed, post_delete
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models.loading import get_model
-from datetime import datetime
-
-from fitcompetition.settings import TIME_ZONE
-import pytz
 
 
 #this is to avoid cyclical dependencies, since this file is imported in models.py
