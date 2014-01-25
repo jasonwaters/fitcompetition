@@ -158,6 +158,13 @@ def hashtaggify(value):
 def fullDate(d):
     return d.isoformat()
 
+@register.filter
+def notNone(value):
+    if value is None:
+        return ''
+    else:
+        return value
+
 
 @register.filter
 def fromSettings(key):
@@ -261,6 +268,15 @@ def player_row(context, user, player, challenge, rank, offset=0):
             'player': player,
             'challenge': challenge,
             'rank': rank + offset}
+
+
+@register.inclusion_tag('inclusions/social.html', takes_context=True)
+def social(context, user, challenge, competitor):
+    return {
+        'user': user,
+        'challenge': challenge,
+        'competitor': competitor
+    }
 
 
 @register.inclusion_tag('inclusions/player_ante.html', takes_context=True)

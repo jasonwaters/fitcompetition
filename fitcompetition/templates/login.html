@@ -8,9 +8,7 @@
             <p>Maybe you're fit, maybe you're trying to get fit.  Either way, Fit Crown is fun for everybody.</p>
             <p>It's simple.  Join a challenge to complete a certain number of miles within a specific time frame.  Put the required ante in the pot, and if you complete the challenge, you share a peice of the pot with everyone else who completed the challenge!</p>
             <p>If everyone completes the challenge, everyone gets thier money back!  But if you are one of only a few to complete the challenge, get ready for some bling!  What have you got to lose?</p>
-            <a class="runkeeper-login-button" href="{% url 'socialauth_begin' 'runkeeper' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In">
-                <img src='http://static1.runkeeper.com/images/assets/login-black-black-300x57.png'/>
-            </a>
+			<a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Join the Fun</a>
         </div>
     </div>
 {% endblock %}

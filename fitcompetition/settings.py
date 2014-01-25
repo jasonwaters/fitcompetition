@@ -90,6 +90,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
+    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
+    'fitcompetition.middleware.SocialAuthExceptionMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -117,7 +119,7 @@ INSTALLED_APPS = (
     'fitcompetition',
     'grappelli',
     'django.contrib.admin',
-    'social_auth',
+    'social.apps.django_app.default',
     'south',
     'pipeline',
     'storages',
@@ -194,16 +196,15 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'fitcompetition.FitUser'
 SOCIAL_AUTH_USER_MODEL = 'fitcompetition.FitUser'
+SOCIAL_AUTH_UID_LENGTH = 255
+SOCIAL_AUTH_NONCE_SERVER_URL_LENGTH = 255
+SOCIAL_AUTH_ASSOCIATION_SERVER_URL_LENGTH = 255
+SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 255
 
-#Migratios for social_auth were failing due ot having a custom user.
-#This allowed me to genearate new migrations based on the FitUser model.
-#Sucks, because if we update django-social-auth, we'll have to be sure to generate our own db migrations
-SOUTH_MIGRATION_MODULES = {
-    'social_auth': 'fitcompetition.social_auth',
-}
 
 AUTHENTICATION_BACKENDS = (
-    'fitcompetition.backends.runkeeper.RunkeeperBackend',
+    'fitcompetition.backends.runkeeper.RunkeeperOauth2',
+    'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
     'django.contrib.auth.backends.ModelBackend'
 )
 
@@ -216,18 +217,21 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
-    'social_auth.context_processors.social_auth_by_type_backends',
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 SOCIAL_AUTH_PIPELINE = (
-    'social_auth.backends.pipeline.social.social_auth_user',
-    'social_auth.backends.pipeline.user.get_username',
-    'social_auth.backends.pipeline.user.create_user',
-    'social_auth.backends.pipeline.social.associate_user',
-    'social_auth.backends.pipeline.social.load_extra_data',
-    'social_auth.backends.pipeline.user.update_user_details',
-    'social_auth.backends.pipeline.misc.save_status_to_session',
-    'fitcompetition.pipeline.persistHealthgraphData',
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+    # 'fitcompetition.pipeline.persistHealthgraphData',
 )
 
 TEAM_MEMBER_MAXIMUM = 5

@@ -1,13 +1,7 @@
-{% extends 'base.html' %}
-{% load apptags %}
-{% load humanize %}
+{% extends 'error.html' %}
 
 {% block head_title %}404 Error{% endblock %}
 
-
-{% block content %}
-    <div class="row">
-        <h3>Well, this is embarrassing&hellip;</h3>
-        <p>It seems that you have tried to access a page that does not exist.  Would you like to <a href="{% url "home" %}">try that again?</a></p>
-    </div>
+{% block error_content %}
+	<p class="lead">It seems that you have tried to access a page that does not exist.  Would you like to <a href="{% url "home" %}">try that again?</a></p>
 {% endblock %}

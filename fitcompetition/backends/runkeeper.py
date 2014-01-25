@@ -1,22 +1,16 @@
-from urllib import urlencode
+from social.backends.oauth import BaseOAuth2
 
-from django.utils import simplejson
-
-from social_auth.backends import BaseOAuth2, OAuthBackend
-from social_auth.utils import dsa_urlopen
-
-RUNKEEPER_AUTHORIZATION_URL = 'https://runkeeper.com/apps/authorize'
-RUNKEEPER_DEAUTHORIZATION_URL = 'https://runkeeper.com/apps/de-authorize'
-RUNKEEPER_ACCESS_TOKEN_URL = 'https://runkeeper.com/apps/token'
 
 RUNKEEPER_API_URL = 'https://api.runkeeper.com'
 RUNKEEPER_USER_RESOURCE = '/user'
 RUNKEEPER_PROFILE_RESOURCE = '/profile'
 
 
-class RunkeeperBackend(OAuthBackend):
+class RunkeeperOauth2(BaseOAuth2):
     name = 'runkeeper'
-
+    AUTHORIZATION_URL = 'https://runkeeper.com/apps/authorize'
+    ACCESS_TOKEN_URL = 'https://runkeeper.com/apps/token'
+    ACCESS_TOKEN_METHOD = 'POST'
     EXTRA_DATA = [
         ('expires', 'expires')
     ]
@@ -25,7 +19,6 @@ class RunkeeperBackend(OAuthBackend):
         return response['user']['userID']
 
     def get_user_details(self, response):
-        """Return user details from RUNKEEPER account"""
         username = response['user']['userID']
         fullname = response['profile'].get('name', '')
 
@@ -58,31 +51,9 @@ class RunkeeperBackend(OAuthBackend):
             'normal_picture': normal_picture
         }
 
-
-class RunkeeperAuth(BaseOAuth2):
-    """RUNKEEPER OAuth mechanism"""
-    AUTHORIZATION_URL = RUNKEEPER_AUTHORIZATION_URL
-    ACCESS_TOKEN_URL = RUNKEEPER_ACCESS_TOKEN_URL
-    AUTH_BACKEND = RunkeeperBackend
-    SETTINGS_KEY_NAME = 'RUNKEEPER_CLIENT_ID'
-    SETTINGS_SECRET_NAME = 'RUNKEEPER_CLIENT_SECRET'
-
     def user_data(self, access_token, *args, **kwargs):
-        """Loads user data from service"""
-
-        url = "%s%s?%s" % (RUNKEEPER_API_URL, RUNKEEPER_USER_RESOURCE, urlencode({'access_token': access_token}))
-
-        try:
-            user_data = simplejson.load(dsa_urlopen(url))
-        except ValueError:
-            user_data = None
-
-        if user_data:
-            url = "%s%s?%s" % (RUNKEEPER_API_URL, RUNKEEPER_PROFILE_RESOURCE, urlencode({'access_token': access_token}))
-            try:
-                profile_data = simplejson.load(dsa_urlopen(url))
-            except ValueError:
-                profile_data = None
+        user_data = self.requestRunkeeperData(access_token, RUNKEEPER_USER_RESOURCE)
+        profile_data = self.requestRunkeeperData(access_token, RUNKEEPER_PROFILE_RESOURCE)
 
         return {
             'user': user_data,
@@ -90,8 +61,6 @@ class RunkeeperAuth(BaseOAuth2):
             'expires': 60 * 60 * 24 * 365
         }
 
-
-# Backend definition
-BACKENDS = {
-    'runkeeper': RunkeeperAuth,
-}
+    def requestRunkeeperData(self, access_token, api_endpiont):
+        url = "%s%s" % (RUNKEEPER_API_URL, api_endpiont)
+        return self.get_json(url, params={'access_token': access_token})

@@ -17,7 +17,6 @@ import os
 import pytz
 from requests import RequestException
 from dateutil import parser
-import signals
 
 
 class CurrencyField(models.DecimalField):
@@ -54,6 +53,9 @@ class FitUserManager(UserManager):
 
 class FitUser(AbstractUser):
     runkeeperToken = models.CharField(max_length=255, blank=True, null=True, default=None)
+    mapmyfitnessToken = models.CharField(max_length=255, blank=True, null=True, default=None)
+    mapmyfitnessTokenSecret = models.CharField(max_length=255, blank=True, null=True, default=None)
+
     fullname = models.CharField(max_length=255, blank=True, null=True, default=None)
     gender = models.CharField(max_length=1, blank=True, null=True, default=None)
     profile_url = models.CharField(max_length=255, blank=True, null=True, default=None)
@@ -372,7 +374,7 @@ class Challenge(models.Model):
 
     def getRecentActivities(self):
         now = datetime.now(tz=pytz.utc)
-        yesterday = now + relativedelta(days=-1)
+        yesterday = now + relativedelta(hours=-24)
 
         filter = self.getActivitiesFilter(generic=True)
         filter = filter & Q(date__gt=yesterday.date()) & Q(user__in=self.challengers)

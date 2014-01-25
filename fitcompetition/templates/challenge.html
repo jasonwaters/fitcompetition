@@ -157,14 +157,8 @@
 		<p><small>Having second thoughts?  You can <a href="#" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
 	{% endif %}
 
-    {% if competitor and not challenge.hasEnded and show_social %}
-        <div class="fc-callout fc-callout-info" data-calloutid="social-callout-{{ challenge.id }}">
-            <button type="button" class="close close-callout">&times;</button>
-            <h4>It's more fun with friends. <small>Share the love</small></h4>
-            <button type="button" class="btn btn-default btn-share" data-service="twitter"><i class="fa fa-twitter fa-2x"></i><br/>Tweet</button>
-            <button type="button" class="btn btn-default btn-share" data-service="facebook"><i class="fa fa-facebook-square fa-2x"></i><br/>Share</button>
-            <button type="button" class="btn btn-default btn-share" data-service="google"><i class="fa fa-google-plus fa-2x"></i><br/>Share</button>
-        </div>
+    {% if show_social %}
+		{% social user challenge competitor %}
     {% endif %}
 
     <div class="tabbable">

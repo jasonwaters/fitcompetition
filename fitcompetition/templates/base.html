@@ -37,17 +37,42 @@
                         {% endif %}
                         <li><a href="{% url "faq" %}" title="Frequently Asked Questions">FAQ</a></li>
                     </ul>
-                    <ul class="nav navbar-nav pull-right">
+                    <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'account' %}">Balance: {{ user.account.balance|currency }}</a></li>
                             <li><a href="{% url "logout" %}?next={{ request.path }}" title="{{ user.first_name }} {{ user.last_name }} is signed in.">Sign Out</a></li>
                         {% else %}
-                            <li><a href="{% url 'socialauth_begin' 'runkeeper' %}?next={{ request.path }}" title="Sign in with Runkeeper">Sign In</a></li>
+                            <li><a href="{% url 'social:begin' 'runkeeper' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In with Runkeeper">Sign In</a></li>
+                            {#<li><a href="#loginModal" data-toggle="modal" title="Sign In">Sign In</a></li>#}
                         {% endif %}
                     </ul>
                 </nav>
             </div>
         </header>
+
+
+        <!-- Login Modal -->
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Sign In With&hellip;</h4>
+                    </div>
+                    <div class="modal-body">
+                        <a class="btn btn-default btn-standard btn-sign-in" href="{% url 'social:begin' 'runkeeper' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In with Runkeeper">
+                            <img src='/static/img/runkeeper-logo.png' />
+                        </a>
+                        <a class="btn btn-default btn-standard btn-sign-in" href="{% url 'social:begin' 'mapmyfitness' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In with Map My Run">
+                            <img src='/static/img/mapmyrun-logo.png' />
+                        </a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
         <div class="container main-container">
             {% block content %}{% endblock %}

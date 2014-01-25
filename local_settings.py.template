@@ -37,6 +37,9 @@ MAILCHIMP_LIST_ID = ''
 RUNKEEPER_CLIENT_ID = ''
 RUNKEEPER_CLIENT_SECRET = ''
 
+MAPMYFITNESS_CLIENT_ID = ''
+MAPMYFITNESS_CLIENT_SECRET = ''
+
 #The unique identifier for your website as registered on Disqus. If undefined, the Disqus embed will not load.
 DISQUS_SHORTNAME = ""
 

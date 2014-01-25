@@ -207,7 +207,7 @@ tr.team .team-total {
     margin-right: 10px;
 }
 
-.btn-share {
+.btn-standard {
      /*fallback */
     background-color: fefefe;
     background-repeat: repeat-x;
@@ -253,6 +253,11 @@ tr.team .team-total {
 
 .tooltip-inner {
 	max-width: 300px;
+}
+
+.btn-sign-in {
+	margin-right: 10px;
+	margin-bottom: 10px;
 }
 
 .list-challenges.dimmed {

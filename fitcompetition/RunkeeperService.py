@@ -67,7 +67,7 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
         headers['If-Modified-Since'] = modifiedSince.replace(tzinfo=pytz.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     if modifiedNoEarlierThan is not None:
-        params['modifiedNoEarlierThan'] = modifiedNoEarlierThan.strftime('%Y-%m-%dT%H:%M:%S') #yyyy-mm-ddThh:mm:ss
+        params['modifiedNoEarlierThan'] = modifiedNoEarlierThan.strftime('%Y-%m-%dT%H:%M:%S')
 
     if modifiedNoLaterThan is not None:
         params['modifiedNoLaterThan'] = modifiedNoLaterThan.strftime('%Y-%m-%dT%H:%M:%S')
