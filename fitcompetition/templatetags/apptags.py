@@ -2,6 +2,8 @@ from datetime import datetime
 from decimal import Decimal
 from math import floor
 import math
+from django import template
+from django.template import Node
 from django.template.defaultfilters import register
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -97,17 +99,20 @@ def duration(secs):
     h, m = divmod(m, 60)
     return "%d:%02d:%02d" % (h, m, s)
 
+
 @register.filter
 def daysUntil(targetdate):
     now = datetime.now(tz=pytz.timezone(TIME_ZONE))
     delta = targetdate - now
     return "%s days" % delta.days
 
+
 @register.filter
 def daysSince(targetdate):
     now = datetime.now(tz=pytz.timezone(TIME_ZONE))
     delta = now - targetdate
     return "%s days" % delta.days
+
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -158,6 +163,7 @@ def hashtaggify(value):
 def fullDate(d):
     return d.isoformat()
 
+
 @register.filter
 def notNone(value):
     if value is None:
@@ -199,12 +205,14 @@ def challengeType(challenge):
     elif challenge.isTypeTeam:
         return 'Team Challenge'
 
+
 @register.filter
 def challengeStyle(challenge):
     if challenge.isStyleAllCanWin:
         return "All Can Win"
     elif challenge.isStyleWinnerTakesAll:
         return 'Winner Takes All'
+
 
 @register.filter
 def commaSeparated(list, word="or"):
@@ -217,6 +225,7 @@ def commaSeparated(list, word="or"):
     all_but_last = ", ".join(list[:-1])
     return "%s %s %s" % (all_but_last, word, list[-1])
 
+
 @register.filter(is_safe=True)
 def activityIcons(activities):
     result = ""
@@ -224,6 +233,7 @@ def activityIcons(activities):
         result += "<span class='activity-icon %s' title='%s'></span>" % (slugify(activity), activity)
 
     return mark_safe(result)
+
 
 @register.filter
 def times(number):
@@ -253,8 +263,35 @@ def pastTense(value):
     }[value]
 
 
-@register.inclusion_tag('inclusions/challenges_table.html', takes_context=True)
-def challenges_table(context, user, challenges, title, iconClass=None, deemphasize=False):
+@register.tag(name='aggregate')
+def do_aggregate(parser, token):
+    try:
+        tag_name, args = token.contents.split(None, 1)
+    except ValueError:
+        raise template.TemplateSyntaxError("'aggregate' node requires a variable name.")
+    nodelist = parser.parse(('endaggregate',))
+    parser.delete_first_token()
+    return AggregateNode(nodelist, args)
+
+
+class AggregateNode(Node):
+    def __init__(self, nodelist, varname):
+        self.nodelist = nodelist
+        self.varname = varname
+
+    def render(self, context):
+        output = self.nodelist.render(context)
+        if self.varname in context:
+            context[self.varname] += output
+            context.dicts[0][self.varname] += output
+        else:
+            # context[self.varname] = output
+            context.dicts[0][self.varname] = output
+        return u''
+
+
+@register.inclusion_tag('inclusions/challenges_table.html', takes_context=False)
+def challenges_table(user, challenges, title, iconClass=None, deemphasize=False):
     return {'user': user,
             'challenges': challenges,
             'title': title,
@@ -262,34 +299,9 @@ def challenges_table(context, user, challenges, title, iconClass=None, deemphasi
             'deemphasize': deemphasize}
 
 
-@register.inclusion_tag('inclusions/player_row.html', takes_context=True)
-def player_row(context, user, player, challenge, rank, offset=0):
+@register.inclusion_tag('inclusions/player_row.html', takes_context=False)
+def player_row(user, player, challenge, rank, offset=0):
     return {'user': user,
             'player': player,
             'challenge': challenge,
             'rank': rank + offset}
-
-
-@register.inclusion_tag('inclusions/social.html', takes_context=True)
-def social(context, user, challenge, competitor):
-    return {
-        'user': user,
-        'challenge': challenge,
-        'competitor': competitor
-    }
-
-
-@register.inclusion_tag('inclusions/player_ante.html', takes_context=True)
-def player_ante(context, user, challenge, competitor):
-    return {
-        'user': user,
-        'challenge': challenge,
-        'competitor': competitor
-    }
-
-
-@register.inclusion_tag('inclusions/player_email.html', takes_context=True)
-def player_email(context, user):
-    return {
-        'user': user
-    }

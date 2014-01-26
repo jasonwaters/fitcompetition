@@ -14,15 +14,6 @@
     <meta property="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
 {% endblock %}
 
-
-{% block head_scripts %}
-    {{ block.super }}
-{% endblock %}
-
-{% block head_css %}
-    {{ block.super }}
-{% endblock %}
-
 {% block content %}
     <div class="page-header">
         <h2>{{ challenge.name }}</h2>
@@ -108,8 +99,8 @@
 		</div>
 	</div>
 
-	{% player_email user %}
-	{% player_ante user challenge competitor %}
+	{% include "inclusions/player_email.html" %}
+	{% include "inclusions/player_ante.html" %}
 
 	{% if canJoin %}
         {% if user.is_authenticated %}
@@ -158,7 +149,7 @@
 	{% endif %}
 
     {% if show_social %}
-		{% social user challenge competitor %}
+		{% include "inclusions/social.html" %}
     {% endif %}
 
     <div class="tabbable">
@@ -273,175 +264,178 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-		(function() {
-			function round(value) {
-				return Math.ceil(value * 100) / 100
-			}
 
-			$(".alert").alert();
-			$("[data-toggle=tooltip]").tooltip();
-
-			var hidePopovers = function(list) {
-				$(list).popover('destroy');
-				$(list).removeAttr('data-content');
-				$(list).removeAttr('data-showing-now');
-			};
-
-			$('body').click(function(evt) {
-				if($(evt.target).parents('.popover').length == 0) {
-					hidePopovers($('a.popover-link'));
-				}
-			});
-
-			$('a.team-total-link').popover().click(function(evt) {
-				evt.preventDefault();
-				evt.stopPropagation(evt.target);
-
-				if(($(evt.target).attr('data-showing-now')) != null) {
-					//popup already showing
-					hidePopovers($('a.popover-link'));
-				}else {
-					hidePopovers(_.without($('a.popover-link'), evt.target));
-					$(this).popover('show');
-					$(this).attr('data-showing-now','true');
-				}
-			})
-
-			$('a.activities-link').popover().click(function(evt) {
-				evt.preventDefault();
-				evt.stopPropagation(evt.target);
-
-				if(($(evt.target).attr('data-content')) != null) {
-					//popup already showing
-					hidePopovers($('a.popover-link'));
-				}else {
-					hidePopovers(_.without($('a.popover-link'), evt.target));
-					var url = $(this).data('url');
-					$.get(url, function(result) {
-						$(this).attr('data-content', result);
-						$(this).popover('show');
-					}.bind(this));
-				}
-			});
-
-			$('body').delegate('.show-more-activities', 'click', function(evt) {
-				var link = $(evt.target);
-				$('.activities-list tr.hidden').removeClass('hidden');
-				link.addClass('hidden');
-			});
-
-			$('.btn.settle-up').click(function(evt) {
-				evt.preventDefault();
-				var win = window.open('http://www.paypal.com', '_blank');
-				win.focus();
-			});
-
-			$('.close-callout').click(function(evt) {
-				evt.preventDefault();
-				var $this = $(this),
-					callout = $this.parent('.fc-callout'),
-					calloutid = callout.data('calloutid');
-
-				callout.remove();
-
-				var hiddenCallouts = $.cookie('hidden_callouts') || '';
-
-				hiddenCallouts = hiddenCallouts.length > 0 ? hiddenCallouts.split(',') : [];
-
-				if( hiddenCallouts.indexOf(calloutid) < 0) {
-					hiddenCallouts.push(calloutid);
+	{% aggregate inline_javascript %}
+		<script type="text/javascript">
+			(function() {
+				function round(value) {
+					return Math.ceil(value * 100) / 100
 				}
 
-				$.cookie('hidden_callouts', hiddenCallouts.join(','));
-			});
+				$(".alert").alert();
+				$("[data-toggle=tooltip]").tooltip();
 
-			$('.btn-share').click(function(evt) {
-			   evt.preventDefault();
-				var $this = $(this),
-					service = $this.data('service');
+				var hidePopovers = function(list) {
+					$(list).popover('destroy');
+					$(list).removeAttr('data-content');
+					$(list).removeAttr('data-showing-now');
+				};
 
-				if(service === 'twitter') {
-					var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcrown';
-					window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
-				}else if(service === 'facebook') {
-					window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),
-								'facebook-share-dialog',
-								'width=626,height=436');
-				}else if(service === 'google') {
-					window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
-				}
-			});
-
-			{% if fetchLatest %}
-				$.get("{% url 'fetch_latest_activities' challenge.id %}", function(result) {
-					if(result && result.success) {
-						$('tr.current-player a.distance-enclave').text(round(result.distance));
+				$('body').click(function(evt) {
+					if($(evt.target).parents('.popover').length == 0) {
+						hidePopovers($('a.popover-link'));
 					}
 				});
-			{% endif %}
 
-			$('.join-challenge').click(function(evt) {
-				evt.preventDefault();
-				$.get("{% url 'join_challenge' challenge.id %}", function(result) {
-					window.location.reload();
+				$('a.team-total-link').popover().click(function(evt) {
+					evt.preventDefault();
+					evt.stopPropagation(evt.target);
+
+					if(($(evt.target).attr('data-showing-now')) != null) {
+						//popup already showing
+						hidePopovers($('a.popover-link'));
+					}else {
+						hidePopovers(_.without($('a.popover-link'), evt.target));
+						$(this).popover('show');
+						$(this).attr('data-showing-now','true');
+					}
+				})
+
+				$('a.activities-link').popover().click(function(evt) {
+					evt.preventDefault();
+					evt.stopPropagation(evt.target);
+
+					if(($(evt.target).attr('data-content')) != null) {
+						//popup already showing
+						hidePopovers($('a.popover-link'));
+					}else {
+						hidePopovers(_.without($('a.popover-link'), evt.target));
+						var url = $(this).data('url');
+						$.get(url, function(result) {
+							$(this).attr('data-content', result);
+							$(this).popover('show');
+						}.bind(this));
+					}
 				});
-			});
 
-			$('.join-team').click(function(evt) {
-				evt.preventDefault();
-				var teamID = $(this).data('id');
-
-				var url = "{% url 'join_team' challenge.id '000000' %}".replace(/000000/, teamID.toString());
-				$.get(url, function(result) {
-					window.location.reload();
+				$('body').delegate('.show-more-activities', 'click', function(evt) {
+					var link = $(evt.target);
+					$('.activities-list tr.hidden').removeClass('hidden');
+					link.addClass('hidden');
 				});
-			});
 
-			$('.create-team').click(function(evt) {
-				evt.preventDefault();
-				$.get('{% url 'create_team' challenge.id %}', function(result) {
-					window.location.reload();
+				$('.btn.settle-up').click(function(evt) {
+					evt.preventDefault();
+					var win = window.open('http://www.paypal.com', '_blank');
+					win.focus();
 				});
-			});
 
-			$('.withdraw-challenge').click(function(evt) {
-				evt.preventDefault();
-				var withdraw = window.confirm("Are you sure you want to withdraw from this challenge?")
+				$('.close-callout').click(function(evt) {
+					evt.preventDefault();
+					var $this = $(this),
+							callout = $this.parent('.fc-callout'),
+							calloutid = callout.data('calloutid');
 
-				if(withdraw) {
-					$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
+					callout.remove();
+
+					var hiddenCallouts = $.cookie('hidden_callouts') || '';
+
+					hiddenCallouts = hiddenCallouts.length > 0 ? hiddenCallouts.split(',') : [];
+
+					if( hiddenCallouts.indexOf(calloutid) < 0) {
+						hiddenCallouts.push(calloutid);
+					}
+
+					$.cookie('hidden_callouts', hiddenCallouts.join(','));
+				});
+
+				$('.btn-share').click(function(evt) {
+					evt.preventDefault();
+					var $this = $(this),
+							service = $this.data('service');
+
+					if(service === 'twitter') {
+						var tweetBody = 'Compete. Get Fit. Get Paid.  Join "{{ challenge.name }}" with me! {{ request.build_absolute_uri }} #fitcrown';
+						window.open('https://twitter.com/intent/tweet?original_referer={{ request.build_absolute_uri|urlencode }}&text=' + encodeURIComponent(tweetBody), '', 'width=626,height=436')
+					}else if(service === 'facebook') {
+						window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('{{ request.build_absolute_uri }}'),
+								'facebook-share-dialog',
+								'width=626,height=436');
+					}else if(service === 'google') {
+						window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
+					}
+				});
+
+				{% if fetchLatest %}
+					$.get("{% url 'fetch_latest_activities' challenge.id %}", function(result) {
+						if(result && result.success) {
+							$('tr.current-player a.distance-enclave').text(round(result.distance));
+						}
+					});
+				{% endif %}
+
+				$('.join-challenge').click(function(evt) {
+					evt.preventDefault();
+					$.get("{% url 'join_challenge' challenge.id %}", function(result) {
 						window.location.reload();
 					});
-				}
-			});
+				});
 
-			$('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
-				var text = $(this).text();
-				$(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
-			});
+				$('.join-team').click(function(evt) {
+					evt.preventDefault();
+					var teamID = $(this).data('id');
 
-			$('a#disqus_count').click(function(evt) {
-				evt.preventDefault();
-				$('#challenge_tabs a[href="#disqus"]').tab('show');
-			});
+					var url = "{% url 'join_team' challenge.id '000000' %}".replace(/000000/, teamID.toString());
+					$.get(url, function(result) {
+						window.location.reload();
+					});
+				});
 
-			{% if "DISQUS_SHORTNAME"|fromSettings %}
-				window.disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}';
-				window.disqus_identifier = '{{ disqus_identifier }}';
+				$('.create-team').click(function(evt) {
+					evt.preventDefault();
+					$.get('{% url 'create_team' challenge.id %}', function(result) {
+						window.location.reload();
+					});
+				});
 
-				(function () {
-					var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-					dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-					(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+				$('.withdraw-challenge').click(function(evt) {
+					evt.preventDefault();
+					var withdraw = window.confirm("Are you sure you want to withdraw from this challenge?")
+
+					if(withdraw) {
+						$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
+							window.location.reload();
+						});
+					}
+				});
+
+				$('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
+					var text = $(this).text();
+					$(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
+				});
+
+				$('a#disqus_count').click(function(evt) {
+					evt.preventDefault();
+					$('#challenge_tabs a[href="#disqus"]').tab('show');
+				});
+
+				{% if "DISQUS_SHORTNAME"|fromSettings %}
+					window.disqus_shortname = '{{ "DISQUS_SHORTNAME"|fromSettings }}';
+					window.disqus_identifier = '{{ disqus_identifier }}';
+
+					(function () {
+						var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+						dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+						(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 
 
-					var s = document.createElement('script'); s.async = true;
-					s.type = 'text/javascript';
-					s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-					(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-				}());
-			{% endif %}
-		})();
-	</script>
+						var s = document.createElement('script'); s.async = true;
+						s.type = 'text/javascript';
+						s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+						(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+					}());
+				{% endif %}
+			})();
+		</script>
+	{% endaggregate %}
 {% endblock %}

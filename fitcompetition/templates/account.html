@@ -5,14 +5,6 @@
 
 {% block head_title %}Account Summary{% endblock %}
 
-{% block head_scripts %}
-    {{ block.super }}
-{% endblock %}
-
-{% block head_css %}
-    {{ block.super }}
-{% endblock %}
-
 {% block content %}
     <div class="page-header">
         <h2>Account Summary <small>Balance: {{ user.account.balance|currency }}</small></h2>

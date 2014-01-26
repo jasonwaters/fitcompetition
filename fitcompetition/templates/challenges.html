@@ -14,7 +14,7 @@
 		Fit Crown is a social fitness game you play with your friends.  Join an exercise challenge and put some cash in the pot.  Then, log your miles with Runkeeper.  If you go the distance before the challenge ends you get a piece of the pot!
 	</p>
 	<p><a href="{% url 'faq' %}">What's this all about?</a></p>
-	{% player_email user %}
+	{% include "inclusions/player_email.html" %}
 	{% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
     {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
 	<h3 class="text-centered">${{ totalPaid|intcomma }} paid out to winners!</h3>

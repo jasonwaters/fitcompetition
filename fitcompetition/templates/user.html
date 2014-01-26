@@ -5,14 +5,6 @@
 
 {% block head_title %}{{ userprofile.fullname }}{% endblock %}
 
-{% block head_scripts %}
-    {{ block.super }}
-{% endblock %}
-
-{% block head_css %}
-    {{ block.super }}
-{% endblock %}
-
 {% block content %}
     <div class="page-header">
         <h2>{{ userprofile.fullname }} <small><a href="{{ userprofile.profile_url }}" target="_blank">view Runkeeper profile &raquo;</a></small></h2>
@@ -55,59 +47,61 @@
         </tbody>
     </table>
 
-	<script type="text/javascript">
-		$('.show-activity-image').click(function() {
-			var url = $(this).data('imgurl');
-			if(url && url.length > 0) {
-				window.open(url, '_blank');
-			}
-		});
+	{% aggregate inline_javascript %}
+		<script type="text/javascript">
+			$('.show-activity-image').click(function() {
+				var url = $(this).data('imgurl');
+				if(url && url.length > 0) {
+					window.open(url, '_blank');
+				}
+			});
 
-		$('.upload-activity-image').click(function() {
-			var $this = $(this);
+			$('.upload-activity-image').click(function() {
+				var $this = $(this);
 
-			$this.removeClass('fa-cloud');
-			$this.addClass('fa-upload');
+				$this.removeClass('fa-cloud');
+				$this.addClass('fa-upload');
 
-			$(this).prev('input[type=file]').trigger('click');
-		});
+				$(this).prev('input[type=file]').trigger('click');
+			});
 
 
-		$('input[name=activity-image]').change(function () {
-			var $this = $(this),
-				file = this.files[0],
-				row = $this.closest('tr'),
-				showIco = row.find('.show-activity-image'),
-				uploadIco = row.find('.upload-activity-image'),
-				activityID = row.data('id');
+			$('input[name=activity-image]').change(function () {
+				var $this = $(this),
+					file = this.files[0],
+					row = $this.closest('tr'),
+					showIco = row.find('.show-activity-image'),
+					uploadIco = row.find('.upload-activity-image'),
+					activityID = row.data('id');
 
-				canvasResize(file, {
-					width: 640,
-					quality: 80,
-					callback: function (data, width, height) {
-						var url = "{% url 'activity_upload_photo' '000000' %}".replace(/000000/, activityID.toString());
-						$.ajax({
-							'url': url,
-							'type': 'POST',
-							'data': {
-								'base64image': data,
-								'filename': file.name,
-								'type': file.type
-							}
-						}).done(function(response) {
-							response = JSON.parse(response);
-							if(response.success) {
-								uploadIco.removeClass('fa-upload');
-								uploadIco.addClass('fa-cloud');
+					canvasResize(file, {
+						width: 640,
+						quality: 80,
+						callback: function (data, width, height) {
+							var url = "{% url 'activity_upload_photo' '000000' %}".replace(/000000/, activityID.toString());
+							$.ajax({
+								'url': url,
+								'type': 'POST',
+								'data': {
+									'base64image': data,
+									'filename': file.name,
+									'type': file.type
+								}
+							}).done(function(response) {
+								response = JSON.parse(response);
+								if(response.success) {
+									uploadIco.removeClass('fa-upload');
+									uploadIco.addClass('fa-cloud');
 
-								showIco.removeClass('hide');
-								showIco.data('imgurl', response.photoUrl);
-							}
-						});
-					}
-				});
-		});
-	</script>
+									showIco.removeClass('hide');
+									showIco.data('imgurl', response.photoUrl);
+								}
+							});
+						}
+					});
+			});
+		</script>
+	{% endaggregate %}
 
     <h2>Challenges</h2>
     {% challenges_table user activeChallenges "Competing Now" "fa fa-location-arrow" %}
