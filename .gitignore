@@ -21,3 +21,4 @@ Thumbs.db
 local_settings.py
 
 node_modules/*
+celerybeat-schedule

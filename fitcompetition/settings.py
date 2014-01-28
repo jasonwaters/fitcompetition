@@ -1,4 +1,5 @@
 # Django settings for fitcompetition project.
+from __future__ import absolute_import
 import manage
 import os
 
@@ -123,7 +124,8 @@ INSTALLED_APPS = (
     'south',
     'pipeline',
     'storages',
-    # 'brabeion',
+    'djcelery',
+    'seacucumber',
 )
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
@@ -234,6 +236,15 @@ SOCIAL_AUTH_PIPELINE = (
     # 'fitcompetition.pipeline.persistHealthgraphData',
 )
 
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_DISABLE_RATE_LIMITS = False
+CUCUMBER_RATE_LIMIT = 5
+
 TEAM_MEMBER_MAXIMUM = 5
 
 LOGIN_URL = '/'
@@ -246,6 +257,9 @@ try:
     from local_settings import *
 except:
     pass
+
+SOCIAL_AUTH_RAISE_EXCEPTIONS = DEBUG
+RAISE_EXCEPTIONS = DEBUG
 
 AWS_HEADERS = {
     'Expires': 'access plus 1 year',

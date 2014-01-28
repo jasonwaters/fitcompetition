@@ -1,0 +1,10 @@
+{% extends 'email/base.html' %}
+{% block content %}
+	<h1>Hello {{first_name}}!</h1>
+
+	<p>
+		This is a test HTML email!<br/>
+		<a href="http://fitcrown.com">Fit Crown</a>
+		<h3>{{now}}</h3>
+	</p>
+{% endblock %}

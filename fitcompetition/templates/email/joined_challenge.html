@@ -1,0 +1,34 @@
+{% extends 'email/base.html' %}
+{% load apptags %}
+{% load humanize %}
+
+{% block content %}
+	<p>Hey {{user.first_name}}!</p>
+
+	<p>Congratulations! You joined the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge  on Fit Crown.  Here's the details:</p>
+	<ul>
+		<li>
+			{% if challenge.isTypeIndividual %}
+				It's an Individual Challenge
+			{% elif challenge.isTypeTeam %}
+				It's a Team Challenge
+			{% endif %}
+		</li>
+		<li>
+			{% if challenge.isStyleAllCanWin %}
+				All Can Win
+			{% elif challenge.isStyleWinnerTakesAll %}
+				Winner Takes All
+			{% endif %}
+		</li>
+		<li>{% if challenge.isTypeTeam %}Your team{% else %}You{% endif %} must complete {{ challenge.distance|floatformat:"-1" }} miles</li>
+		<li>Approved Activities: {{ approvedActivities|commaSeparated }}</li>
+		<li>Start Date: {{ challenge.startdate|date:"F j, Y" }}</li>
+		<li>End Date: {{ challenge.enddate|date:"F j, Y" }}</li>
+	</ul>
+	<p>
+		{% if user.account.balance < 0 %}
+			You owe {{ user.account.balance|abs|currency }}.  <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a>.
+		{% endif %}
+	</p>
+{% endblock %}
