@@ -24,15 +24,18 @@ sys.path.append(SITE_PACKAGES_DIR)
 # mod_wsgi daemon mode with each site in its own daemon process, or use
 # os.environ["DJANGO_SETTINGS_MODULE"] = "fitcompetition.settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fitcompetition.settings")
+os.environ["CELERY_LOADER"] = "django"
+
+
+import djcelery
+djcelery.setup_loader()
+
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
-
-import djcelery
-djcelery.setup_loader()
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
