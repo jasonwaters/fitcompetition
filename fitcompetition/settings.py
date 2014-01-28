@@ -253,6 +253,9 @@ LOGIN_ERROR_URL = '/'
 
 PYTHON_FOLDER_NAME = 'python2.7'
 
+import djcelery
+djcelery.setup_loader()
+
 try:
     from local_settings import *
 except:

@@ -30,7 +30,6 @@ os.environ["CELERY_LOADER"] = "django"
 import djcelery
 djcelery.setup_loader()
 
-
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
