@@ -21,10 +21,10 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
     CELERYBEAT_SCHEDULE={
-        "runs-every-hour": {
-            "task": "fitcompetition.tasks.hourly",
-            "schedule": crontab(minute=0, hour='*/1')
-        },
+        # "runs-every-hour": {
+        #     "task": "fitcompetition.tasks.hourly",
+        #     "schedule": crontab(minute=0, hour='*/1')
+        # },
         "runs-every-day": {
             "task": "fitcompetition.tasks.daily",
             "schedule": crontab(minute=0, hour=0)
