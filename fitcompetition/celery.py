@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from datetime import timedelta
+from celery.schedules import crontab
 
 import os
 
@@ -21,9 +22,13 @@ app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
     CELERYBEAT_SCHEDULE={
         "runs-every-hour": {
-            "task": "fitcompetition.tasks.emailme",
-            "schedule": timedelta(minutes=60)
+            "task": "fitcompetition.tasks.hourly",
+            "schedule": crontab(minute=0, hour='*/1')
         },
+        "runs-every-day": {
+            "task": "fitcompetition.tasks.daily",
+            "schedule": crontab(minute=0, hour=0)
+        }
     }
 )
 
