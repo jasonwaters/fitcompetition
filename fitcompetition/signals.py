@@ -1,16 +1,10 @@
-from django import dispatch
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models.loading import get_model
-
-# new_challenger = dispatch.Signal(providing_args=["toppings", "size"])
+from fitcompetition.email import EmailFactory
 
 
 #this is to avoid cyclical dependencies, since this file is imported in models.py
-from fitcompetition.email import Email
-from fitcompetition.util.ListUtil import createListFromProperty
-
-
 def getModel(name):
     return get_model('fitcompetition', name)
 
@@ -48,21 +42,7 @@ def save_new_challenger(sender, **kwargs):
                                                  "Joined '%s' competition." % challenge.name,
                                                  "%s Joined" % user.fullname)
 
-        if user.email and len(user.email) > 0:
-            email = Email(to=user.email, subject='You joined "%s"' % challenge.name)
-
-            approvedTypes = challenge.approvedActivities.all()
-
-            ctxt = {
-                'challenge': challenge,
-                'user': user,
-                'approvedActivities': createListFromProperty(approvedTypes, 'name'),
-            }
-
-            # email.text("email/test.txt", ctxt)
-            email.html("email/joined_challenge.html", ctxt)
-            email.send("FitCrown<contact@fitcrown.com>")
-
+        EmailFactory().challengeJoin(user, challenge)
 
 @receiver(post_delete, sender=getModel('Challenger'))
 def delete_existing_challenger(sender, **kwargs):

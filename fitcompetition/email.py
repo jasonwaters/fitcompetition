@@ -2,7 +2,48 @@ from datetime import datetime
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from fitcompetition.util.ListUtil import createListFromProperty
 import pytz
+
+
+class EmailFactory(object):
+    def __init__(self):
+        self.FROM = "FitCrown<contact@fitcrown.com>"
+
+    def _emailable(self, user):
+        return user.email and len(user.email) > 0
+
+    def cashWithdrawal(self, user, paypalEmailAddress, value):
+        if self._emailable(user):
+            playerEmail = Email(to=user.email, subject="Your cash is on it's way!")
+            systemEmail = Email(to=getattr(settings, "PAYPAL_ACCOUNT_EMAIL"), subject="%s is cashing out" % user.first_name)
+
+            context = {
+                'user': user,
+                'email': paypalEmailAddress,
+                'value': value
+            }
+
+            playerEmail.html('email/cashWithdrawal_player.html', context)
+            systemEmail.html('email/cashWithdrawal_system.html', context)
+
+            playerEmail.send(self.FROM)
+            systemEmail.send()
+
+    def challengeJoin(self, user, challenge):
+        if self._emailable(user):
+            email = Email(to=user.email, subject='You joined "%s"' % challenge.name)
+
+            approvedTypes = challenge.approvedActivities.all()
+
+            context = {
+                'challenge': challenge,
+                'user': user,
+                'approvedActivities': createListFromProperty(approvedTypes, 'name'),
+            }
+
+            email.html("email/joined_challenge.html", context)
+            email.send(self.FROM)
 
 
 class Email(object):

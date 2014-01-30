@@ -1,0 +1,10 @@
+{% extends 'email/base.html' %}
+{% load apptags %}
+{% load humanize %}
+
+{% block content %}
+	<p>{{user.fullname}} is cashing out!</p>
+
+	<p>Please initiate a PayPal transfer for <strong>{{ value|currency }}</strong> to {{ email }} ASAP.</p>
+	<p>Don't forget to <a href="{{ "BASE_URL"|fromSettings }}{% url 'admin:fitcompetition_account_change' user.account.id %}">record the transaction in the FitCrown Admin</a>.</p>
+{% endblock %}

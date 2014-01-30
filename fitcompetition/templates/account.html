@@ -12,12 +12,67 @@
 
     {% if user.account.balance > 0 %}
         <div class="alert alert-info">
-            <p>You have a positive account balance.  You may join another challenge or cash out.</p>
+            <p>You have a positive account balance.  You can join another challenge or cash out.</p>
             <div class="top-padding">
                 <a href="{% url 'home' %}" class="btn btn-primary">Find a Challenge</a>
-                <a href="mailto:{{ "PAYPAL_ACCOUNT_EMAIL"|fromSettings }}" class="btn btn-link">Cash Out</a>
+                <button class="btn btn-link" data-toggle="modal" data-target="#modal-cash-out">Cash Out</button>
             </div>
         </div>
+
+		<div class="modal fade" id="modal-cash-out" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<form id="cash_out_form" role="form">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">Cash Out</h4>
+						</div>
+						<div class="modal-body">
+							<p>We use Paypal to securely send money to you.  We just need to know the email address that is associated with your PayPal account and how much you want cash out.</p>
+							<fieldset>
+								{% csrf_token %}
+								<div class="form-group">
+									<label for="inputEmailAddress">PayPal Email Address</label>
+									<input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email" value="">
+								</div>
+								<div class="form-group">
+									<label for="inputEmailAddress">Amount to cash out. ( {{ user.account.balance|currency }} maximum )</label>
+									<input type="text" name="cashValue" id="inputCashValue" placeholder="Enter dollar amount" class="form-control">
+								</div>
+							</fieldset>
+							<p>After submitting this form, watch your PayPal account for a credit in the next few days.</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+							<button type="submit" class="btn btn-primary">Cash Out</button>
+						</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
+			</form>
+		</div><!-- /.modal -->
+		{% aggregate inline_javascript %}
+			<script type="text/javascript">
+				$(document).ready(function (jQuery) {
+					$("#cash_out_form").validate({
+						rules: {
+							emailAddress: {
+								email: true,
+								required: true
+							},
+							cashValue: {
+								number: true,
+								range: [0, {{ user.account.balance }}],
+								required: true
+							}
+						},
+						submitHandler: function(form) {
+							$('#modal-cash-out').modal('hide')
+							$.post('{% url 'account_cash_out' %}', $(form).serialize())
+						}
+					});
+				});
+			</script>
+		{% endaggregate %}
     {% elif user.account.balance < 0 %}
         <div class="alert alert-danger">
             <p>You have a negative account balance.  It's time to settle up!  You can do that by following these steps:</p>
@@ -25,7 +80,10 @@
         </div>
     {% else %}
         <div class="alert alert-info">
-            <p>You have a neutral account balance.</p>
+            <p>Your account balance is zero.</p>
+			<div class="top-padding">
+				<a href="{% url 'home' %}" class="btn btn-primary">Find a Challenge</a>
+			</div>
         </div>
     {% endif %}
     <h3>Transactions</h3>

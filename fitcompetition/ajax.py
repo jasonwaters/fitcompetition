@@ -1,6 +1,7 @@
 import base64
 import json
 from django.core.files.base import ContentFile
+from fitcompetition.email import EmailFactory
 import re
 
 from django.contrib.auth.decorators import login_required
@@ -126,7 +127,6 @@ def subscribeToMailingList(user):
 @login_required
 def user_details_update(request):
     request.user.email = request.POST.get('emailAddress')
-    request.user.phoneNumber = request.POST.get('phoneNumber')
     request.user.save()
 
     subscribeToMailingList(request.user)
@@ -137,4 +137,18 @@ def user_details_update(request):
 @login_required
 def refresh_user_activities(request):
     request.user.syncRunkeeperData()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+@login_required
+def account_cash_out(request):
+    paypalEmailAddress = request.POST.get('emailAddress')
+    cashValue = float(request.POST.get('cashValue'))
+
+    if request.user.email is None or len(request.user.email) == 0:
+        request.user.email = paypalEmailAddress
+        request.user.save()
+
+    factory = EmailFactory()
+    factory.cashWithdrawal(request.user, paypalEmailAddress, cashValue)
+
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")

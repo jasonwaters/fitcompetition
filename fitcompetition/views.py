@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from fitcompetition.email import Email
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
@@ -35,17 +34,6 @@ def profile(request):
 @login_required
 def account(request):
     transactions = Transaction.objects.filter(account=request.user.account).order_by('-date')
-
-    email = Email(to='jason@myheck.net', subject="This is a test")
-
-    ctxt = {
-        'first_name': request.user.fullname,
-        'now': datetime.now(tz=pytz.utc)
-    }
-
-    email.text("email/test.txt", ctxt)
-    email.html("email/test.html", ctxt)
-    email.send()
 
     return render(request, 'account.html', {
         'transactions': transactions
