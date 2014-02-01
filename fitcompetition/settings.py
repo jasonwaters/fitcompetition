@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     'south',
     'pipeline',
     'storages',
+    'djcelery',
     'seacucumber',
 )
 
