@@ -45,6 +45,18 @@ class EmailFactory(object):
             email.html("email/joined_challenge.html", context)
             email.send(self.FROM)
 
+    def cashDeposit(self, transaction, account, user):
+        email = Email(to=user.email, subject="Your payment was received")
+
+        context = {
+            'transaction': transaction,
+            'user': user,
+            'account': account,
+        }
+
+        email.html("email/cashDeposit.html", context)
+        email.send(self.FROM)
+
 
 class Email(object):
     def __init__(self, to, subject):

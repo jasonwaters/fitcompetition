@@ -1,4 +1,5 @@
 DEBUG = False
+SSL_ENABLED = True
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
@@ -18,27 +19,25 @@ DATABASES = {
 #run 'locale -a' in terminal and select one.
 LOCALE = 'en_US.utf8'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+#this is used in the instructions for putting money in the pot.
+PAYPAL_ACCOUNT_EMAIL = ''
+
+SERVER_EMAIL = ''
+
+EMAIL_BACKEND = ''
 
 AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
 AWS_STORAGE_BUCKET_NAME = ''
 
-#this is used in the instructions for putting money in the pot.
-PAYPAL_ACCOUNT_EMAIL = ''
-
 MAILCHIMP_API_KEY = ''
 MAILCHIMP_LIST_ID = ''
 
-RUNKEEPER_CLIENT_ID = ''
-RUNKEEPER_CLIENT_SECRET = ''
+SOCIAL_AUTH_RUNKEEPER_KEY = ''
+SOCIAL_AUTH_RUNKEEPER_SECRET = ''
 
-MAPMYFITNESS_CLIENT_ID = ''
-MAPMYFITNESS_CLIENT_SECRET = ''
+SOCIAL_AUTH_MAPMYFITNESS_KEY = ''
+SOCIAL_AUTH_MAPMYFITNESS_SECRET = ''
 
 #The unique identifier for your website as registered on Disqus. If undefined, the Disqus embed will not load.
 DISQUS_SHORTNAME = ""
@@ -46,4 +45,10 @@ DISQUS_SHORTNAME = ""
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
+BASE_URL = 'http://localhost'
+
+#celery broker (RabbitMQ)
+BROKER_URL = "amqp://"
+
+# GOOGLE_ANALYTICS_TRACKING_ID = 'UA-15696857-1'
 GOOGLE_ANALYTICS_TRACKING_ID = ''

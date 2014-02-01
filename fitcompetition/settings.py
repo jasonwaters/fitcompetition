@@ -93,6 +93,7 @@ MIDDLEWARE_CLASSES = (
     'pipeline.middleware.MinifyHTMLMiddleware',
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SocialAuthExceptionMiddleware',
+    'fitcompetition.middleware.SSLRedirect',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )

@@ -18,7 +18,7 @@ import pytz
 from requests import RequestException
 from dateutil import parser
 
-#DO NOT REMOVE signals import
+# noinspection PyUnresolvedReferences
 import signals
 
 
