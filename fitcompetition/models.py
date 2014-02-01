@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
 import operator
 import uuid
+import math
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
@@ -588,7 +589,17 @@ class TransactionManager(models.Manager):
         self.create(date=now,
                     account=account,
                     description="Deposit",
-                    amount=amount)
+                    amount=amount,
+                    isCashflow=True)
+
+    def withdraw(self, account, amount):
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+        self.create(date=now,
+                    account=account,
+                    description="Withdrawal",
+                    amount=math.fabs(amount)*-1,
+                    isCashflow=True)
 
 
 class Transaction(models.Model):
@@ -596,5 +607,6 @@ class Transaction(models.Model):
     account = models.ForeignKey(Account)
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
+    isCashflow = models.BooleanField(verbose_name="Is Cashflow In/Out", default=False)
 
     objects = TransactionManager()

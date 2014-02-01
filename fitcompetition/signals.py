@@ -9,6 +9,16 @@ def getModel(name):
     return get_model('fitcompetition', name)
 
 
+@receiver(post_save, sender=getModel('Transaction'))
+def save_new_transaction(sender, **kwargs):
+    if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Transaction')):
+        transaction = kwargs['instance']
+        account = transaction.account
+        user = account.user
+        if user and transaction.isCashflow and transaction.amount > 0:
+            EmailFactory().cashDeposit(transaction, account, user)
+
+
 @receiver(post_save, sender=getModel('Challenge'))
 def save_new_challenge(sender, **kwargs):
     if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Challenge')):

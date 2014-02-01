@@ -3,8 +3,9 @@ Run "manage.py test".
 """
 import datetime
 from decimal import Decimal
-
-from django.test import TestCase
+import json
+from django.core import mail
+from django.test import TestCase, Client
 from fitcompetition.models import FitUser, Account, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.templatetags.apptags import toMeters
@@ -48,6 +49,74 @@ class AccountCreationTests(TestCase):
             self.assertTrue(False, "Account for challenge was not created")
 
 
+class EmailTests(TestCase):
+    def setUp(self):
+        self.user = FitUser.objects.create(username='alf',
+                                           password="pbkdf2_sha256$12000$cqeuHZqWbU2u$vuhnwLgqU6haP5d9D2Qdudld1Jpr4dmc1c52zBx7d90=",
+                                           first_name='alf',
+                                           last_name='doe',
+                                           email='alf@pluto.net',
+                                           is_staff=False,
+                                           fullname="Alf")
+
+        self.challenge = Challenge.objects.create(name="Marathon",
+                                                  type="INDV",
+                                                  style="ALL",
+                                                  distance=100,
+                                                  startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                                  enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                                  ante=25)
+
+    def testEmailConfirm(self):
+        pass
+
+    def testJoinChallenge(self):
+        # now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+
+        self.challenge.addChallenger(self.user)
+
+        self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
+        self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
+        mail.outbox = []
+
+        self.challenge.removeChallenger(self.user, force=True)
+
+        self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
+
+    def testCashOut(self):
+        c = Client()
+        auth = c.login(username='alf', password='user')
+        self.assertTrue(auth, 'failed to authenticate alf/user')
+        response = c.post('/account-cash-out/', {
+            'emailAddress': "jake@jones.net",
+            'cashValue': '100'
+        })
+        value = json.loads(response.content)
+        self.assertTrue(value.get('success'), "Cash Out request failed to return success:True")
+        self.assertEqual(2, len(mail.outbox), "two emails were not sent when user cashed out")
+
+    def testDeposit(self):
+        Transaction.objects.deposit(self.user.account, 25)
+
+        self.assertEqual(25, self.user.account.balance)
+        self.assertEqual(1, len(mail.outbox), "Deposit email failed to send")
+        self.assertTrue("Your payment was received" in mail.outbox[0].subject, "Deposit email failed to send")
+        mail.outbox = []
+
+        Transaction.objects.withdraw(self.user.account, 15)
+        self.assertEqual(10, self.user.account.balance)
+        self.assertEqual(0, len(mail.outbox))
+
+    def testChallengeStart(self):
+        pass
+
+    def testChallengeHalf(self):
+        pass
+
+    def testChallengeEnd(self):
+        pass
+
+
 class TransactionTests(TestCase):
     def setUp(self):
         self.user = FitUser.objects.create(username='alf',
@@ -69,17 +138,12 @@ class TransactionTests(TestCase):
         pass
 
     def testChallengeMembership(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-
         self.challenge.addChallenger(self.user)
 
         self.assertEqual(25, self.challenge.account.balance, "Transaction for challenge was not created")
         self.assertEqual(-25, self.user.account.balance, "Transaction for user was not created")
 
-        Transaction.objects.create(date=now,
-                                   account=self.user.account,
-                                   description="",
-                                   amount=25)
+        Transaction.objects.deposit(self.user.account, 25)
 
         self.assertEqual(0, self.user.account.balance, "Incorrect balance for user")
 
@@ -99,11 +163,11 @@ class ReconciliationTests(TestCase):
         self.running, created = ActivityType.objects.get_or_create(name='Running')
 
         self.elmo = FitUser.objects.create(username='user1',
-                                            first_name='Elmo',
-                                            last_name='user',
-                                            email='a@a.net',
-                                            is_staff=False,
-                                            fullname="Elmo")
+                                           first_name='Elmo',
+                                           last_name='user',
+                                           email='a@a.net',
+                                           is_staff=False,
+                                           fullname="Elmo")
 
         self.count = FitUser.objects.create(username='user2',
                                             first_name='Count',
@@ -113,11 +177,11 @@ class ReconciliationTests(TestCase):
                                             fullname="Count Dracula")
 
         self.bert = FitUser.objects.create(username='user3',
-                                            first_name='Bert',
-                                            last_name='user',
-                                            email='c@a.net',
-                                            is_staff=False,
-                                            fullname="Bert")
+                                           first_name='Bert',
+                                           last_name='user',
+                                           email='c@a.net',
+                                           is_staff=False,
+                                           fullname="Bert")
 
         self.ernie = FitUser.objects.create(username='user4',
                                             first_name='Ernie',
@@ -250,9 +314,15 @@ class ReconciliationTests(TestCase):
         challenge.addChallenger(self.bert)
         challenge.addChallenger(self.ernie)
 
+        self.assertEqual(4, len(mail.outbox))
+        mail.outbox = []
+
         Transaction.objects.deposit(self.elmo.account, 25)
         Transaction.objects.deposit(self.count.account, 25)
         Transaction.objects.deposit(self.bert.account, 25)
+
+        self.assertEqual(3, len(mail.outbox))
+        mail.outbox = []
 
         self.assertEqual(100, challenge.account.balance)
 
@@ -274,6 +344,8 @@ class ReconciliationTests(TestCase):
         self.assertEqual(challenge.numWinners, 3)
         self.assertAlmostEqual(challenge.disbursementAmount, Decimal(33.33), 2)
         self.assertAlmostEqual(challenge.totalDisbursed, Decimal(99.99), 2)
+
+        self.assertEqual(0, len(mail.outbox))
 
     def testIndividualAllCanWin2(self):
         challenge = Challenge.objects.create(name="Marathon",

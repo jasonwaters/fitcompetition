@@ -148,7 +148,6 @@ def account_cash_out(request):
         request.user.email = paypalEmailAddress
         request.user.save()
 
-    factory = EmailFactory()
-    factory.cashWithdrawal(request.user, paypalEmailAddress, cashValue)
+    EmailFactory().cashWithdrawal(request.user, paypalEmailAddress, cashValue)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
