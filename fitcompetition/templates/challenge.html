@@ -366,13 +366,6 @@
 					}
 				});
 
-				{% if fetchLatest %}
-					$.get("{% url 'fetch_latest_activities' challenge.id %}", function(result) {
-						if(result && result.success) {
-							$('tr.current-player a.distance-enclave').text(round(result.distance));
-						}
-					});
-				{% endif %}
 
 				$('.join-challenge').click(function(evt) {
 					evt.preventDefault();

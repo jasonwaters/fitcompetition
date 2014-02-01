@@ -115,7 +115,10 @@ class FitUser(AbstractUser):
             self.gender = profile.get('gender')
             self.profile_url = profile.get('profile')
             self.save()
-        except(RunkeeperException, RequestException):
+        except(RunkeeperException, RequestException), e:
+            if e.forbidden:
+                self.runkeeperToken = None
+                self.save()
             successful = False
 
         return successful

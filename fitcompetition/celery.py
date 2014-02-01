@@ -19,14 +19,13 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.update(
-    CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
     CELERYBEAT_SCHEDULE={
-        # "runs-every-hour": {
-        #     "task": "fitcompetition.tasks.hourly",
-        #     "schedule": crontab(minute=0, hour='*/1')
-        # },
-        "runs-every-day": {
-            "task": "fitcompetition.tasks.daily",
+        "sync-runkeeper-data-hourly": {
+            "task": "fitcompetition.tasks.syncRunkeeperDataAllUsers",
+            "schedule": crontab(minute=0, hour='*/1')
+        },
+        "send-challenge-notifications-daily": {
+            "task": "fitcompetition.tasks.sendChallengeNotifications",
             "schedule": crontab(minute=0, hour=0)
         }
     }

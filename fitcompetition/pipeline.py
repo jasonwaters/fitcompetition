@@ -1,3 +1,6 @@
+from fitcompetition import tasks
+
+
 def persistHealthgraphData(strategy, details, response, user=None, *args, **kwargs):
     if user:
-        user.syncRunkeeperData()
+        tasks.syncRunkeeperData.delay(user.id)

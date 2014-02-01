@@ -21,7 +21,13 @@ RECORDS = '/records'
 
 
 class RunkeeperException(Exception):
-    pass
+    def __init__(self, message, status_code=None, **kwargs):
+        super(RunkeeperException, self).__init__(message, **kwargs)
+        self.status_code = status_code
+
+    @property
+    def forbidden(self):
+        return self.status_code == 403
 
 
 def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSince=None):
@@ -49,7 +55,7 @@ def getFitnessActivities(user, noEarlierThan=None, noLaterThan=None, modifiedSin
         # status = 304 ~ not modified
         return []
     elif r.status_code != 200:
-        raise RunkeeperException("Status Code: %s" % r.status_code)
+        raise RunkeeperException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
     json = r.json()
     return json.get('items', [])
@@ -79,7 +85,7 @@ def getChangeLog(user, modifiedNoEarlierThan=None, modifiedNoLaterThan=None, mod
         # status = 304 ~ not modified
         return {}
     elif r.status_code != 200:
-        raise RunkeeperException("Status Code: %s" % r.status_code)
+        raise RunkeeperException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
     return r.json()
 
@@ -93,6 +99,6 @@ def getUserProfile(user):
     r = requests.get(url, params=params)
 
     if r.status_code != 200:
-        raise RunkeeperException("Status Code: %s" % r.status_code)
+        raise RunkeeperException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
     return r.json()

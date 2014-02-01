@@ -109,7 +109,6 @@ def challenge(request, id):
         'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
-        'fetchLatest': False,
         'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities(),
     }

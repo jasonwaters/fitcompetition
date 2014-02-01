@@ -1,33 +1,25 @@
-from datetime import datetime
 from fitcompetition.celery import app
-from fitcompetition.email import Email
-import pytz
+from fitcompetition.models import FitUser
 
 
 @app.task(ignore_result=True)
-def hourly():
-    email = Email(to='jason@myheck.net', subject="This is an hourly test")
+def syncRunkeeperData(user_id):
+    try:
+        user = FitUser.objects.get(id=user_id)
+        user.syncRunkeeperData()
+    except FitUser.DoesNotExist:
+        pass
 
-    now = datetime.now(tz=pytz.utc)
-
-    ctxt = {
-        'first_name': 'Jason',
-        'now': now
-    }
-
-    email.html("email/test.html", ctxt)
-    email.send("FitCrown<contact@fitcrown.com>")
-
+#hourly
 @app.task(ignore_result=True)
-def daily():
-    email = Email(to='jason@myheck.net', subject="This is a daily test")
+def syncRunkeeperDataAllUsers():
+    users = FitUser.objects.exclude(runkeeperToken__isnull=True).exclude(runkeeperToken__exact='')
 
-    now = datetime.now(tz=pytz.utc)
+    for user in users:
+        syncRunkeeperData.delay(user.id)
 
-    ctxt = {
-        'first_name': 'Jason',
-        'now': now
-    }
 
-    email.html("email/test.html", ctxt)
-    email.send("FitCrown<contact@fitcrown.com>")
+#daily
+@app.task(ignore_result=True)
+def sendChallengeNotifications():
+    pass

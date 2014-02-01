@@ -3,11 +3,9 @@ import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
 import re
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team, FitnessActivity
-from fitcompetition.templatetags.apptags import toMiles
 from django.conf import settings
 import mailchimp
 
@@ -52,17 +50,6 @@ def upload_activity_image(request, activity_id):
             'photoUrl': activity.photo.url
         }))
     return HttpResponse(json.dumps({'success': False}))
-
-@login_required
-def fetch_latest_activities(request, challenge_id):
-    request.user.syncRunkeeperData()
-
-    try:
-        challenge = Challenge.objects.get(id=challenge_id)
-        distance = request.user.getDistance(challenge)
-        return HttpResponse(json.dumps({'success': True, 'distance': toMiles(distance)}), content_type="application/json")
-    except Challenge.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 
 @login_required
@@ -133,11 +120,6 @@ def user_details_update(request):
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
-
-@login_required
-def refresh_user_activities(request):
-    request.user.syncRunkeeperData()
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 @login_required
 def account_cash_out(request):
