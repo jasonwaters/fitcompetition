@@ -91,7 +91,11 @@ class EmailTests(TestCase):
             'emailAddress': "jake@jones.net",
             'cashValue': '100'
         })
-        value = json.loads(response.content)
+        try:
+            value = json.loads(response.content)
+        except ValueError:
+            self.fail("Unable to parse JSON: %s" % response.content)
+
         self.assertTrue(value.get('success'), "Cash Out request failed to return success:True")
         self.assertEqual(2, len(mail.outbox), "two emails were not sent when user cashed out")
 
