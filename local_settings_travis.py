@@ -1,5 +1,5 @@
 DEBUG = False
-SSL_ENABLED = True
+SSL_ENABLED = False
 
 SECRET_KEY = 'travis-ci'
 
@@ -12,7 +12,7 @@ DATABASES = {
         'HOST': '',
         'PORT': '',
         'STORAGE_ENGINE': 'MyISAM',
-        }
+    }
 }
 
 PAYPAL_ACCOUNT_EMAIL = 'not@valid.net'
