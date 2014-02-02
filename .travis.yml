@@ -1,0 +1,5 @@
+language: python
+python:
+  - "2.7"
+pip install -r requirements.pip --use-mirrors
+python manage.py test
