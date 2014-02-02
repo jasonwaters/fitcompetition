@@ -1,7 +1,15 @@
 language: python
 python:
   - "2.7"
+services:
+  - mysql
+  - rabbitmq
 install:
-  pip install -r requirements.pip --use-mirrors
+  - pip install -r requirements.pip --use-mirrors
+before_script:
+  - mysql -e 'create database fc_test_db;'
+  - mv local_settings_travis.py local_settings.py
+  - python manage.py syncdb --noinput
+  - python manage.py migrate --noinput
 script:
-  python manage.py test
+  - python manage.py test
