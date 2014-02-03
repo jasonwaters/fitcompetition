@@ -42,8 +42,34 @@ class EmailFactory(object):
                 'approvedActivities': createListFromProperty(approvedTypes, 'name'),
             }
 
-            email.html("email/joined_challenge.html", context)
+            email.html("email/challenge_joined.html", context)
             email.send(self.FROM)
+
+    def challengeStart(self, user, challenge):
+        email = Email(to=user.email, subject="The challenge has begun!")
+
+        approvedTypes = challenge.approvedActivities.all()
+
+        context = {
+            'challenge': challenge,
+            'user': user,
+            'approvedActivities': createListFromProperty(approvedTypes, 'name'),
+        }
+
+        email.html("email/challenge_start.html", context)
+        email.send(self.FROM)
+
+    def challengeHalf(self, user, challenge):
+        email = Email(to=user.email, subject="The challenge is half over!")
+
+        context = {
+            'challenge': challenge,
+            'user': user,
+            'achievedGoal': challenge.getAchievedGoal(user)
+        }
+
+        email.html("email/challenge_half.html", context)
+        email.send(self.FROM)
 
     def cashDeposit(self, transaction, account, user):
         email = Email(to=user.email, subject="Your payment was received")

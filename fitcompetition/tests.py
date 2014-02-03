@@ -6,6 +6,7 @@ from decimal import Decimal
 import json
 from django.core import mail
 from django.test import TestCase, Client
+from fitcompetition import tasks
 from fitcompetition.models import FitUser, Account, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
 from fitcompetition.templatetags.apptags import toMeters
@@ -51,13 +52,23 @@ class AccountCreationTests(TestCase):
 
 class EmailTests(TestCase):
     def setUp(self):
-        self.user = FitUser.objects.create(username='alf',
-                                           password="pbkdf2_sha256$12000$cqeuHZqWbU2u$vuhnwLgqU6haP5d9D2Qdudld1Jpr4dmc1c52zBx7d90=",
-                                           first_name='alf',
-                                           last_name='doe',
-                                           email='alf@pluto.net',
-                                           is_staff=False,
-                                           fullname="Alf")
+        self.running, created = ActivityType.objects.get_or_create(name='Running')
+
+        self.user1 = FitUser.objects.create(username='alf',
+                                            password="pbkdf2_sha256$12000$cqeuHZqWbU2u$vuhnwLgqU6haP5d9D2Qdudld1Jpr4dmc1c52zBx7d90=",
+                                            first_name='alf',
+                                            last_name='doe',
+                                            email='alf@pluto.net',
+                                            is_staff=False,
+                                            fullname="Alf")
+
+        self.user2 = FitUser.objects.create(username='elmo',
+                                            password="pbkdf2_sha256$12000$cqeuHZqWbU2u$vuhnwLgqU6haP5d9D2Qdudld1Jpr4dmc1c52zBx7d90=",
+                                            first_name='elmo',
+                                            last_name='love',
+                                            email='elmo@sesame.net',
+                                            is_staff=False,
+                                            fullname="Elmo")
 
         self.challenge = Challenge.objects.create(name="Marathon",
                                                   type="INDV",
@@ -73,13 +84,13 @@ class EmailTests(TestCase):
     def testJoinChallenge(self):
         # now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
 
-        self.challenge.addChallenger(self.user)
+        self.challenge.addChallenger(self.user1)
 
         self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
         self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
         mail.outbox = []
 
-        self.challenge.removeChallenger(self.user, force=True)
+        self.challenge.removeChallenger(self.user1, force=True)
 
         self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
 
@@ -102,22 +113,80 @@ class EmailTests(TestCase):
         self.assertEqual(2, len(mail.outbox), "two emails were not sent when user cashed out")
 
     def testDeposit(self):
-        Transaction.objects.deposit(self.user.account, 25)
+        Transaction.objects.deposit(self.user1.account, 25)
 
-        self.assertEqual(25, self.user.account.balance)
+        self.assertEqual(25, self.user1.account.balance)
         self.assertEqual(1, len(mail.outbox), "Deposit email failed to send")
         self.assertTrue("Your payment was received" in mail.outbox[0].subject, "Deposit email failed to send")
         mail.outbox = []
 
-        Transaction.objects.withdraw(self.user.account, 15)
-        self.assertEqual(10, self.user.account.balance)
+        Transaction.objects.withdraw(self.user1.account, 15)
+        self.assertEqual(10, self.user1.account.balance)
         self.assertEqual(0, len(mail.outbox))
 
     def testChallengeStart(self):
-        pass
+        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+        self.challenge = Challenge.objects.create(name="aaa",
+                                                  type="INDV",
+                                                  style="ALL",
+                                                  distance=100,
+                                                  startdate=now,
+                                                  enddate=now + datetime.timedelta(days=10),
+                                                  ante=10)
+
+        self.challenge.addChallenger(self.user1)
+        self.challenge.addChallenger(self.user2)
+        mail.outbox = []
+
+        tasks.sendChallengeNotifications()
+
+        self.assertEqual(2, len(mail.outbox), '2 challenge kick-off emails should have been sent')
+        self.assertEqual("The challenge has begun!", mail.outbox[0].subject)
+        self.assertEqual("The challenge has begun!", mail.outbox[1].subject)
 
     def testChallengeHalf(self):
-        pass
+        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+        self.challenge = Challenge.objects.create(name="aaa",
+                                                  type="INDV",
+                                                  style="ALL",
+                                                  distance=100,
+                                                  startdate=now + datetime.timedelta(days=-4),
+                                                  enddate=now + datetime.timedelta(days=4),
+                                                  ante=100)
+
+        self.challenge.approvedActivities.add(self.running)
+
+        self.challenge.addChallenger(self.user1)
+        self.challenge.addChallenger(self.user2)
+
+        FitnessActivity.objects.create(user=self.user1,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now,
+                                       calories=0,
+                                       distance=toMeters(120))
+
+        FitnessActivity.objects.create(user=self.user2,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now,
+                                       calories=0,
+                                       distance=toMeters(50))
+
+        mail.outbox = []
+
+        tasks.sendChallengeNotifications()
+
+        self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
+        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
+        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
+
+        self.assertTrue("120 miles" in mail.outbox[0].alternatives[0][0])
+        self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
+        self.assertTrue("50 miles" in mail.outbox[1].alternatives[0][0])
+        self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
 
     def testChallengeEnd(self):
         pass

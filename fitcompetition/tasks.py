@@ -1,5 +1,6 @@
 from django.utils import timezone
 from fitcompetition.celery import app
+from fitcompetition.email import EmailFactory
 from fitcompetition.models import FitUser, Challenge
 from fitcompetition.settings import TIME_ZONE
 import pytz
@@ -31,12 +32,15 @@ def sendChallengeNotifications():
     for challenge in challenges:
         #check challenges started
         if challenge.startdate.astimezone(pytz.timezone(TIME_ZONE)).date() == now.date():
-            print "%s started" % challenge.name
+            for user in challenge.challengers:
+                EmailFactory().challengeStart(user, challenge)
 
         #check challenges middle
-        if challenge.midwaydate.astimezone(pytz.timezone(TIME_ZONE)).date() == now.date():
-            print "%s is half over" % challenge.name
+        elif challenge.middate.astimezone(pytz.timezone(TIME_ZONE)).date() == now.date():
+            for user in challenge.getChallengersWithActivities():
+                EmailFactory().challengeHalf(user, challenge)
 
         #check challenged ended
-        if challenge.enddate.astimezone(pytz.timezone(TIME_ZONE)).date() == now.date():
+        elif challenge.enddate.astimezone(pytz.timezone(TIME_ZONE)) < now:
+            #perform reconciliation
             print "%s ended" % challenge.name
