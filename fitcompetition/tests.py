@@ -180,16 +180,58 @@ class EmailTests(TestCase):
         tasks.sendChallengeNotifications()
 
         self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
-        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
-        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
 
+        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
         self.assertTrue("120 miles" in mail.outbox[0].alternatives[0][0])
         self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
+
+        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
         self.assertTrue("50 miles" in mail.outbox[1].alternatives[0][0])
         self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
 
     def testChallengeEnd(self):
-        pass
+        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+        self.challenge = Challenge.objects.create(name="aaa",
+                                                  type="INDV",
+                                                  style="ALL",
+                                                  distance=100,
+                                                  startdate=now + datetime.timedelta(days=-20),
+                                                  enddate=now + datetime.timedelta(days=-1),
+                                                  ante=100)
+
+        self.challenge.approvedActivities.add(self.running)
+
+        self.challenge.addChallenger(self.user1)
+        self.challenge.addChallenger(self.user2)
+
+        FitnessActivity.objects.create(user=self.user1,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now + datetime.timedelta(days=-5),
+                                       calories=0,
+                                       distance=toMeters(120))
+
+        FitnessActivity.objects.create(user=self.user2,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now + datetime.timedelta(days=-5),
+                                       calories=0,
+                                       distance=toMeters(50))
+
+        mail.outbox = []
+
+        tasks.sendChallengeNotifications()
+        self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
+
+        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
+        self.assertTrue("120 miles" in mail.outbox[0].alternatives[0][0])
+        self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
+
+        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
+        self.assertTrue("50 miles" in mail.outbox[1].alternatives[0][0])
+        self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
 
 
 class ChallengeTests(TestCase):

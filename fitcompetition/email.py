@@ -71,6 +71,18 @@ class EmailFactory(object):
         email.html("email/challenge_half.html", context)
         email.send(self.FROM)
 
+    def challengeEnd(self, user, challenge):
+        email = Email(to=user.email, subject="The challenge is over!")
+
+        context = {
+            'challenge': challenge,
+            'user': user,
+            'achievedGoal': challenge.getAchievedGoal(user)
+        }
+
+        email.html("email/challenge_end.html", context)
+        email.send(self.FROM)
+
     def cashDeposit(self, transaction, account, user):
         email = Email(to=user.email, subject="Your payment was received")
 

@@ -1,0 +1,18 @@
+{% extends 'email/base.html' %}
+{% load apptags %}
+{% load humanize %}
+
+{% block content %}
+	<p>Hey {{user.first_name}}!</p>
+
+	<p>Welp, that's a wrap.  The "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge has ended!</p>
+	<p>
+		{% if achievedGoal %}
+			Wow!  You rocked the house and completed the challenge with {{ user.total_distance|toMiles|floatformat:"-1" }} miles!
+			Way to go!!  You are one of the {{ challenge.numWinners }} people who completed this challenge.  Pat yourself on the back.  We've credited {{ challenge.disbursementAmount|currency }} to <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">your account</a>.<br/>
+		{% else %}
+			You logged {{ user.total_distance|toMiles|floatformat:"-1" }} mile{{ user.total_distance|toMiles|pluralize }}.  That's an "A" for effort.  But sadly you did not complete the challenge.
+		{% endif %}
+	</p>
+	<p>We hope you'll <a href="{{ "BASE_URL"|fromSettings }}">play again</a> soon!</p>
+{% endblock %}
