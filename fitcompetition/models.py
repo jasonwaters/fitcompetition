@@ -225,6 +225,7 @@ class Challenge(models.Model):
     distance = models.DecimalField(max_digits=16, decimal_places=2)
 
     startdate = models.DateTimeField(verbose_name='Start Date')
+    middate = models.DateTimeField(verbose_name='Mid Date', blank=True, null=True, default=None)
     enddate = models.DateTimeField(verbose_name='End Date')
     ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
 
@@ -405,7 +406,8 @@ class Challenge(models.Model):
 
     @property
     def numDays(self):
-        return (self.enddate - self.startdate).days
+        #we add 1 because we include the end date in the calculation
+        return (self.enddate - self.startdate).days + 1
 
     @property
     def hasEnded(self):
@@ -421,6 +423,13 @@ class Challenge(models.Model):
     def clean(self):
         if self.startdate > self.enddate:
             raise ValidationError("Start Date must be before End Date")
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.startdate = self.startdate.replace(hour=0, minute=0, second=0, microsecond=0)
+        self.enddate = self.enddate.replace(hour=23, minute=59, second=59, microsecond=999999)
+        self.middate = self.startdate + ((self.enddate-self.startdate)/2)
+
+        super(Challenge, self).save(force_insert, force_update, using, update_fields)
 
 
 class TeamManager(models.Manager):

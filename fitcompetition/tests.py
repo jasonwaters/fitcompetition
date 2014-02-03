@@ -123,6 +123,53 @@ class EmailTests(TestCase):
         pass
 
 
+class ChallengeTests(TestCase):
+    def setUp(self):
+        self.c1 = Challenge.objects.create(name="aaa",
+                                           type="INDV",
+                                           style="ALL",
+                                           distance=100,
+                                           startdate=datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           enddate=datetime.datetime(2014, 1, 10, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           ante=10)
+
+        self.c2 = Challenge.objects.create(name="bbb",
+                                           type="INDV",
+                                           style="ONE",
+                                           distance=100,
+                                           startdate=datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           enddate=datetime.datetime(2014, 4, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           ante=20)
+
+        self.c3 = Challenge.objects.create(name="ccc",
+                                           type="TEAM",
+                                           style="ALL",
+                                           distance=100,
+                                           startdate=datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           enddate=datetime.datetime(2014, 1, 7, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           ante=30)
+
+        self.c4 = Challenge.objects.create(name="ddd",
+                                           type="TEAM",
+                                           style="ONE",
+                                           distance=100,
+                                           startdate=datetime.datetime(2014, 2, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           enddate=datetime.datetime(2014, 3, 1, tzinfo=pytz.timezone(TIME_ZONE)),
+                                           ante=30)
+
+    def testMidDate(self):
+        self.assertEqual(datetime.datetime(2014, 1, 5, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c1.middate.date())
+        self.assertEqual(datetime.datetime(2014, 2, 15, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c2.middate.date())
+        self.assertEqual(datetime.datetime(2014, 1, 4, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c3.middate.date())
+        self.assertEqual(datetime.datetime(2014, 2, 15, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c4.middate.date())
+
+    def testDuration(self):
+        self.assertEqual(10, self.c1.numDays)
+        self.assertEqual(91, self.c2.numDays)
+        self.assertEqual(7, self.c3.numDays)
+        self.assertEqual(29, self.c4.numDays)
+
+
 class TransactionTests(TestCase):
     def setUp(self):
         self.user = FitUser.objects.create(username='alf',

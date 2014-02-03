@@ -118,7 +118,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'fitcompetition',
     'grappelli',
     'django.contrib.admin',
     'social.apps.django_app.default',
@@ -127,6 +126,7 @@ INSTALLED_APPS = (
     'storages',
     'djcelery',
     'seacucumber',
+    'fitcompetition',
 )
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'

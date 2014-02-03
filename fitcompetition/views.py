@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from fitcompetition import tasks
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
@@ -95,8 +96,11 @@ def challenge(request, id):
         except Challenger.DoesNotExist:
             competitor = None
 
-    if competitor and challenge.startdate <= now <= challenge.enddate and request.user.healthGraphStale():
-        request.user.syncRunkeeperData(syncProfile=False)
+    if competitor and challenge.startdate <= now <= challenge.enddate:
+        if request.user.healthGraphStale():
+            request.user.syncRunkeeperData(syncProfile=False)
+        else:
+            tasks.syncRunkeeperData.delay(request.user.id, syncProfile=False)
 
     approvedTypes = challenge.approvedActivities.all()
 

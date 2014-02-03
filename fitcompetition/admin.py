@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.sites.models import Site
+from djcelery.models import TaskState, WorkerState, IntervalSchedule, CrontabSchedule, PeriodicTask
 from fitcompetition.models import Challenge, FitUser, Challenger, Transaction, Team, Account
+from social.apps.django_app.default.models import Nonce, Association, UserSocialAuth
 
 
 class TeamInline(admin.TabularInline):
@@ -30,7 +32,8 @@ class TransactionInline(admin.TabularInline):
 
 
 class ChallengeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'distance', 'startdate', 'enddate')
+    list_display = ('name', 'distance', 'startdate', 'middate', 'enddate')
+    exclude = ('middate',)
     ordering = ('-startdate', '-enddate',)
     inlines = (TeamInline, ChallengerInline,)
 
@@ -50,3 +53,15 @@ admin.site.register(FitUser, FitUserAdmin)
 admin.site.register(Account, AccountAdmin)
 
 admin.site.unregister(Site)
+
+#python-social-auth
+admin.site.unregister(Nonce)
+admin.site.unregister(Association)
+admin.site.unregister(UserSocialAuth)
+
+#djcelery
+admin.site.unregister(TaskState)
+admin.site.unregister(WorkerState)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(PeriodicTask)
