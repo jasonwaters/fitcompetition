@@ -42,6 +42,7 @@ def sendChallengeNotifications():
 
         #check challenged ended
         elif challenge.enddate.astimezone(pytz.timezone(TIME_ZONE)) < now:
+            upcomingChallenges = Challenge.objects.upcomingChallenges()
             challenge.performReconciliation()
             for user in challenge.getChallengersWithActivities():
-                EmailFactory().challengeEnd(user, challenge)
+                EmailFactory().challengeEnd(user, challenge, upcomingChallenges)
