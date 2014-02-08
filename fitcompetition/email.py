@@ -71,13 +71,14 @@ class EmailFactory(object):
         email.html("email/challenge_half.html", context)
         email.send(self.FROM)
 
-    def challengeEnd(self, user, challenge, upcomingChallenges):
+    def challengeEnd(self, user, challenge, upcomingChallenges, isWinner):
         email = Email(to=user.email, subject="The challenge is over!")
 
         context = {
             'challenge': challenge,
             'user': user,
             'achievedGoal': challenge.getAchievedGoal(user),
+            'isWinner': isWinner,
             'upcomingChallenges': upcomingChallenges
         }
 
