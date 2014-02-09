@@ -425,9 +425,16 @@ class Challenge(models.Model):
             raise ValidationError("Start Date must be before End Date")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.startdate = self.startdate.replace(hour=0, minute=0, second=0, microsecond=0)
-        self.enddate = self.enddate.replace(hour=23, minute=59, second=59, microsecond=999999)
-        self.middate = self.startdate + ((self.enddate-self.startdate)/2)
+
+        startdate = pytz.timezone(TIME_ZONE).normalize(self.startdate)
+        enddate = pytz.timezone(TIME_ZONE).normalize(self.enddate)
+
+        startdate.replace(hour=0, minute=0, second=0)
+        enddate.replace(hour=23, minute=59, second=59)
+
+        self.startdate = startdate
+        self.enddate = enddate
+        self.middate = startdate + ((enddate-startdate)/2)
 
         super(Challenge, self).save(force_insert, force_update, using, update_fields)
 

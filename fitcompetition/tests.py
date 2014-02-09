@@ -339,6 +339,76 @@ class ChallengeTests(TestCase):
                                            enddate=datetime.datetime(2014, 3, 1, tzinfo=pytz.timezone(TIME_ZONE)),
                                            ante=30)
 
+    def testStartDateEndDate(self):
+        self.c1 = Challenge.objects.get(id=self.c1.id)
+        self.c2 = Challenge.objects.get(id=self.c2.id)
+        self.c3 = Challenge.objects.get(id=self.c3.id)
+        self.c4 = Challenge.objects.get(id=self.c4.id)
+
+        #challenge 1
+        start = datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        start.replace(hour=0, minute=0, second=0)
+
+        end = datetime.datetime(2014, 1, 10, tzinfo=pytz.timezone(TIME_ZONE))
+        end.replace(hour=23, minute=59, second=59)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c1.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c1.enddate)
+
+        self.c1.performReconciliation()
+        self.c1 = Challenge.objects.get(id=self.c1.id)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c1.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c1.enddate)
+
+        #challenge 2
+        start = datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        start.replace(hour=0, minute=0, second=0)
+
+        end = datetime.datetime(2014, 4, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        end.replace(hour=23, minute=59, second=59)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c2.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c2.enddate)
+
+        self.c2.performReconciliation()
+        self.c2 = Challenge.objects.get(id=self.c2.id)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c2.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c2.enddate)
+
+        #challenge 3
+        start = datetime.datetime(2014, 1, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        start.replace(hour=0, minute=0, second=0)
+
+        end = datetime.datetime(2014, 1, 7, tzinfo=pytz.timezone(TIME_ZONE))
+        end.replace(hour=23, minute=59, second=59)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c3.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c3.enddate)
+
+        self.c3.performReconciliation()
+        self.c3 = Challenge.objects.get(id=self.c3.id)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c3.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c3.enddate)
+
+        #challenge 4
+        start = datetime.datetime(2014, 2, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        start.replace(hour=0, minute=0, second=0)
+
+        end = datetime.datetime(2014, 3, 1, tzinfo=pytz.timezone(TIME_ZONE))
+        end.replace(hour=23, minute=59, second=59)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c4.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c4.enddate)
+
+        self.c4.performReconciliation()
+        self.c4 = Challenge.objects.get(id=self.c4.id)
+
+        self.assertEqual(pytz.utc.normalize(start.astimezone(pytz.timezone(TIME_ZONE))), self.c4.startdate)
+        self.assertEqual(pytz.utc.normalize(end.astimezone(pytz.timezone(TIME_ZONE))), self.c4.enddate)
+
     def testMidDate(self):
         self.assertEqual(datetime.datetime(2014, 1, 5, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c1.middate.date())
         self.assertEqual(datetime.datetime(2014, 2, 15, tzinfo=pytz.timezone(TIME_ZONE)).date(), self.c2.middate.date())

@@ -27,7 +27,7 @@
 		{% elif challenge.hasEnded %}
 			This Challenge ended {{ challenge.enddate|timesince }} ago.
 			{% if challenge.reconciled and challenge.disbursementAmount > 0 %}
-				<strong>{{ challenge.numWinners }} players won ${{ challenge.disbursementAmount }} each.</strong>
+				<strong>{{ challenge.numWinners }} player{{ challenge.numWinners|pluralize }} won ${{ challenge.disbursementAmount|floatformat:"-2" }}{{ challenge.numWinners|pluralize:" each" }}.</strong>
 			{% endif %}
 		{% else%}
 			<span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
