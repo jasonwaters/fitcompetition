@@ -22,8 +22,8 @@ def challenges(request):
         'currentChallenges': currentChallenges,
         'upcomingChallenges': upcomingChallenges,
         'pastChallenges': pastChallenges,
-        'totalPaid': attr(challengeStats, 'grandTotalDisbursed'),
-        'averagePaid': attr(challengeStats, 'grandTotalDisbursed') / attr(challengeStats, 'totalWinnerCount')
+        'totalPaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0),
+        'averagePaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0) / attr(challengeStats, 'totalWinnerCount', defaultValue=1)
     })
 
 
