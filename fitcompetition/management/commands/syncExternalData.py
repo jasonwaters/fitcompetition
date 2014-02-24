@@ -17,6 +17,8 @@ class Command(BaseCommand):
         overwrite = options.get('reset', False)
         if overwrite:
             FitnessActivity.objects.all().delete()
-            FitUser.objects.all().update(lastHealthGraphUpdate=None)
+            FitUser.objects.all().update(lastExternalSyncDate=None)
 
-        tasks.syncRunkeeperDataAllUsers.delay()
+        tasks.syncExternalDataAllUsers.delay(syncActivities=True,
+                                             syncProfile=True,
+                                             pruneActivities=True)

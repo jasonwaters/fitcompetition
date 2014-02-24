@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="page-header">
-        <h2>{{ userprofile.fullname }} <small><a href="{{ userprofile.profile_url }}" target="_blank">view Runkeeper profile &raquo;</a></small></h2>
+        <h2>{{ userprofile.fullname }} {% if userprofile.integrationName %}<small><a href="{{ userprofile.profile_url }}" target="_blank">view {{ userprofile.integrationName }} profile &raquo;</a></small>{% endif %}</h2>
     </div>
     <div class="user-photo">
         <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />
@@ -25,7 +25,7 @@
         <tbody>
             {% for activity in recentActivities %}
                 <tr data-id="{{ activity.id }}">
-                    <td>{{ activity.date|naturalday:"F j, Y" }}</td>
+                    <td title="{{ activity.date|fullDate }}">{{ activity.date|naturalday:"F j, Y" }}</td>
                     <td>{{ activity.type.name }}</td>
                     <td>{{ activity.distance|toMiles|twoDecimals }}</td>
                     <td>{{ activity.duration|duration }}</td>

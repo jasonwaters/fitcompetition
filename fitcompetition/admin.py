@@ -39,8 +39,8 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 
 class FitUserAdmin(UserAdmin):
-    list_display = ('fullname', 'email', 'phoneNumber', 'profile_url', 'lastHealthGraphUpdate', 'runkeeperToken', 'date_joined')
-    ordering = ('fullname',)
+    list_display = ('fullname', 'email', 'phoneNumber', 'profile_url', 'lastExternalSyncDate', 'integrationName', 'date_joined')
+    ordering = ('fullname', 'integrationName')
 
 
 class AccountAdmin(admin.ModelAdmin):

@@ -207,7 +207,7 @@ SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 255
 
 AUTHENTICATION_BACKENDS = (
     'fitcompetition.backends.runkeeper.RunkeeperOauth2',
-    # 'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
+    'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
     'django.contrib.auth.backends.ModelBackend'
 )
 
@@ -234,8 +234,15 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.associate_user',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details',
-    # 'fitcompetition.pipeline.persistHealthgraphData',
 )
+
+SOCIAL_AUTH_USER_FIELDS = [
+    "username",
+    "first_name",
+    "last_name",
+    "fullname",
+    "email"
+]
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)

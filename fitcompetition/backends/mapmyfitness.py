@@ -1,3 +1,4 @@
+from fitcompetition.services import Integration
 from social.backends.oauth import BaseOAuth1
 
 
@@ -19,7 +20,7 @@ class MapMyFitnessOAuth(BaseOAuth1):
     MMF_BASE_URL = 'http://mapmyfitness.com'
 
     def get_user_id(self, details, response):
-        return response['user']['userID']
+        return response['user']['id']
 
     def get_user_details(self, response):
         user = response.get('user')
@@ -33,17 +34,18 @@ class MapMyFitnessOAuth(BaseOAuth1):
             imageMap[image.get('name')] = image.get('href')
 
         return {
-            'username': 'mmf_%s' % user.get('id'),
+            'username': 'mmf_%s' % str(user.get('id')),
             'email': user.get('email'),
-            'fullname': '%s %s' % (user.get('display_name')),
+            'fullname': '%s' % (user.get('display_name')),
             'mapmyfitnessToken': token,
             'mapmyfitnessTokenSecret': tokenSecret,
             'first_name': user.get('first_name'),
             'last_name': user.get('last_name'),
             'gender': user.get('gender'),
-            'profile_url': None,
+            'profile_url': "http://www.mapmyfitness.com/profile/%s/" % str(user.get('id')),
             'medium_picture': '%s%s' % (self.MMF_BASE_URL, imageMap.get('medium')),
-            'normal_picture': '%s%s' % (self.MMF_BASE_URL, imageMap.get('large'))
+            'normal_picture': '%s%s' % (self.MMF_BASE_URL, imageMap.get('large')),
+            'integrationName': Integration.MAPMYFITNESS
         }
 
     def user_data(self, access_token, *args, **kwargs):

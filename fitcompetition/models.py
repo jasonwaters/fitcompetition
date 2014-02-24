@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 import operator
 import uuid
@@ -8,8 +8,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField, Sum, Q, Max, Count
-from fitcompetition import RunkeeperService
-from fitcompetition.RunkeeperService import RunkeeperException
+from fitcompetition.services import ExternalIntegrationException, getExternalIntegrationService, Activity, Integration
 from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
 from fitcompetition.templatetags.apptags import toMeters, toMiles
 from fitcompetition.util import ListUtil
@@ -17,7 +16,6 @@ from fitcompetition.util.ListUtil import createListFromProperty, attr
 import os
 import pytz
 from requests import RequestException
-from dateutil import parser
 
 # noinspection PyUnresolvedReferences
 import signals
@@ -66,12 +64,13 @@ class FitUser(AbstractUser):
     medium_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
     normal_picture = models.CharField(max_length=255, blank=True, null=True, default=None)
     phoneNumber = models.CharField(max_length=255, blank=True, null=True, default=None)
+    integrationName = models.CharField(verbose_name="Integration", max_length=255, blank=True, null=True, default=None)
 
-    lastHealthGraphUpdate = models.DateTimeField(blank=True, null=True, default=None)
+    lastExternalSyncDate = models.DateTimeField(verbose_name="Last Sync", blank=True, null=True, default=None)
     objects = FitUserManager()
 
     def __unicode__(self):
-        return self.fullname or "Unnamed User"
+        return "%s ( %s )" % (self.fullname or "Unnamed User", self.integrationName)
 
     @property
     def account(self):
@@ -97,38 +96,41 @@ class FitUser(AbstractUser):
     def is_authenticated(self):
         return True
 
-    def syncRunkeeperData(self, syncProfile=True):
-        successful = self.syncProfileWithRunkeeper() if syncProfile else True
-        successful = successful and FitnessActivity.objects.pruneActivities(self)
-        successful = successful and FitnessActivity.objects.syncActivities(self)
+    def syncExternalActivities(self):
+        successful = FitnessActivity.objects.syncActivities(self)
 
         if successful:
-            self.lastHealthGraphUpdate = datetime.now(tz=pytz.utc)
+            self.lastExternalSyncDate = datetime.now(tz=pytz.utc)
             self.save()
 
-    def syncProfileWithRunkeeper(self):
+    def pruneExternalActivities(self):
+        return FitnessActivity.objects.pruneActivities(self)
+
+    def syncExternalProfile(self):
         successful = True
         try:
-            profile = RunkeeperService.getUserProfile(self)
+            profile = getExternalIntegrationService(self).getUserProfile()
             self.medium_picture = profile.get('medium_picture')
             self.normal_picture = profile.get('normal_picture')
             self.gender = profile.get('gender')
-            self.profile_url = profile.get('profile')
+            self.profile_url = profile.get('profile_url')
             self.save()
-        except(RunkeeperException, RequestException), e:
+        except(ExternalIntegrationException, RequestException), e:
             if e.forbidden:
                 self.runkeeperToken = None
+                self.mapmyfitnessToken = None
+                self.mapmyfitnessTokenSecret = None
                 self.save()
             successful = False
 
         return successful
 
     def healthGraphStale(self):
-        if self.lastHealthGraphUpdate is None:
+        if self.lastExternalSyncDate is None:
             return True
 
         timeago = datetime.now(tz=pytz.utc) + relativedelta(minutes=-20)
-        return self.lastHealthGraphUpdate < timeago
+        return self.lastExternalSyncDate < timeago
 
     @property
     def lackingDetail(self):
@@ -522,18 +524,37 @@ class Challenger(models.Model):
 class FitnessActivityManager(models.Manager):
     def pruneActivities(self, user):
         successful = True
-        #delete the activities cached in the database that have been deleted on the health graph
-        try:
-            changelog = RunkeeperService.getChangeLog(user, modifiedSince=user.lastHealthGraphUpdate)
-            deletedActivities = changelog.get('fitness_activities', {}).get('deleted', [])
+        thirtyDaysAgo = datetime.now(tz=pytz.utc) + timedelta(days=-30)
+        service = getExternalIntegrationService(user)
 
-            for deletedUri in deletedActivities:
-                try:
-                    activity = FitnessActivity.objects.get(uri=deletedUri)
-                    activity.delete()
-                except FitnessActivity.DoesNotExist:
-                    pass
-        except(RunkeeperException, RequestException):
+        try:
+            if user.integrationName == Integration.RUNKEEPER:
+                #delete the activities cached in the database that have been deleted on the health graph
+                changelog = service.getChangeLog(modifiedNoEarlierThan=thirtyDaysAgo)
+                deletedActivities = changelog.get('fitness_activities', {}).get('deleted', [])
+
+                for deletedUri in deletedActivities:
+                    try:
+                        activity = self.get(uri=deletedUri)
+                        activity.delete()
+                    except FitnessActivity.DoesNotExist:
+                        pass
+            elif user.integrationName == Integration.MAPMYFITNESS:
+                apiActivities = service.getFitnessActivities(noEarlierThan=thirtyDaysAgo)
+                dbActivities = self.filter(user=user, date__gt=thirtyDaysAgo)
+
+                if len(apiActivities) != len(dbActivities):
+                    uris = {}
+                    for apiActivity in apiActivities:
+                        uri = apiActivity.get('_links').get('self')[0].get('href')
+                        uris[uri] = True
+
+                    for dbActivity in dbActivities:
+                        if not uris.get(dbActivity.uri, False):
+                            #it was deleted from mapmyfitness
+                            dbActivity.delete()
+
+        except(ExternalIntegrationException, RequestException):
             successful = False
 
         return successful
@@ -542,17 +563,22 @@ class FitnessActivityManager(models.Manager):
         successful = True
         #populate the database with activities from the health graph
         try:
-            activities = RunkeeperService.getFitnessActivities(user, modifiedSince=user.lastHealthGraphUpdate)
+            activities = getExternalIntegrationService(user).getFitnessActivities(modifiedSince=user.lastExternalSyncDate)
             for activity in activities:
+                activity = Activity(activity, user.integrationName)
+
                 type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
+
                 dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
                 dbo.type = type
                 dbo.duration = activity.get('duration')
-                dbo.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
-                dbo.calories = activity.get('total_calories')
-                dbo.distance = activity.get('total_distance')
+                dbo.date = activity.get('date')
+                dbo.calories = activity.get('calories')
+                dbo.distance = activity.get('distance')
+                dbo.hasEvidence = activity.get('hasEvidence')
                 dbo.save()
-        except (RunkeeperException, RequestException) as e:
+
+        except (ExternalIntegrationException, RequestException) as e:
             successful = False
 
         return successful
@@ -573,6 +599,7 @@ class FitnessActivity(models.Model):
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
     photo = models.ImageField(upload_to=get_file_path, default=None, null=True)
+    hasEvidence = models.BooleanField(default=False)
 
     objects = FitnessActivityManager()
 

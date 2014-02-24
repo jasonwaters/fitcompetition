@@ -375,3 +375,8 @@ input[name=activity-image] {
 	display: none;
 	height: 0;
 }
+
+.user-photo img {
+	max-width: 300px;
+	height: auto;
+}

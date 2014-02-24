@@ -4,6 +4,7 @@ from social import exceptions as social_exceptions
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
 
+
 class SocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
     def process_exception(self, request, exception):
         if hasattr(social_exceptions, exception.__class__.__name__):
@@ -11,8 +12,8 @@ class SocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
                 'errorMessage': 'There was an authentication error.',
                 'errorDetails': str(exception)
             })
-        else:
-            raise exception
+        # else:
+        #     raise exception
 
 
 SSL = 'SSL'

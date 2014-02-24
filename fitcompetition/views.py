@@ -98,9 +98,9 @@ def challenge(request, id):
 
     if competitor and challenge.startdate <= now <= challenge.enddate:
         if request.user.healthGraphStale():
-            request.user.syncRunkeeperData(syncProfile=False)
+            request.user.syncExternalActivities()
         else:
-            tasks.syncRunkeeperData.delay(request.user.id, syncProfile=False)
+            tasks.syncExternalActivities.delay(request.user.id)
 
     approvedTypes = challenge.approvedActivities.all()
 

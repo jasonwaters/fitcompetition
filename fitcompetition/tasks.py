@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.utils import timezone
 from fitcompetition.celery import app
 from fitcompetition.email import EmailFactory
@@ -7,20 +8,57 @@ import pytz
 
 
 @app.task(ignore_result=True)
-def syncRunkeeperData(user_id, syncProfile=True):
+def syncExternalProfile(user_id):
     try:
         user = FitUser.objects.get(id=user_id)
-        user.syncRunkeeperData(syncProfile=syncProfile)
+        user.syncExternalProfile()
     except FitUser.DoesNotExist:
         pass
 
+
+@app.task(ignore_result=True)
+def syncExternalActivities(user_id):
+    try:
+        user = FitUser.objects.get(id=user_id)
+        user.syncExternalActivities()
+    except FitUser.DoesNotExist:
+        pass
+
+
+@app.task(ignore_result=True)
+def pruneExternalActivities(user_id):
+    try:
+        user = FitUser.objects.get(id=user_id)
+        user.pruneExternalActivities()
+    except FitUser.DoesNotExist:
+        pass
+
+
+@app.task(ignore_result=True)
+def syncExternalData(user_id, syncActivities=True, syncProfile=False, pruneActivities=False):
+
+    if syncProfile:
+        syncExternalProfile.delay(user_id)
+
+    if syncActivities:
+        syncExternalActivities.delay(user_id)
+
+    if pruneActivities:
+        pruneExternalActivities.delay(user_id)
+
+
 #hourly
 @app.task(ignore_result=True)
-def syncRunkeeperDataAllUsers():
-    users = FitUser.objects.exclude(runkeeperToken__isnull=True).exclude(runkeeperToken__exact='')
+def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False):
+    filter = Q()
+
+    filter |= Q(runkeeperToken__isnull=False)
+    filter |= Q(mapmyfitnessToken__isnull=False)
+
+    users = FitUser.objects.filter(filter)
 
     for user in users:
-        syncRunkeeperData.delay(user.id)
+        syncExternalData.delay(user.id, syncActivities=syncActivities, syncProfile=syncProfile, pruneActivities=pruneActivities)
 
 
 #daily

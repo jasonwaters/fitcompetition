@@ -21,13 +21,29 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
     CELERYBEAT_SCHEDULE={
-        "sync-runkeeper-data-hourly": {
-            "task": "fitcompetition.tasks.syncRunkeeperDataAllUsers",
-            "schedule": crontab(minute=0, hour='*/1')
+        "sync-external-activities-hourly": {
+            "task": "fitcompetition.tasks.syncExternalDataAllUsers",
+            "schedule": crontab(minute=0, hour='*/1'),
+            "kwargs": {
+                'syncActivities': True,
+                'syncProfile': False,
+                'pruneActivities': False
+            }
         },
+
+        "sync-profile-prune-external-activities-daily": {
+            "task": "fitcompetition.tasks.syncExternalDataAllUsers",
+            "schedule": crontab(minute=0, hour=0),
+            "kwargs": {
+                'syncActivities': False,
+                'syncProfile': True,
+                'pruneActivities': True
+            }
+        },
+
         "send-challenge-notifications-daily": {
             "task": "fitcompetition.tasks.sendChallengeNotifications",
-            "schedule": crontab(minute=0, hour=0)
+            "schedule": crontab(minute=0, hour=0),
         }
     }
 )

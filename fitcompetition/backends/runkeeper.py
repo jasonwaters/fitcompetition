@@ -1,3 +1,4 @@
+from fitcompetition.services import Integration
 from social.backends.oauth import BaseOAuth2
 
 
@@ -49,7 +50,8 @@ class RunkeeperOauth2(BaseOAuth2):
             'gender': gender,
             'profile_url': profile_url,
             'medium_picture': medium_picture,
-            'normal_picture': normal_picture
+            'normal_picture': normal_picture,
+            'integrationName': Integration.RUNKEEPER
         }
 
     def user_data(self, access_token, *args, **kwargs):
