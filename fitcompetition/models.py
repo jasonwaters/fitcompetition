@@ -350,10 +350,13 @@ class Challenge(models.Model):
             teams = self.rankedTeams
 
             if self.isStyleWinnerTakesAll:
-                topTeam = list(teams[:1])[0]
-
-                if toMiles(topTeam.averageDistance) > self.distance:
-                    return topTeam.members.all()
+                try:
+                    topTeam = list(teams[:1])[0]
+                    if toMiles(topTeam.averageDistance) > self.distance:
+                        return topTeam.members.all()
+                except IndexError:
+                    #if there are no teams for the challenge
+                    pass
 
                 return list()
             elif self.isStyleAllCanWin:
