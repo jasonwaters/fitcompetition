@@ -95,8 +95,8 @@ def withdraw_challenge(request, id):
 
 
 def subscribeToMailingList(user):
-    api_key = getattr(settings, 'MAILCHIMP_API_KEY')
-    list_id = getattr(settings, 'MAILCHIMP_LIST_ID')
+    api_key = getattr(settings, 'MAILCHIMP_API_KEY', None)
+    list_id = getattr(settings, 'MAILCHIMP_LIST_ID', None)
 
     if api_key is not None and list_id is not None:
         m = mailchimp.Mailchimp(api_key)
