@@ -22,11 +22,15 @@ class ExternalIntegrationException(Exception):
     def forbidden(self):
         return self.status_code == 403
 
+    @property
+    def unauthorized(self):
+        return self.status_code == 401
+
 
 def getExternalIntegrationService(user):
-    if user.integrationName == Integration.RUNKEEPER and user.runkeeperToken is not None and len(user.runkeeperToken) > 0:
+    if user.integrationName == Integration.RUNKEEPER:
         return RunkeeperService(user)
-    elif user.integrationName == Integration.MAPMYFITNESS and user.mapmyfitnessToken is not None and len(user.mapmyfitnessToken) > 0:
+    elif user.integrationName == Integration.MAPMYFITNESS:
         return MapMyFitnessService(user)
 
 
@@ -70,7 +74,10 @@ class Activity(object):
             self.uri = activity.get('uri')
             self.type = activity.get('type')
             self.duration = activity.get('duration')
+
+            #translate the date to mst, since runkeeper gives plain jane utc
             self.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
+
             self.calories = activity.get('total_calories')
             self.distance = activity.get('total_distance')
             self.hasEvidence = activity.get('has_path')
@@ -138,12 +145,9 @@ class Activity(object):
             self.uri = links.get('self')[0].get('href')
             self.duration = aggregates.get('elapsed_time_total')
 
-            #activities are stored in utc time but based on the user's local time. We do some date manipulation here to comply with how
-            #runkeeper stores their dates, for better or worse.
-
+            #preserve the timezone entered by the user in MapmyFitness
             activityTimezone = pytz.timezone(activity.get('start_locale_timezone'))
             self.date = activityTimezone.normalize(parser.parse(activity.get('start_datetime')).astimezone(pytz.utc))
-            self.date = datetime(self.date.year, self.date.month, self.date.day, self.date.hour, self.date.minute, self.date.second, tzinfo=pytz.utc)
 
             self.calories = aggregates.get('metabolic_engergy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
@@ -176,6 +180,9 @@ class RunkeeperService(object):
     def __init__(self, user):
         self.user = user
         super(RunkeeperService, self).__init__()
+
+    def hasTokens(self):
+        return self.user.runkeeperToken is not None and len(self.user.runkeeperToken) > 0
 
     def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None):
         params = {
@@ -257,6 +264,9 @@ class MapMyFitnessService:
                             unicode(user.mapmyfitnessTokenSecret),
                             signature_type='AUTH_HEADER')
 
+    def hasTokens(self):
+        return self.user.mapmyfitnessToken is not None and len(self.user.mapmyfitnessToken) > 0
+
     def getOutput(self, json):
         return json.get('result').get('output')
 
@@ -302,7 +312,7 @@ class MapMyFitnessService:
 
     def getActivityTypes(self, url='/v7.0/activity_type/'):
         r = requests.get('%s%s' % (self.API_URL, url), auth=self.oauth, params={
-            'limit': 40
+            'limit': 1000
         })
 
         if r.status_code != 200:

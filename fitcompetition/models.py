@@ -116,14 +116,17 @@ class FitUser(AbstractUser):
             self.profile_url = profile.get('profile_url')
             self.save()
         except(ExternalIntegrationException, RequestException), e:
-            if e.forbidden:
-                self.runkeeperToken = None
-                self.mapmyfitnessToken = None
-                self.mapmyfitnessTokenSecret = None
-                self.save()
             successful = False
+            if e.forbidden or e.unauthorized:
+                self.stripTokens()
 
         return successful
+
+    def stripTokens(self):
+        self.runkeeperToken = None
+        self.mapmyfitnessToken = None
+        self.mapmyfitnessTokenSecret = None
+        self.save()
 
     def healthGraphStale(self):
         if self.lastExternalSyncDate is None:
@@ -439,7 +442,7 @@ class Challenge(models.Model):
 
         self.startdate = startdate
         self.enddate = enddate
-        self.middate = startdate + ((enddate-startdate)/2)
+        self.middate = startdate + ((enddate - startdate) / 2)
 
         super(Challenge, self).save(force_insert, force_update, using, update_fields)
 
@@ -557,8 +560,10 @@ class FitnessActivityManager(models.Manager):
                             #it was deleted from mapmyfitness
                             dbActivity.delete()
 
-        except(ExternalIntegrationException, RequestException):
+        except(ExternalIntegrationException, RequestException), e:
             successful = False
+            if e.forbidden or e.unauthorized:
+                user.stripTokens()
 
         return successful
 
@@ -581,8 +586,10 @@ class FitnessActivityManager(models.Manager):
                 dbo.hasEvidence = activity.get('hasEvidence')
                 dbo.save()
 
-        except (ExternalIntegrationException, RequestException) as e:
+        except (ExternalIntegrationException, RequestException), e:
             successful = False
+            if e.forbidden or e.unauthorized:
+                user.stripTokens()
 
         return successful
 
@@ -647,7 +654,7 @@ class TransactionManager(models.Manager):
         self.create(date=now,
                     account=account,
                     description="Withdrawal",
-                    amount=math.fabs(amount)*-1,
+                    amount=math.fabs(amount) * -1,
                     isCashflow=True)
 
 
