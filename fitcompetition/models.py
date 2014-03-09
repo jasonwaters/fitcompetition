@@ -162,9 +162,14 @@ class ChallengeManager(models.Manager):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         return self.annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('startdate', '-num_players')
 
-    def pastChallenges(self):
+    def pastChallenges(self, daysAgo=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(enddate__lt=now).order_by('-startdate')
+        filters = Q(enddate__lt=now)
+
+        if daysAgo is not None:
+            filters &= Q(enddate__gt=now-timedelta(days=daysAgo))
+
+        return self.annotate(num_players=Count('players')).filter(filters).order_by('-startdate')
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -389,11 +394,11 @@ class Challenge(models.Model):
         return dateFilter & typeFilter
 
     def getRecentActivities(self):
-        now = datetime.now(tz=pytz.utc)
+        now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         yesterday = now + relativedelta(hours=-24)
 
         filter = self.getActivitiesFilter(generic=True)
-        filter = filter & Q(date__gt=yesterday.date()) & Q(user__in=self.challengers)
+        filter = filter & Q(date__gt=yesterday) & Q(user__in=self.challengers)
 
         return FitnessActivity.objects.filter(filter).order_by('-date')
 

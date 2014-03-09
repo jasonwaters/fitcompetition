@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'grappelli',
+    'rest_framework',
     'django.contrib.admin',
     'social.apps.django_app.default',
     'south',
@@ -128,6 +129,13 @@ INSTALLED_APPS = (
     'seacucumber',
     'fitcompetition',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
 PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
@@ -147,6 +155,8 @@ PIPELINE_JS = {
     'all-js': {
         'source_filenames': (
             'js/jquery.js',
+            # 'js/angular.js',
+            # 'js/angular-ui-bootstrap-tpls.js',
             'js/jquery.cookie.js',
             'js/jquery.validate.js',
             'js/additional-methods.js',

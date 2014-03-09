@@ -2,12 +2,22 @@ import base64
 import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
+from fitcompetition.serializers import ChallengeSerializer
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team, FitnessActivity
 from django.conf import settings
 import mailchimp
+from rest_framework import viewsets
+
+
+class ChallengeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows challenges to be viewed or edited.
+    """
+    queryset = Challenge.objects.all()
+    serializer_class = ChallengeSerializer
 
 
 def addChallenger(challenge_id, user):

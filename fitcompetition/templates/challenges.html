@@ -11,12 +11,24 @@
     </div>
 
     <p class="lead">
-		Fit Crown is a social exercise game you play with your friends.  Join an exercise challenge and put some cash in the pot.  Then, log your miles with Runkeeper or MapmyFitness.  If you go the distance before the challenge ends you get a piece of the pot!
+		Fit Crown is a social exercise game you play with your friends.  Join an exercise challenge and put some cash in the pot.  Then, log your miles with your favorite app.  If you go the distance before the challenge ends you get a piece of the pot!
 	</p>
 	<p><a href="{% url 'faq' %}">What's this all about?</a></p>
+
 	{% include "inclusions/player_email.html" %}
 	{% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
     {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
 	<h3 class="text-centered">${{ totalPaid|intcomma }} paid out to winners!</h3>
+	<div class="well supported-apps">
+		<div class="apps-grid">
+			<h4>Track your miles with one of these great fitness tracking apps:</h4>
+			<div class="app-icon runkeeper"><span><a href="http://runkeeper.com" target="_blank">Runkeeper</a></span></div>
+			<div class="app-icon mapmyfitness"><span><a href="http://www.mapmyfitness.com" target="_blank">MapMyFitness</a></span></div>
+			<div class="app-icon mapmyrun"><span><a href="http://www.mapmyrun.com" target="_blank">MapMyRun</a></span></div>
+			<div class="app-icon mapmywalk"><span><a href="http://www.mapmywalk.com" target="_blank">MapMyWalk</a></span></div>
+			<div class="app-icon mapmyhike"><span><a href="http://www.mapmyhike.com" target="_blank">MapMyHike</a></span></div>
+			<div class="app-icon mapmyride"><span><a href="http://www.mapmyride.com" target="_blank">MapMyRide</a></span></div>
+		</div>
+	</div>
     {% challenges_table user pastChallenges "Recently Ended" "fa fa-flag-checkered" True %}
 {% endblock %}

@@ -260,6 +260,23 @@ tr.team .team-total {
 	margin-bottom: 10px;
 }
 
+.btn-sign-in .logo {
+	display: inline-block;
+}
+
+.btn-sign-in.runkeeper .logo {
+	background: url('/static/img/runkeeper-logo.png') no-repeat;
+	width: 230px;
+	height: 68px;
+}
+
+.btn-sign-in.mapmyfitness .logo {
+	background: url('/static/img/mapmyfitness-logo.png') no-repeat;
+	width: 230px;
+	height: 67px;
+
+}
+
 .list-challenges.dimmed {
 	color: #a9a9a9;
 }
@@ -379,4 +396,57 @@ input[name=activity-image] {
 .user-photo img {
 	max-width: 300px;
 	height: auto;
+}
+
+.supported-apps {
+	margin-top: 30px;
+}
+
+.apps-grid {
+	max-width: 680px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.app-icon {
+	width: 100px;
+	height: 120px;
+	display: inline-block;
+	margin: 5px;
+	position: relative;
+}
+
+.app-icon a {
+	color: black;
+	text-shadow: 1px 1px 1px #ccc;
+}
+
+.app-icon span {
+	position: absolute;
+	top: 105px;
+	left: 0px;
+	text-align: center;
+	width: 100px;
+	color: black;
+	text-shadow: 1px 1px 1px #ccc;
+}
+
+.app-icon.runkeeper {
+	background: url('/static/img/app_runkeeper.png') no-repeat;
+}
+
+.app-icon.mapmyfitness {
+	background: url('/static/img/app_mapmyfitness.png') no-repeat;
+}
+.app-icon.mapmyrun {
+	background: url('/static/img/app_mapmyrun.png') no-repeat;
+}
+.app-icon.mapmywalk {
+	background: url('/static/img/app_mapmywalk.png') no-repeat;
+}
+.app-icon.mapmyhike {
+	background: url('/static/img/app_mapmyhike.png') no-repeat;
+}
+.app-icon.mapmyride {
+	background: url('/static/img/app_mapmyride.png') no-repeat;
 }

@@ -1,6 +1,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -14,7 +15,7 @@ import pytz
 def challenges(request):
     currentChallenges = Challenge.objects.currentChallenges()
     upcomingChallenges = Challenge.objects.upcomingChallenges()
-    pastChallenges = Challenge.objects.pastChallenges()
+    pastChallenges = Challenge.objects.pastChallenges(daysAgo=60)
 
     challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'), totalWinnerCount=Sum('numWinners'))
 

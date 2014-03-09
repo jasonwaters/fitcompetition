@@ -54,10 +54,10 @@
 			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 				{% if not challenge.hasStarted %}
 					<div class="challenge-label">Starts on</div>
-					<div class="challenge-value">{{ challenge.startdate|date:"N j" }}</div>
+					<div class="challenge-value">{{ challenge.startdate|date:"l, N j" }}</div>
 				{% elif not challenge.hasEnded %}
 					<div class="challenge-label">Ends on</div>
-					<div class="challenge-value">{{ challenge.enddate|date:"N j" }}</div>
+					<div class="challenge-value">{{ challenge.enddate|date:"l, N j" }}</div>
 				{% else %}
 					<div class="challenge-label">Ended on</div>
 					<div class="challenge-value">{{ challenge.enddate|date:"N j, y" }}</div>
@@ -247,7 +247,7 @@
 				{% if challenge.isTypeIndividual %}
 					<ul>
 						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapmyFitness">MapmyFitness</a>.</li>
+						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapMyFitness">MapMyFitness</a>.</li>
 						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
 						<li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
 					</ul>
@@ -255,7 +255,7 @@
 					<ul>
 						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
 						<li>Join a team.  Teams can have a maximum of 5 players.</li>
-						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapmyFitness">MapmyFitness</a>.</li>
+						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapMyFitness">MapMyFitness</a>.</li>
 						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
 						<li>A team can only win if everyone on the team has completed the {{ challenge.distance|floatformat:"-1" }} mile challenge.</li>
 						<li>Get Paid. The team with the highest average miles per player wins the challenge.  The money pot is dispersed evenly to members of that team.</li>
