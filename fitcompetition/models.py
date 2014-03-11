@@ -66,18 +66,13 @@ class FitUser(AbstractUser):
     phoneNumber = models.CharField(max_length=255, blank=True, null=True, default=None)
     integrationName = models.CharField(verbose_name="Integration", max_length=255, blank=True, null=True, default=None)
 
+    account = models.ForeignKey('Account', blank=True, null=True, default=None)
+
     lastExternalSyncDate = models.DateTimeField(verbose_name="Last Sync", blank=True, null=True, default=None)
     objects = FitUserManager()
 
     def __unicode__(self):
         return "%s ( %s )" % (self.fullname or "Unnamed User", self.integrationName)
-
-    @property
-    def account(self):
-        try:
-            return Account.objects.get(user=self)
-        except Account.DoesNotExist:
-            return None
 
     @property
     def delinquent(self):
@@ -87,11 +82,6 @@ class FitUser(AbstractUser):
         filter = challenge.getActivitiesFilter(generic=True) & Q(user=self)
         result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
         return result.get('distance__sum') if result.get('distance__sum') is not None else 0
-
-    @property
-    def balance(self):
-        result = Transaction.objects.filter(user=self).aggregate(balance=Sum('amount'))
-        return ListUtil.attr(result, 'balance', 0)
 
     def is_authenticated(self):
         return True
@@ -247,14 +237,9 @@ class Challenge(models.Model):
     numWinners = models.IntegerField(blank=True, null=True, default=0)
     totalDisbursed = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
 
-    objects = ChallengeManager()
+    account = models.ForeignKey('Account', blank=True, null=True, default=None)
 
-    @property
-    def account(self):
-        try:
-            return Account.objects.get(challenge=self)
-        except Account.DoesNotExist:
-            return None
+    objects = ChallengeManager()
 
     @property
     def isTypeIndividual(self):
@@ -438,16 +423,13 @@ class Challenge(models.Model):
             raise ValidationError("Start Date must be before End Date")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-
         startdate = pytz.timezone(TIME_ZONE).normalize(self.startdate)
         enddate = pytz.timezone(TIME_ZONE).normalize(self.enddate)
 
-        startdate.replace(hour=0, minute=0, second=0)
-        enddate.replace(hour=23, minute=59, second=59)
+        self.startdate = startdate.replace(hour=0, minute=0, second=0)
+        self.enddate = enddate.replace(hour=23, minute=59, second=59)
 
-        self.startdate = startdate
-        self.enddate = enddate
-        self.middate = startdate + ((enddate - startdate) / 2)
+        self.middate = self.startdate + ((self.enddate - self.startdate) / 2)
 
         super(Challenge, self).save(force_insert, force_update, using, update_fields)
 
@@ -621,13 +603,14 @@ class FitnessActivity(models.Model):
 
 class Account(models.Model):
     description = models.CharField(max_length=255)
-    user = models.ForeignKey(FitUser, blank=True, null=True, default=None)
-    challenge = models.ForeignKey(Challenge, blank=True, null=True, default=None)
 
     @property
     def balance(self):
         result = Transaction.objects.filter(account=self).aggregate(balance=Sum('amount'))
         return ListUtil.attr(result, 'balance', 0.0)
+
+    def __unicode__(self):
+        return "%s ( $%s )" % (self.description, self.balance)
 
 
 class TransactionManager(models.Manager):

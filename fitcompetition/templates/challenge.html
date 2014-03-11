@@ -123,7 +123,7 @@
                 <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button" data-toggle="tooltip" data-placement="top" data-html="true" data-title="Go ahead, take the plunge.<br/>You can always change your mind later.">Join this Challenge</button>
             {% endif %}
         {% else %}
-            <a class="vertical-padding btn btn-primary btn-lg" href="{% url 'social:begin' 'runkeeper' %}?next={{ request.path }}">Sign In to Play</a>
+            <a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Sign In to Play</a>
         {% endif %}
 	{% elif canSwitchTeams %}
 		<div class="btn-group vertical-padding ">

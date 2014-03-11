@@ -14,30 +14,38 @@ def save_new_transaction(sender, **kwargs):
     if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Transaction')):
         transaction = kwargs['instance']
         account = transaction.account
-        user = account.user
-        if user and transaction.isCashflow and transaction.amount > 0:
-            EmailFactory().cashDeposit(transaction, account, user)
+
+        try:
+            user = account.fituser_set.all().order_by('-last_login')[0]
+
+            if user and transaction.isCashflow and transaction.amount > 0:
+                EmailFactory().cashDeposit(transaction, account, user)
+        except IndexError:
+            pass
+
 
 
 @receiver(post_save, sender=getModel('Challenge'))
 def save_new_challenge(sender, **kwargs):
     if kwargs.get('created') and isinstance(kwargs['instance'], getModel('Challenge')):
         challenge = kwargs['instance']
-        account, created = getModel('Account').objects.get_or_create(challenge=challenge)
-        if created:
-            account.description = "Challenge Account: %s" % challenge.name
-            account.save()
+        if challenge.account is None:
+            account = getModel('Account').objects.create(description="Challenge Account: %s" % challenge.name)
+
+            challenge.account = account
+            challenge.save()
 
 
 @receiver(post_save, sender=getModel('FitUser'))
 def save_new_user(sender, **kwargs):
     if kwargs.get('created') and isinstance(kwargs['instance'], getModel('FitUser')):
         user = kwargs['instance']
-        account, created = getModel('Account').objects.get_or_create(user=user)
 
-        if created:
-            account.description = "User Account: %s" % user.fullname
-            account.save()
+        if user.account is None:
+            account = getModel('Account').objects.create(description = "User Account: %s" % user.fullname)
+
+            user.account = account
+            user.save()
 
 
 @receiver(post_save, sender=getModel('Challenger'))

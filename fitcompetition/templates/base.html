@@ -56,8 +56,8 @@
                         <h4 class="modal-title">Sign In With&hellip;</h4>
                     </div>
                     <div class="modal-body">
-                        <a class="btn btn-default btn-standard btn-sign-in runkeeper" href="{% url 'social:begin' 'runkeeper' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In with Runkeeper"><div class="logo"></div></a>
-                        <a class="btn btn-default btn-standard btn-sign-in mapmyfitness" href="{% url 'social:begin' 'mapmyfitness' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" title="Sign In with Map My Run"><div class="logo"></div></a>
+                        <a class="btn btn-default btn-standard btn-sign-in runkeeper" href="{% url 'social:begin' 'runkeeper' %}?next={{ request.path }}" title="Sign In with Runkeeper"><div class="logo"></div></a>
+                        <a class="btn btn-default btn-standard btn-sign-in mapmyfitness" href="{% url 'social:begin' 'mapmyfitness' %}?next={{ request.path }}" title="Sign In with Map My Run"><div class="logo"></div></a>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

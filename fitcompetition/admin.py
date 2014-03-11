@@ -41,10 +41,43 @@ class ChallengeAdmin(admin.ModelAdmin):
 class FitUserAdmin(UserAdmin):
     list_display = ('fullname', 'email', 'phoneNumber', 'profile_url', 'lastExternalSyncDate', 'integrationName', 'date_joined')
     ordering = ('fullname', 'integrationName')
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('account',)}),
+    )
 
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('description', 'balance', 'user', 'challenge')
+
+    def users(self):
+        def getAdminUrl(user):
+            return "/admin/fitcompetition/fituser/%s/" % user.id
+
+        html = "<ul>"
+
+        for user in FitUser.objects.filter(account__id__exact=self.id):
+            html += '<li><a href="%s">%s ( %s )</a></li>' % (getAdminUrl(user), user.fullname, user.integrationName)
+
+        html += "</ul>"
+
+        return html
+
+    def challenges(self):
+        def getAdminUrl(challenge):
+            return "/admin/fitcompetition/challenge/%s/" % challenge.id
+
+        html = "<ul>"
+
+        for challenge in Challenge.objects.filter(account__id__exact=self.id):
+            html += '<li><a href="%s">%s</a></li>' % (getAdminUrl(challenge), challenge.name)
+
+        html += "</ul>"
+
+        return html
+
+    users.allow_tags = True
+    challenges.allow_tags = True
+
+    list_display = ('description', 'balance', users, challenges)
     inlines = (TransactionInline,)
     ordering = ('description',)
 
