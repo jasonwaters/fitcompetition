@@ -5,7 +5,7 @@
 {% block content %}
 	<p>Hey {{user.first_name}}!</p>
 
-	<p>Congratulations! You joined the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge  on Fit Crown.  Here's the details:</p>
+	<p>Welcome to the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge on Fit Crown!  Here's the details:</p>
 	<ul>
 		<li>
 			{% if challenge.isTypeIndividual %}
@@ -28,7 +28,7 @@
 	</ul>
 	<p>
 		{% if user.account.balance < 0 %}
-			You owe {{ user.account.balance|abs|currency }}.  <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a>.
+			You owe {{ user.account.balance|abs|currency }}.  It's easy to <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a>.
 		{% endif %}
 	</p>
 {% endblock %}
