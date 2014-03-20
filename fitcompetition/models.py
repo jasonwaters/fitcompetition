@@ -558,20 +558,24 @@ class FitnessActivityManager(models.Manager):
         successful = True
         #populate the database with activities from the health graph
         try:
-            activities = getExternalIntegrationService(user).getFitnessActivities(modifiedSince=user.lastExternalSyncDate)
-            for activity in activities:
-                activity = Activity(activity, user.integrationName)
+            next = {'hasMore': True, 'url': None}
 
-                type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
+            while next.get('hasMore'):
+                activities, next = getExternalIntegrationService(user).getFitnessActivities(modifiedSince=user.lastExternalSyncDate, url=next.get('url'))
 
-                dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
-                dbo.type = type
-                dbo.duration = activity.get('duration')
-                dbo.date = activity.get('date')
-                dbo.calories = activity.get('calories')
-                dbo.distance = activity.get('distance')
-                dbo.hasEvidence = activity.get('hasEvidence')
-                dbo.save()
+                for activity in activities:
+                    activity = Activity(activity, user.integrationName)
+
+                    type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
+
+                    dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
+                    dbo.type = type
+                    dbo.duration = activity.get('duration')
+                    dbo.date = activity.get('date')
+                    dbo.calories = activity.get('calories')
+                    dbo.distance = activity.get('distance')
+                    dbo.hasEvidence = activity.get('hasEvidence')
+                    dbo.save()
 
         except (ExternalIntegrationException, RequestException), e:
             successful = False

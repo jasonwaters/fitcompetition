@@ -12,6 +12,10 @@ class Integration(object):
     RUNKEEPER = "Runkeeper"
     MAPMYFITNESS = "MapmyFitness"
 
+    @staticmethod
+    def all():
+        return [Integration.RUNKEEPER, Integration.MAPMYFITNESS]
+
 
 class ExternalIntegrationException(Exception):
     def __init__(self, message, status_code=None, **kwargs):
@@ -143,7 +147,7 @@ class Activity(object):
 
             self.type = types.get(activity_type_id, self.OTHER)
             self.uri = links.get('self')[0].get('href')
-            self.duration = aggregates.get('elapsed_time_total')
+            self.duration = aggregates.get('active_time_total')
 
             #preserve the timezone entered by the user in MapmyFitness
             activityTimezone = pytz.timezone(activity.get('start_locale_timezone'))
@@ -184,35 +188,46 @@ class RunkeeperService(object):
     def hasTokens(self):
         return self.user.runkeeperToken is not None and len(self.user.runkeeperToken) > 0
 
-    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None):
+    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
         params = {
             'access_token': self.user.runkeeperToken,
             'pageSize': 1000,
         }
 
-        if noEarlierThan is not None:
-            params['noEarlierThan'] = noEarlierThan.strftime('%Y-%m-%d')
+        if url is None:
+            if noEarlierThan is not None:
+                params['noEarlierThan'] = noEarlierThan.strftime('%Y-%m-%d')
 
-        if noLaterThan is not None:
-            params['noLaterThan'] = noLaterThan.strftime('%Y-%m-%d')
+            if noLaterThan is not None:
+                params['noLaterThan'] = noLaterThan.strftime('%Y-%m-%d')
 
-        headers = {}
+            headers = {}
 
-        if modifiedSince is not None:
-            modifiedSince = modifiedSince-timedelta(days=1)
-            headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            if modifiedSince is not None:
+                modifiedSince = modifiedSince - timedelta(days=1)
+                headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
-        url = "%s%s" % (self.RUNKEEPER_API_URL, self.FITNESS_ACTIVITIES)
-        r = requests.get(url, params=params, headers=headers)
+            url = "%s%s" % (self.RUNKEEPER_API_URL, self.FITNESS_ACTIVITIES)
+            r = requests.get(url, params=params, headers=headers)
+        else:
+            url = "%s%s" % (self.RUNKEEPER_API_URL, url)
+            r = requests.get(url, params=params)
+
+        more = {'hasMore': False, 'url': None}
 
         if r.status_code == 304:
             # status = 304 ~ not modified
-            return []
+            return [], more
         elif r.status_code != 200:
             raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
-        json = r.json()
-        return json.get('items', [])
+        result = r.json()
+
+        next = result.get('next', None)
+        if next is not None:
+            more = {'hasMore': True, 'url': next}
+
+        return result.get('items', []), more
 
     def getChangeLog(self, modifiedNoEarlierThan=None, modifiedNoLaterThan=None):
         params = {
@@ -270,28 +285,38 @@ class MapMyFitnessService:
     def getOutput(self, json):
         return json.get('result').get('output')
 
-    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None):
-        params = {
-            'limit': 1000,
-            'user': self.user.username.split('_')[-1],
-        }
+    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
+        if url is not None:
+            r = requests.get('%s%s' % (self.API_URL, url), auth=self.oauth)
+        else:
+            params = {
+                'limit': 1000,
+                'user': self.user.username.split('_')[-1],
+            }
 
-        if noEarlierThan is not None:
-            params['started_after'] = noEarlierThan
+            if noEarlierThan is not None:
+                params['started_after'] = noEarlierThan
 
-        if noLaterThan is not None:
-            params['started_before'] = noLaterThan
+            if noLaterThan is not None:
+                params['started_before'] = noLaterThan
 
-        if modifiedSince is not None:
-            params['updated_after'] = modifiedSince
+            if modifiedSince is not None:
+                params['updated_after'] = modifiedSince
 
-        r = requests.get('%s/v7.0/workout/' % self.API_URL, auth=self.oauth, params=params)
+            r = requests.get('%s/v7.0/workout/' % self.API_URL, auth=self.oauth, params=params)
 
         if r.status_code != 200:
             raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
         result = r.json()
-        return result.get('_embedded').get('workouts')
+        next = result.get('_links').get('next', [])
+
+        if len(next) > 0:
+            more = {'hasMore': True, 'url': next[0].get('href')}
+        else:
+            more = {'hasMore': False, 'url': None}
+
+        return result.get('_embedded').get('workouts'), more
 
     def getUserProfile(self):
         r = requests.get('%s/v7.0/user/self/' % self.API_URL, auth=self.oauth)

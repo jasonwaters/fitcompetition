@@ -3,6 +3,7 @@ from django.utils import timezone
 from fitcompetition.celery import app
 from fitcompetition.email import EmailFactory
 from fitcompetition.models import FitUser, Challenge
+from fitcompetition.services import Integration
 from fitcompetition.settings import TIME_ZONE
 import pytz
 
@@ -49,11 +50,17 @@ def syncExternalData(user_id, syncActivities=True, syncProfile=False, pruneActiv
 
 #hourly
 @app.task(ignore_result=True)
-def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False):
+def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False, integrations=None):
     filter = Q()
 
-    filter |= Q(runkeeperToken__isnull=False)
-    filter |= Q(mapmyfitnessToken__isnull=False)
+    if integrations is None:
+        integrations = Integration.all()
+
+    if Integration.RUNKEEPER in integrations:
+        filter |= Q(runkeeperToken__isnull=False)
+
+    if Integration.MAPMYFITNESS in integrations:
+        filter |= Q(mapmyfitnessToken__isnull=False)
 
     users = FitUser.objects.filter(filter)
 
