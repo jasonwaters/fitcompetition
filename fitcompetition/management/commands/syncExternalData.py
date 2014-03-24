@@ -26,10 +26,10 @@ class Command(BaseCommand):
 
         if overwrite:
             if service is not None:
-                FitnessActivity.objects.filter(user__integrationName=service).delete()
+                # FitnessActivity.objects.filter(user__integrationName=service).delete()
                 FitUser.objects.filter(integrationName=service).update(lastExternalSyncDate=None)
             else:
-                FitnessActivity.objects.all().delete()
+                # FitnessActivity.objects.all().delete()
                 FitUser.objects.all().update(lastExternalSyncDate=None)
 
         if service is not None:
