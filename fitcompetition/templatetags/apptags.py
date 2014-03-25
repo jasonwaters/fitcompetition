@@ -250,8 +250,8 @@ def times(number):
 def pastTense(value):
     return {
         'Running': 'ran',
-        'Cycling': 'cycled',
-        'Mountain Biking': 'mountain biked',
+        'Cycling': 'rode',
+        'Mountain Biking': 'rode',
         'Walking': 'walked',
         'Hiking': 'hiked',
         'Downhill Skiing': 'downhill skied',
