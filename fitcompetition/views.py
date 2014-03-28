@@ -115,7 +115,7 @@ def challenge(request, id):
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
         'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
-        'recentActivities': challenge.getRecentActivities(),
+        'recentActivities': challenge.getRecentActivities()[:5],
     }
 
     if challenge.isTypeIndividual:

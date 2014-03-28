@@ -568,14 +568,15 @@ class FitnessActivityManager(models.Manager):
 
                     type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
 
-                    dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
-                    dbo.type = type
-                    dbo.duration = activity.get('duration')
-                    dbo.date = activity.get('date')
-                    dbo.calories = activity.get('calories')
-                    dbo.distance = activity.get('distance')
-                    dbo.hasEvidence = activity.get('hasEvidence')
-                    dbo.save()
+                    if activity.get('distance') > 0:
+                        dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
+                        dbo.type = type
+                        dbo.duration = activity.get('duration')
+                        dbo.date = activity.get('date')
+                        dbo.calories = activity.get('calories')
+                        dbo.distance = activity.get('distance')
+                        dbo.hasEvidence = activity.get('hasEvidence')
+                        dbo.save()
 
         except (ExternalIntegrationException, RequestException), e:
             successful = False
