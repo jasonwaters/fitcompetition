@@ -132,9 +132,8 @@ INSTALLED_APPS = (
 
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'PAGINATE_BY': 40
 }
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
@@ -155,8 +154,9 @@ PIPELINE_JS = {
     'all-js': {
         'source_filenames': (
             'js/jquery.js',
-            # 'js/angular.js',
-            # 'js/angular-ui-bootstrap-tpls.js',
+            'js/angular.js',
+            'js/angular-resource.js',
+            'js/angular-ui-bootstrap-tpls.js',
             'js/jquery.cookie.js',
             'js/jquery.validate.js',
             'js/additional-methods.js',

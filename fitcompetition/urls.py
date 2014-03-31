@@ -1,7 +1,17 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from fitcompetition import ajax
+from fitcompetition.ajax import UserTransactionsList
+from rest_framework import routers
 
 admin.autodiscover()
+
+
+router = routers.DefaultRouter()
+router.register(r'activities', ajax.ActivityViewSet)
+router.register(r'users', ajax.UserViewSet)
+router.register(r'challenges', ajax.ChallengeViewSet)
+router.register(r'transactions', ajax.TransactionViewSet)
 
 urlpatterns = patterns('',
                        #VIEWS
@@ -34,5 +44,9 @@ urlpatterns = patterns('',
                        url(r'', include('social.apps.django_app.urls', namespace='social')),
                        url(r'^admin/', include(admin.site.urls)),
 
+
+                       #Django REST Framework
+                       url(r'^api/', include(router.urls)),
+                       url(r'^api/users/(?P<pk>\d+)/transactions$', UserTransactionsList.as_view(), name='usertransactions-list'),
                        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 )

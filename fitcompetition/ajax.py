@@ -2,14 +2,14 @@ import base64
 import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
-from fitcompetition.serializers import ChallengeSerializer
+from fitcompetition.serializers import ChallengeSerializer, ActivitySerializer, UserSerializer, TransactionSerializer
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from fitcompetition.models import Challenge, Team, FitnessActivity
+from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction
 from django.conf import settings
 import mailchimp
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 
 
 class ChallengeViewSet(viewsets.ModelViewSet):
@@ -143,3 +143,51 @@ def account_cash_out(request):
     EmailFactory().cashWithdrawal(request.user, paypalEmailAddress, cashValue)
 
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+#################################
+##  Django REST Framework views
+#################################
+
+class UserTransactionsList(generics.ListAPIView):
+    model = Transaction
+    serializer_class = TransactionSerializer
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super(UserTransactionsList, self).get_queryset()
+        user_pk = self.kwargs.get('pk')
+        user = FitUser.objects.get(pk=user_pk)
+        return queryset.filter(account=user.account).order_by('-date')
+
+
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows activities to be viewed or edited.
+    """
+    queryset = FitnessActivity.objects.all()
+    serializer_class = ActivitySerializer
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = FitUser.objects.all()
+    serializer_class = UserSerializer
+
+
+class ChallengeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows challenges to be viewed or edited.
+    """
+    queryset = Challenge.objects.all()
+    serializer_class = ChallengeSerializer
+
+
+class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows tranactions to be viewed or edited.
+    """
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer

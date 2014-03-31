@@ -503,7 +503,7 @@ class Team(models.Model):
 class Challenger(models.Model):
     fituser = models.ForeignKey(FitUser)
     challenge = models.ForeignKey(Challenge)
-    date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None)
+    date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None, auto_now_add=True)
 
     @property
     def user(self):
@@ -593,7 +593,7 @@ def get_file_path(instance, filename):
 
 
 class FitnessActivity(models.Model):
-    user = models.ForeignKey(FitUser)
+    user = models.ForeignKey(FitUser, related_name="activities")
     type = models.ForeignKey(ActivityType, blank=True, null=True, default=None)
     uri = models.CharField(max_length=255)
     duration = models.FloatField(blank=True, null=True, default=0)
@@ -604,6 +604,9 @@ class FitnessActivity(models.Model):
     hasEvidence = models.BooleanField(default=False)
 
     objects = FitnessActivityManager()
+
+    def __unicode__(self):
+        return "%s %s" % (self.type.name, self.date)
 
 
 class Account(models.Model):

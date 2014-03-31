@@ -5,102 +5,121 @@
 
 {% block head_title %}Account Summary{% endblock %}
 
+{% block ng_app %}account{% endblock %}
+
 {% block content %}
-    <div class="page-header">
-        <h2>Account Summary <small>Balance: {{ user.account.balance|currency }}</small></h2>
-    </div>
-
-    {% if user.account.balance > 0 %}
-        <div class="alert alert-info">
-            <p>You have a positive account balance.  You can join another challenge or cash out.</p>
-            <div class="top-padding">
-                <a href="{% url 'home' %}" class="btn btn-primary">Find a Challenge</a>
-                <button class="btn btn-link" data-toggle="modal" data-target="#modal-cash-out">Cash Out</button>
-            </div>
-        </div>
-
-		<div class="modal fade" id="modal-cash-out" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			<form id="cash_out_form" role="form">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="myModalLabel">Cash Out</h4>
-						</div>
-						<div class="modal-body">
-							<p>We use PayPal to securely send you money.  Just tell us the email address that is associated with your PayPal account and how much to send you.</p>
-							<fieldset>
-								{% csrf_token %}
-								<div class="form-group">
-									<label for="inputEmailAddress">PayPal Email Address</label>
-									<input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email" value="">
-								</div>
-								<div class="form-group">
-									<label for="inputEmailAddress">Amount to cash out.</label>
-									<input type="text" name="cashValue" id="inputCashValue" placeholder="Enter dollar amount" class="form-control">
-								</div>
-							</fieldset>
-							<p>After submitting this form, watch your PayPal account for a credit in the next few days.</p>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
-							<button type="submit" class="btn btn-primary">Cash Out</button>
-						</div>
-					</div><!-- /.modal-content -->
-				</div><!-- /.modal-dialog -->
-			</form>
-		</div><!-- /.modal -->
-		{% aggregate inline_javascript %}
-			<script type="text/javascript">
-				$(document).ready(function (jQuery) {
-					$("#cash_out_form").validate({
-						rules: {
-							emailAddress: {
-								email: true,
-								required: true
-							},
-							cashValue: {
-								number: true,
-								range: [1, {{ user.account.balance }}],
-								required: true
-							}
-						},
-						submitHandler: function(form) {
-							$('#modal-cash-out').modal('hide')
-							$.post('{% url 'account_cash_out' %}', $(form).serialize())
-						}
-					});
-				});
-			</script>
-		{% endaggregate %}
-    {% elif user.account.balance < 0 %}
-        <div class="alert alert-danger">
-            <p>You have a negative account balance.  It's time to settle up!  You can do that by following these steps:</p>
-            {% include "inclusions/paypal_instructions.html" %}
-        </div>
-    {% else %}
-        <div class="alert alert-info">
-            <p>Your account balance is zero.</p>
-			<div class="top-padding">
-				<a href="{% url 'home' %}" class="btn btn-primary">Find a Challenge</a>
+	{% verbatim %}
+		<div ng-controller="account-controller" ng-cloak>
+			<div class="page-header">
+				<h2>Account Summary <small ng-class="{red: user.account.balance<0}">Balance: {{ user.account.balance | currency }}</small></h2>
 			</div>
-        </div>
-    {% endif %}
-    <h3>Transactions</h3>
-    <table class="table table-striped">
-        <thead>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Amount</th>
-        </thead>
-        <tbody>
-            {% for transaction in transactions %}
-                <tr>
-                    <td title="{{ transaction.date }}">{{ transaction.date|naturalday:"F j, Y" }}</td>
-                    <td>{{ transaction.description }}</td>
-                    <td>{{ transaction.amount|currency }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+			<alert type="alertType">
+				<p>{{ alertMessage }}</p>
+				<div class="top-padding">
+					<a href="#" class="btn btn-primary">Find a Challenge</a>
+					<button class="btn btn-link">Cash Out</button>
+				</div>
+			</alert>
+
+			<h3>Transactions</h3>
+			<table class="table table-striped">
+				<thead>
+					<th>Date</th>
+					<th>Description</th>
+					<th>Amount</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="transaction in transactions | orderBy:'date':true">
+						<td title="{{ transaction.date }}">{{ transaction.date | date:"longDate"}}</td>
+						<td>{{ transaction.description }}</td>
+						<td ng-class="{red: transaction.amount<0}">{{ transaction.amount | currency }}</td>
+					</tr>
+				</tbody>
+			</table>
+			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" page="currentPage" items-per-page="10" on-select-page="setPage(page)"></pagination>
+		</div>
+	{% endverbatim %}
+
+	{% aggregate inline_javascript %}
+	<script type="text/javascript">
+		(function() {
+			"use strict";
+
+			var fcServices = angular.module('fcServices', ['ngResource']);
+
+			fcServices.factory('User', ['$resource', function($resource) {
+				return $resource('/api/users/:userID', {
+					userID: '@userID'
+				}, {
+					get: {
+						method: 'GET',
+						transformResponse: function(data, headers){
+							data = JSON.parse(data);
+							data.account.balance = parseFloat(data.account.balance);
+							return data;
+						}
+					}
+				});
+			}]);
+
+			fcServices.factory('UserTransactions', ['$resource', function($resource) {
+				return $resource('/api/users/:userID/transactions?page=:pageNumber', {
+					userID: '@userID',
+					pageNumber: '@pageNumber'
+				}, {
+					query: {
+						method: 'GET',
+						params: {
+							pageNumber: 1
+						},
+						transformResponse: function(data, headers){
+							data = JSON.parse(data);
+							var count = data.results.length;
+							for(var i=0;i<count;i++) {
+								data.results[i].date = new Date(data.results[i].date);
+								data.results[i].amount = parseFloat(data.results[i].amount);
+							}
+							return data;
+						}
+					}
+				});
+			}]);
+
+
+			var accountApp = angular.module('account', ['fcServices', 'ui.bootstrap']);
+
+			accountApp.controller('account-controller', ['$scope', 'User', 'UserTransactions', function($scope, User, UserTransactions) {
+				$scope.transactions = [];
+				$scope.alertType = "info";
+
+				var userID = 3;
+
+				$scope.setPage = function(pageNum) {
+					UserTransactions.query({userID: userID, pageNumber: pageNum}, function(response) {
+						$scope.transactions = response.results
+					});
+				};
+
+				User.get({userID: userID}, function(response) {
+					$scope.user = response;
+					if (response.account.balance >= 0) {
+						$scope.alertType = 'info';
+						$scope.alertMessage = "You have a positive account balance.  You can join another challenge or cash out."
+					}else {
+						$scope.alertType = 'danger';
+						$scope.alertMessage = "You have a negative account balance.  It's time to settle up!  You can do that by following these steps:"
+					}
+				});
+
+				UserTransactions.query({userID: userID}, function(response) {
+					$scope.totalTransactions = response.count;
+					$scope.transactions = response.results
+				});
+
+			}]);
+		})();
+	</script>
+	{% endaggregate %}
+
 {% endblock %}
