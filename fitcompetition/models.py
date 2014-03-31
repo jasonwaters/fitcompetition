@@ -193,8 +193,8 @@ def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilte
 
     if challenge.startdate <= now:
         users_with_activities = challengers.filter(activitiesFilter).annotate(
-            total_distance=Sum('fitnessactivity__distance', distinct=True),
-            latest_activity_date=Max('fitnessactivity__date')).order_by('-total_distance')
+            total_distance=Sum('activities__distance', distinct=True),
+            latest_activity_date=Max('activities__date')).order_by('-total_distance')
 
         activitySet = set(user.id for user in users_with_activities)
 
@@ -332,8 +332,8 @@ class Challenge(models.Model):
 
     def getAchievers(self):
         if self.isTypeIndividual:
-            winners = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
-                                                                                   latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
+            winners = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('activities__distance', distinct=True),
+                                                                                   latest_activity_date=Max('activities__date')).exclude(total_distance__lt=toMeters(self.distance))
 
             if self.isStyleWinnerTakesAll:
                 return winners[:1]
@@ -365,7 +365,7 @@ class Challenge(models.Model):
             if generic:
                 return name
             else:
-                return 'fitnessactivity__%s' % name
+                return 'activities__%s' % name
 
         approvedTypes = self.approvedActivities.all()
 
