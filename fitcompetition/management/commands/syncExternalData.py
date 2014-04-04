@@ -24,6 +24,9 @@ class Command(BaseCommand):
         overwrite = options.get('reset', False)
         service = options.get('serviceName', None)
 
+        FitnessActivity.objects.filter(distance=0).delete()
+        FitnessActivity.objects.filter(distance__isnull=True).delete()
+
         if overwrite:
             if service is not None:
                 # FitnessActivity.objects.filter(user__integrationName=service).delete()
