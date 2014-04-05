@@ -568,7 +568,7 @@ class FitnessActivityManager(models.Manager):
 
                     type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
 
-                    if activity.get('distance') > 0:
+                    if activity.get('distance') is not None and activity.get('distance') > 0:
                         dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
                         dbo.type = type
                         dbo.duration = activity.get('duration')

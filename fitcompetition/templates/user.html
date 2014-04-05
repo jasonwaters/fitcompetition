@@ -19,17 +19,17 @@
             <th>Date</th>
             <th>Type</th>
             <th>Miles</th>
-            <th>Duration</th>
-			<th>Proof</th>
+            <th class="hidden-xs">Duration</th>
+			<th>Evidence</th>
         </thead>
         <tbody>
             {% for activity in recentActivities %}
                 <tr data-id="{{ activity.id }}">
-                    <td title="{{ activity.date }}">{{ activity.date|naturalday:"F j, Y" }}</td>
+                    <td title="{{ activity.date }}">{{ activity.date|naturalday:"N jS" }}</td>
                     <td>{{ activity.type.name }}</td>
                     <td>{{ activity.distance|toMiles|twoDecimals }}</td>
-                    <td>{{ activity.duration|duration }}</td>
-					<td>
+                    <td class="hidden-xs">{{ activity.duration|duration }}</td>
+					<td class="evidence">
 						{% if activity.hasEvidence %}<i class="fa fa-map-marker" title="Tracked via GPS"></i>{% endif %}
 						{% if activity.photo %}
 							<i title="View Image" class="fa fa-picture-o show-activity-image" data-imgurl="{{ activity.photo.url }}"></i>

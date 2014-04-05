@@ -450,3 +450,7 @@ input[name=activity-image] {
 .app-icon.mapmyride {
 	background: url('/static/img/app_mapmyride.png') no-repeat;
 }
+
+.evidence i {
+	margin-right: 5px;
+}

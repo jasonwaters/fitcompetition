@@ -1,0 +1,842 @@
+Popular
+	16		Run / Jog
+	11		Bike Ride
+	9		Walk
+	12		Gym Workout
+	21		Sport / Other Activity
+	24		Hike / Rock Climb
+
+
+
+Bike Ride
+	11		Bike Ride
+	56		Bike Ride - BMX
+	648		Bike Ride - BMX - General
+	52		Bike Ride - Cruiser
+	465		Bike Ride - Cruiser - Beach
+	466		Bike Ride - Cruiser - General
+	60		Bike Ride - CycloCross
+	549		Bike Ride - CycloCross - Event/Race
+	550		Bike Ride - CycloCross - General
+	710		Bike Ride - ElliptiGo
+	33		Bike Ride - Fixed Gear (Fixie)
+	618		Bike Ride - Fixed Gear (Fixie) - Commute
+	619		Bike Ride - Fixed Gear (Fixie) - General
+	64		Bike Ride - Hybrid Cycling
+	653		Bike Ride - Hybrid Cycling - General
+	652		Bike Ride - Hybrid Cycling - Shopping / Errands
+	41		Bike Ride - Mountain Biking
+	457		Bike Ride - Mountain Biking - Commute
+	455		Bike Ride - Mountain Biking - Double Track
+	454		Bike Ride - Mountain Biking - Downhill
+	458		Bike Ride - Mountain Biking - Easy Training Ride
+	452		Bike Ride - Mountain Biking - Event / Race
+	462		Bike Ride - Mountain Biking - Extreme
+	456		Bike Ride - Mountain Biking - General
+	453		Bike Ride - Mountain Biking - Group Ride
+	451		Bike Ride - Mountain Biking - High Intensity
+	461		Bike Ride - Mountain Biking - Hill Workout
+	463		Bike Ride - Mountain Biking - Interval Training
+	448		Bike Ride - Mountain Biking - Light Intensity
+	450		Bike Ride - Mountain Biking - Long Distance
+	460		Bike Ride - Mountain Biking - Medium Intensity
+	449		Bike Ride - Mountain Biking - Moderate Hills
+	464		Bike Ride - Mountain Biking - Recovery
+	459		Bike Ride - Mountain Biking - Single Track
+	50		Bike Ride - Recumbent Bike
+	615		Bike Ride - Recumbent Bike - General
+	36		Bike Ride - Road Cycling
+	637		Bike Ride - Road Cycling - Commute
+	638		Bike Ride - Road Cycling - Easy Training Ride
+	633		Bike Ride - Road Cycling - Event / Race
+	636		Bike Ride - Road Cycling - General
+	634		Bike Ride - Road Cycling - Group Ride
+	632		Bike Ride - Road Cycling - High Intensity
+	640		Bike Ride - Road Cycling - Hill Workout
+	635		Bike Ride - Road Cycling - Interval Training
+	629		Bike Ride - Road Cycling - Light Intensity
+	631		Bike Ride - Road Cycling - Long Distance
+	639		Bike Ride - Road Cycling - Medium Intensity
+	630		Bike Ride - Road Cycling - Moderate Hills
+	641		Bike Ride - Road Cycling - Recovery
+	38		Bike Ride - Touring Bike
+	445		Bike Ride - Touring Bike - Randonneur / Touring
+	44		Bike Ride - Track Cycling
+	523		Bike Ride - Track Cycling - General
+	702		Bike Ride - Trikke
+	47		Bike Ride - Unicycling
+	545		Bike Ride - Unicycling - General
+	544		Bike Ride - Unicycling - Long Distance
+
+
+
+Class Workout
+	23		Class Workout
+	34		Class Workout - Aerobic
+	624		Class Workout - Aerobic - Boxing
+	620		Class Workout - Aerobic - Cross Trainer
+	622		Class Workout - Aerobic - Dance
+	623		Class Workout - Aerobic - Erg Machine
+	628		Class Workout - Aerobic - Kickboxing
+	625		Class Workout - Aerobic - Misc Body Combat
+	621		Class Workout - Aerobic - Pump
+	626		Class Workout - Aerobic - Spinning
+	627		Class Workout - Aerobic - Step
+	704		Class Workout - CrossFit
+	706		Class Workout - TRX Suspension Training
+	78		Class Workout - Yoga
+	726		Class Workout - Yoga - Ashtanga Yoga
+	500		Class Workout - Yoga - General
+	722		Class Workout - Yoga - Hot Yoga
+	724		Class Workout - Yoga - Power Yoga
+
+
+
+Fitbug Activity
+	820		Fitbug Activity
+	822		Fitbug Activity - Walking
+
+
+
+Generic
+	1		Generic
+	7		Generic - Fartleks
+	3		Generic - General
+	2		Generic - Workout
+
+
+
+Gym Workout
+	12		Gym Workout
+	98		Gym Workout - Abs
+	162		Gym Workout - British Military Fitness
+	199		Gym Workout - Calisthenics
+	28		Gym Workout - Circuit Training
+	542		Gym Workout - Circuit Training - Cardiovascular (CV)
+	543		Gym Workout - Circuit Training - Resistance
+	203		Gym Workout - Crunches and Leg Lifts
+	157		Gym Workout - Gym, Misc.
+	720		Gym Workout - Health Club
+	285		Gym Workout - Home Workout
+	241		Gym Workout - Medicine Ball
+	185		Gym Workout - Pull Ups
+	110		Gym Workout - Pull Ups, Dips
+	168		Gym Workout - Push Ups
+	113		Gym Workout - Push Ups, Leglifts
+	233		Gym Workout - Push Ups, Sit Ups
+	238		Gym Workout - Pushups, Pullups, Torso
+	240		Gym Workout - Pyramid Pull Ups
+	170		Gym Workout - Sit Ups
+	158		Gym Workout - Sit Ups, Push Ups
+	140		Gym Workout - Total Body
+
+
+
+Hike / Rock Climb
+	24		Hike / Rock Climb
+	177		Hike / Rock Climb - Cross Country
+	109		Hike / Rock Climb - General
+	32		Hike / Rock Climb - Hills
+	508		Hike / Rock Climb - Hills - Heavy Pack
+	510		Hike / Rock Climb - Hills - Light / No Pack
+	509		Hike / Rock Climb - Hills - Medium Pack
+	220		Hike / Rock Climb - Rock Climbing
+	114		Hike / Rock Climb - Trekking
+
+
+
+Indoor Bike Ride
+	19		Indoor Bike Ride
+	53		Indoor Bike Ride - Road Cycling
+	547		Indoor Bike Ride - Road Cycling - Computrainer
+	548		Indoor Bike Ride - Road Cycling - Stationary Bike
+	546		Indoor Bike Ride - Road Cycling - Trainer
+	857		Indoor Bike Ride - Soul Cycle - 45 Minutes
+	859		Indoor Bike Ride - Soul Survivor - 1 hour
+	120		Indoor Bike Ride - Spinning
+
+
+
+Indoor Hike / Rock Climb
+	22		Indoor Hike / Rock Climb
+	234		Indoor Hike / Rock Climb - Rock Climbing
+
+
+
+Indoor Run / Jog
+	25		Indoor Run / Jog
+	250		Indoor Run / Jog - Elliptical
+	756		Indoor Run / Jog - Indoor Track
+	268		Indoor Run / Jog - Stairs
+	208		Indoor Run / Jog - Treadmill
+
+
+
+Indoor Sport / Other Activity
+	8		Indoor Sport / Other Activity
+	142		Indoor Sport / Other Activity - Badminton
+	82		Indoor Sport / Other Activity - Ballet
+	125		Indoor Sport / Other Activity - Ballroom Dancing
+	259		Indoor Sport / Other Activity - Basketball
+	116		Indoor Sport / Other Activity - Bowling
+	65		Indoor Sport / Other Activity - Boxing
+	565		Indoor Sport / Other Activity - Boxing - Fight
+	564		Indoor Sport / Other Activity - Boxing - Sparing
+	281		Indoor Sport / Other Activity - Brick Session
+	672		Indoor Sport / Other Activity - Climbing Stairs (Running)
+	670		Indoor Sport / Other Activity - Climbing Stairs (Walking)
+	104		Indoor Sport / Other Activity - Curling
+	279		Indoor Sport / Other Activity - Dance
+	155		Indoor Sport / Other Activity - Fencing
+	222		Indoor Sport / Other Activity - Floorball
+	144		Indoor Sport / Other Activity - Games
+	254		Indoor Sport / Other Activity - Gymnastics
+	758		Indoor Sport / Other Activity - Handball
+	135		Indoor Sport / Other Activity - Hockey
+	77		Indoor Sport / Other Activity - House Work
+	600		Indoor Sport / Other Activity - House Work - Cleaning (Light)
+	602		Indoor Sport / Other Activity - House Work - Misc Tasks (Light)
+	601		Indoor Sport / Other Activity - House Work - Misc Tasks (Moderate)
+	604		Indoor Sport / Other Activity - House Work - Mopping
+	603		Indoor Sport / Other Activity - House Work - Vacuuming
+	244		Indoor Sport / Other Activity - Intimacy
+	263		Indoor Sport / Other Activity - Jump Rope
+	251		Indoor Sport / Other Activity - Kickball
+	72		Indoor Sport / Other Activity - Martial Arts
+	473		Indoor Sport / Other Activity - Martial Arts - Aikido
+	469		Indoor Sport / Other Activity - Martial Arts - Judo
+	760		Indoor Sport / Other Activity - Martial Arts - Jujitsu
+	471		Indoor Sport / Other Activity - Martial Arts - Karate
+	472		Indoor Sport / Other Activity - Martial Arts - Kickboxing
+	762		Indoor Sport / Other Activity - Martial Arts - Kung Fu
+	470		Indoor Sport / Other Activity - Martial Arts - Misc
+	813		Indoor Sport / Other Activity - Martial Arts - Mixed Martial Arts
+	833		Indoor Sport / Other Activity - Martial Arts - Nia
+	764		Indoor Sport / Other Activity - Martial Arts - Tae Kwon Do
+	468		Indoor Sport / Other Activity - Martial Arts - Tai Chi
+	76		Indoor Sport / Other Activity - Musical Instrument
+	642		Indoor Sport / Other Activity - Musical Instrument - All
+	839		Indoor Sport / Other Activity - Musical Instrument - Drumming
+	841		Indoor Sport / Other Activity - Musical Instrument - Drumming - Japanese Taiko
+	843		Indoor Sport / Other Activity - Musical Instrument - Drumming - Sitting
+	258		Indoor Sport / Other Activity - Netball
+	236		Indoor Sport / Other Activity - Other
+	214		Indoor Sport / Other Activity - PT Session
+	31		Indoor Sport / Other Activity - Pilates
+	506		Indoor Sport / Other Activity - Pilates - Mat Workout
+	507		Indoor Sport / Other Activity - Pilates - Reformer Workout
+	228		Indoor Sport / Other Activity - Racquetball
+	290		Indoor Sport / Other Activity - Rest Day
+	289		Indoor Sport / Other Activity - Shopping
+	229		Indoor Sport / Other Activity - Singing
+	216		Indoor Sport / Other Activity - Soccer
+	87		Indoor Sport / Other Activity - Spinning
+	163		Indoor Sport / Other Activity - Squash
+	819		Indoor Sport / Other Activity - Table Tennis
+	256		Indoor Sport / Other Activity - Volleyball
+	278		Indoor Sport / Other Activity - Weaponry
+	131		Indoor Sport / Other Activity - Wrestling
+	247		Indoor Sport / Other Activity - Yoga
+	498		Indoor Sport / Other Activity - Yoga - Bikram
+	499		Indoor Sport / Other Activity - Yoga - Vinyasa
+	164		Indoor Sport / Other Activity - Yolates
+
+
+
+Indoor Swim
+	20		Indoor Swim
+	260		Indoor Swim - Aquaforme
+	249		Indoor Swim - Circle Swim
+	59		Indoor Swim - Class / Aerobics
+	649		Indoor Swim - Class / Aerobics - Aqua Fit
+	193		Indoor Swim - Group Swimming
+	75		Indoor Swim - Lap Swim
+	665		Indoor Swim - Lap Swim - General
+	664		Indoor Swim - Lap Swim - Laps
+	151		Indoor Swim - Long Distance
+	97		Indoor Swim - Pool Games / Lessons
+	100		Indoor Swim - Race / Event
+	288		Indoor Swim - Recovery and Form
+	89		Indoor Swim - Speed Workout
+	192		Indoor Swim - Water Aerobics
+	121		Indoor Swim - Water Polo
+	111		Indoor Swim - Water Running
+
+
+
+Indoor Winter Sport / Activity
+	13		Indoor Winter Sport / Activity
+	141		Indoor Winter Sport / Activity - Ice Hockey
+
+
+
+Machine Workout
+	14		Machine Workout
+	139		Machine Workout - Bike
+	226		Machine Workout - Bowflex Treadclimber
+	112		Machine Workout - Boxing
+	71		Machine Workout - Brick
+	599		Machine Workout - Brick - Treadmill/Spin
+	92		Machine Workout - Cross Trainer/Bike
+	211		Machine Workout - Elliptical
+	728		Machine Workout - Ergometer
+	280		Machine Workout - Jump Rope/Core
+	215		Machine Workout - Kickboxing
+	225		Machine Workout - Misc
+	96		Machine Workout - Nordic Track
+	99		Machine Workout - Rowing Machine
+	207		Machine Workout - Skiers Edge
+	730		Machine Workout - Stair Machine
+	861		Machine Workout - Stair Machine - Jacobs Ladder
+	81		Machine Workout - Stationary Bike
+	194		Machine Workout - Steps
+	262		Machine Workout - Treadmill
+	166		Machine Workout - Various
+
+
+
+Program / Video Workout
+	17		Program / Video Workout
+	252		Program / Video Workout - Abs
+	190		Program / Video Workout - Aerobics
+	90		Program / Video Workout - BLT
+	732		Program / Video Workout - Basic Training
+	734		Program / Video Workout - Body Attack
+	186		Program / Video Workout - Body Combat
+	159		Program / Video Workout - Body Pump
+	123		Program / Video Workout - Bootcamp
+	209		Program / Video Workout - Chicometrics
+	198		Program / Video Workout - Conditioning
+	248		Program / Video Workout - Core Secret Ball
+	736		Program / Video Workout - CrossFit
+	181		Program / Video Workout - Curves
+	132		Program / Video Workout - Cybex UBE
+	55		Program / Video Workout - Dance
+	742		Program / Video Workout - Dance - Ballroom
+	744		Program / Video Workout - Dance - Belly Dancing
+	646		Program / Video Workout - Dance - Ceroc
+	746		Program / Video Workout - Dance - Hip Hop
+	748		Program / Video Workout - Dance - Hula
+	750		Program / Video Workout - Dance - Latin Dance
+	647		Program / Video Workout - Dance - Pole
+	752		Program / Video Workout - Dance - Salsa
+	754		Program / Video Workout - Dance - Zumba
+	183		Program / Video Workout - Dance / Yoga
+	232		Program / Video Workout - Fitball
+	230		Program / Video Workout - General
+	245		Program / Video Workout - Gilad
+	276		Program / Video Workout - Hunt Fitness
+	792		Program / Video Workout - Insanity Total Body Workout
+	798		Program / Video Workout - Insanity Total Body Workout - Insanity Cardio Power &amp; Resistance
+	800		Program / Video Workout - Insanity Total Body Workout - Insanity Cardio Recovery
+	804		Program / Video Workout - Insanity Total Body Workout - Insanity Core Cardio &amp; Balance
+	794		Program / Video Workout - Insanity Total Body Workout - Insanity Dig Deeper
+	808		Program / Video Workout - Insanity Total Body Workout - Insanity Interval Plyo
+	810		Program / Video Workout - Insanity Total Body Workout - Insanity Max Cardio Conditioning
+	806		Program / Video Workout - Insanity Total Body Workout - Insanity Max Interval Circuit
+	812		Program / Video Workout - Insanity Total Body Workout - Insanity Max Recovery
+	796		Program / Video Workout - Insanity Total Body Workout - Insanity Plyometric Cardio Circuit
+	802		Program / Video Workout - Insanity Total Body Workout - Insanity Pure Cardio &amp; Cardio Abs
+	738		Program / Video Workout - Kenisis
+	130		Program / Video Workout - NeuStep
+	191		Program / Video Workout - New York Body
+	674		Program / Video Workout - P90X
+	698		Program / Video Workout - P90X - P90X Ab Ripper X
+	694		Program / Video Workout - P90X - P90X Back &amp; Biceps
+	696		Program / Video Workout - P90X - P90X CardioX
+	676		Program / Video Workout - P90X - P90X Chest &amp; Back
+	692		Program / Video Workout - P90X - P90X Chest, Shoulders &amp; Triceps
+	690		Program / Video Workout - P90X - P90X Core Synergistics
+	686		Program / Video Workout - P90X - P90X Kenpo
+	684		Program / Video Workout - P90X - P90X Legs &amp; Back
+	678		Program / Video Workout - P90X - P90X Plyometrics
+	680		Program / Video Workout - P90X - P90X Shoulders and Arms
+	688		Program / Video Workout - P90X - P90X X Stretch
+	682		Program / Video Workout - P90X - P90X YogaX
+	219		Program / Video Workout - Personal Training
+	174		Program / Video Workout - Pi
+	210		Program / Video Workout - Pilates
+	286		Program / Video Workout - Pliometrics
+	270		Program / Video Workout - Plyometrics
+	287		Program / Video Workout - Rep Endurance
+	167		Program / Video Workout - Spin
+	83		Program / Video Workout - Sports Conditioning
+	149		Program / Video Workout - Stretch / Sculpt
+	740		Program / Video Workout - Tae Bo
+	150		Program / Video Workout - The Bean
+	165		Program / Video Workout - Winsor Pilates
+	237		Program / Video Workout - Yoga
+	212		Program / Video Workout - You Workout
+	291		Program / Video Workout - Yourself Fitness
+	716		Program / Video Workout - Yourshape
+
+
+
+Run / Jog
+	16		Run / Jog
+	246		Run / Jog - Brick Workout
+	102		Run / Jog - Commute
+	243		Run / Jog - Cross Country
+	855		Run / Jog - Dog Run
+	283		Run / Jog - Easy / General
+	218		Run / Jog - Fartleks
+	124		Run / Jog - Group Run
+	227		Run / Jog - Hill Workout
+	197		Run / Jog - Interval Training
+	136		Run / Jog - Long Run
+	831		Run / Jog - Pushing Double Stroller
+	829		Run / Jog - Pushing Single Stroller
+	188		Run / Jog - Quick Run
+	172		Run / Jog - Race / Event
+	187		Run / Jog - Recovery
+	118		Run / Jog - Regular / General
+	712		Run / Jog - Retro Running
+	91		Run / Jog - Speed Work
+	103		Run / Jog - Sprints
+	282		Run / Jog - Taper
+	173		Run / Jog - Tempo Run
+	115		Run / Jog - Time Trial
+	108		Run / Jog - Track
+	266		Run / Jog - Trail Run
+
+
+
+Sport / Other Activity
+	21		Sport / Other Activity
+	201		Sport / Other Activity - Adventure Race / Event
+	134		Sport / Other Activity - Baseball
+	231		Sport / Other Activity - Bootcamp Workout
+	217		Sport / Other Activity - Camping
+	57		Sport / Other Activity - Canoeing / Rowing
+	526		Sport / Other Activity - Canoeing / Rowing - For pleasure
+	524		Sport / Other Activity - Canoeing / Rowing - Moderate effort
+	525		Sport / Other Activity - Canoeing / Rowing - Vigorous effort
+	148		Sport / Other Activity - Cheerleading
+	668		Sport / Other Activity - Climbing Stairs (Running)
+	666		Sport / Other Activity - Climbing Stairs (Walking)
+	271		Sport / Other Activity - Cricket
+	835		Sport / Other Activity - Cricket - Action Cricket / Indoor Cricket
+	147		Sport / Other Activity - Dragon Boat
+	224		Sport / Other Activity - Farming
+	161		Sport / Other Activity - Field Hockey
+	195		Sport / Other Activity - FireFighting
+	85		Sport / Other Activity - Fishing
+	784		Sport / Other Activity - Fly
+	265		Sport / Other Activity - Football
+	51		Sport / Other Activity - Football
+	644		Sport / Other Activity - Football - 11 a side (Touch)
+	645		Sport / Other Activity - Football - 5 a side
+	643		Sport / Other Activity - Football - Australian Rules
+	768		Sport / Other Activity - Football - Game, Tackle
+	770		Sport / Other Activity - Football - Practice
+	153		Sport / Other Activity - Frisbee / Ultimate
+	200		Sport / Other Activity - Gardening
+	122		Sport / Other Activity - General
+	154		Sport / Other Activity - Golf
+	823		Sport / Other Activity - Hang Gliding
+	137		Sport / Other Activity - Horseback Riding
+	160		Sport / Other Activity - Inline / Roller Hockey
+	169		Sport / Other Activity - Inline Skating
+	257		Sport / Other Activity - Kayak
+	205		Sport / Other Activity - Kitesurfing
+	178		Sport / Other Activity - Lacrosse
+	714		Sport / Other Activity - Longboarding
+	708		Sport / Other Activity - Motocross
+	223		Sport / Other Activity - Motorcycle / Scooter
+	182		Sport / Other Activity - Nordic Rollerskiing
+	202		Sport / Other Activity - Orienteering
+	88		Sport / Other Activity - Paddle
+	221		Sport / Other Activity - Rock Climbing / Bouldering
+	101		Sport / Other Activity - Roller Skating / Skiing
+	273		Sport / Other Activity - Rollerblading
+	261		Sport / Other Activity - Rowing / Crew
+	235		Sport / Other Activity - Rugby
+	29		Sport / Other Activity - Sailing
+	292		Sport / Other Activity - Sailing - Competitive
+	293		Sport / Other Activity - Sailing - General
+	213		Sport / Other Activity - Scuba Diving
+	196		Sport / Other Activity - Shoveling
+	95		Sport / Other Activity - Skateboarding
+	239		Sport / Other Activity - Ski Surf
+	171		Sport / Other Activity - Skydiving
+	176		Sport / Other Activity - Soccer
+	68		Sport / Other Activity - Softball
+	93		Sport / Other Activity - Softball
+	294		Sport / Other Activity - Softball - Fastball
+	863		Sport / Other Activity - Stand Up Paddling
+	127		Sport / Other Activity - Surfing
+	73		Sport / Other Activity - Tennis
+	617		Sport / Other Activity - Tennis - Doubles
+	616		Sport / Other Activity - Tennis - Singles
+	845		Sport / Other Activity - Trampoline
+	45		Sport / Other Activity - Triathlon
+	520		Sport / Other Activity - Triathlon - Race
+	772		Sport / Other Activity - Vehicle
+	786		Sport / Other Activity - Vehicle - Airplane
+	774		Sport / Other Activity - Vehicle - Car
+	788		Sport / Other Activity - Vehicle - Helicopter
+	778		Sport / Other Activity - Vehicle - Moped
+	776		Sport / Other Activity - Vehicle - Motorcycle
+	782		Sport / Other Activity - Vehicle - Powerboat
+	780		Sport / Other Activity - Vehicle - Scooter
+	790		Sport / Other Activity - Vehicle - Ultralight
+	54		Sport / Other Activity - Volleyball
+	336		Sport / Other Activity - Volleyball - Beach
+	84		Sport / Other Activity - Wakeboarding
+	277		Sport / Other Activity - Water Skiing
+	138		Sport / Other Activity - Whitewater Rafting
+	94		Sport / Other Activity - Wind Surfing
+	267		Sport / Other Activity - Wood Chopping
+	43		Sport / Other Activity - Yard Work
+	206		Sport / Other Activity - Yard Work
+	521		Sport / Other Activity - Yard Work - Mowing Lawn (General)
+	522		Sport / Other Activity - Yard Work - Mowing Lawn (Riding Mower)
+
+
+
+Swim
+	15		Swim
+	284		Swim - Board Diving
+	180		Swim - Open Water
+	128		Swim - Rowing
+	184		Swim - Scuba Diving
+	80		Swim - Snorkeling
+	255		Swim - Surfing
+	156		Swim - Water Skiing
+
+
+
+Walk
+	9		Walk
+	272		Walk - Brisk
+	106		Walk - Casual
+	253		Walk - Commute
+	204		Walk - Dog Walk
+	179		Walk - General / Regular
+	145		Walk - Golf
+	242		Walk - Group
+	269		Walk - Hill Workout
+	264		Walk - Hunting
+	766		Walk - Indoor Track
+	274		Walk - Intervals
+	117		Walk - Long Walk
+	275		Walk - Nordic
+	105		Walk - Power
+	126		Walk - Power Walk
+	827		Walk - Pushing Double Stroller
+	825		Walk - Pushing Single Stroller
+	152		Walk - Quick Walk
+	143		Walk - Race / Event
+	129		Walk - Sight Seeing
+	133		Walk - Stairs
+	146		Walk - Treadmill
+
+
+
+Weight Workout
+	18		Weight Workout
+	46		Weight Workout - Abdominals
+	311		Weight Workout - Abdominals - Ab Roller
+	306		Weight Workout - Abdominals - Alternate Heel Touchers
+	323		Weight Workout - Abdominals - Ball Floor Bridge
+	310		Weight Workout - Abdominals - Ball Knee Raise - Supine
+	308		Weight Workout - Abdominals - Bicycle Kicks
+	309		Weight Workout - Abdominals - Bird Dogs
+	317		Weight Workout - Abdominals - Crunch
+	316		Weight Workout - Abdominals - Crunch -Cable
+	304		Weight Workout - Abdominals - Crunch- Cross Body
+	303		Weight Workout - Abdominals - Crunch- Decline
+	295		Weight Workout - Abdominals - Crunch- Decline Oblique
+	328		Weight Workout - Abdominals - Crunch- Decline Reverse
+	297		Weight Workout - Abdominals - Crunch- Exercise Ball
+	313		Weight Workout - Abdominals - Crunch- Legs on Exercise Ball
+	302		Weight Workout - Abdominals - Crunch- Machine
+	325		Weight Workout - Abdominals - Crunch- Oblique
+	314		Weight Workout - Abdominals - Crunch- Reverse
+	318		Weight Workout - Abdominals - Dead Bugs
+	322		Weight Workout - Abdominals - Dumbbell side bend
+	320		Weight Workout - Abdominals - Exercise ball pull in
+	312		Weight Workout - Abdominals - Hanging leg raise
+	333		Weight Workout - Abdominals - Hanging pike
+	327		Weight Workout - Abdominals - Leg Pull-in
+	319		Weight Workout - Abdominals - Lunge with Rotation
+	335		Weight Workout - Abdominals - Medicine Ball Pullovers
+	298		Weight Workout - Abdominals - One Leg Bridges
+	329		Weight Workout - Abdominals - Opposite Leg Toe touch
+	299		Weight Workout - Abdominals - Other
+	334		Weight Workout - Abdominals - Plank Hold
+	307		Weight Workout - Abdominals - Plate twist
+	332		Weight Workout - Abdominals - Push Ups- spiderman
+	326		Weight Workout - Abdominals - Push-ups - Pike Up
+	305		Weight Workout - Abdominals - Russian Twist
+	301		Weight Workout - Abdominals - Scissor Kick
+	324		Weight Workout - Abdominals - Seated Leg Tucks
+	315		Weight Workout - Abdominals - Side Crunch- Ball
+	321		Weight Workout - Abdominals - Spiderman Walk
+	300		Weight Workout - Abdominals - Stability Ball climbers
+	331		Weight Workout - Abdominals - Toe Touchers
+	330		Weight Workout - Abdominals - V-sits
+	296		Weight Workout - Abdominals - hip lifts
+	79		Weight Workout - Biceps
+	426		Weight Workout - Biceps - 21s- EZ Bar
+	400		Weight Workout - Biceps - Barbell Curl- Lying against incline
+	421		Weight Workout - Biceps - Barbell Curl- Seated, concentration
+	401		Weight Workout - Biceps - Barbell Curl- Standing
+	417		Weight Workout - Biceps - Cable Curl- High pulley
+	402		Weight Workout - Biceps - Cable Curl- Overhead
+	409		Weight Workout - Biceps - Cable Curl- Preacher Curl
+	403		Weight Workout - Biceps - Cable Curl- Standing
+	422		Weight Workout - Biceps - Cable Curl- Standing, one arm
+	410		Weight Workout - Biceps - Cable curl- Lying
+	418		Weight Workout - Biceps - Chin-ups
+	405		Weight Workout - Biceps - Concentration curl
+	406		Weight Workout - Biceps - Dumbbell Curl- Incline
+	429		Weight Workout - Biceps - Dumbbell Curl- Incline inner
+	423		Weight Workout - Biceps - Dumbbell Curl- One-Arm, Incline bench
+	413		Weight Workout - Biceps - Dumbbell Curl- Seated, inner-bicep
+	420		Weight Workout - Biceps - Dumbbell Curl-Standing
+	407		Weight Workout - Biceps - Dumbbell curl- Seated
+	428		Weight Workout - Biceps - EZ-Bar Curl
+	414		Weight Workout - Biceps - EZ-Bar Curl- Close Grip
+	408		Weight Workout - Biceps - Hammer Curl- Cable, rope attachment
+	425		Weight Workout - Biceps - Hammer Curl- Standing
+	404		Weight Workout - Biceps - Other
+	427		Weight Workout - Biceps - Preacher Curl
+	411		Weight Workout - Biceps - Preacher Curl- Machine
+	424		Weight Workout - Biceps - Reverse Barbell Curl
+	416		Weight Workout - Biceps - Reverse cable curl
+	415		Weight Workout - Biceps - Spider Curl
+	412		Weight Workout - Biceps - Step up with curl
+	419		Weight Workout - Biceps - Zottman Curl
+	30		Weight Workout - Calves
+	371		Weight Workout - Calves - Calf Press- Leg press machine
+	368		Weight Workout - Calves - Calf Raise- Barbell, seated
+	370		Weight Workout - Calves - Calf raise- Dumbbell, seated, one leg
+	373		Weight Workout - Calves - Calf raise- barbell, standing
+	365		Weight Workout - Calves - Calf raise- dumbell standing
+	367		Weight Workout - Calves - Calf raise- seated, machine
+	369		Weight Workout - Calves - Calf raise- with bands
+	372		Weight Workout - Calves - Other
+	366		Weight Workout - Calves - calf raise- smith machine, reversed
+	61		Weight Workout - Chest
+	589		Weight Workout - Chest - Around the worlds
+	582		Weight Workout - Chest - Bench Press- Barbell, Declined
+	588		Weight Workout - Chest - Bench Press- Barbell, flat
+	595		Weight Workout - Chest - Bench Press- Barbell, flat, close-grip
+	572		Weight Workout - Chest - Bench Press- Barbell, flat, wide grip
+	569		Weight Workout - Chest - Bench Press- Barbell, inclined
+	596		Weight Workout - Chest - Bench Press- Dumbbell, flat
+	584		Weight Workout - Chest - Bench Press- Dumbbells, inclined
+	593		Weight Workout - Chest - Bench Press- Dumbell Declined
+	594		Weight Workout - Chest - Bench Press- Inclined, Hammer Grip
+	573		Weight Workout - Chest - Bench Press- Machine
+	581		Weight Workout - Chest - Bench Press- Smith Machine
+	580		Weight Workout - Chest - Bent-arm Dumbbell pullover
+	577		Weight Workout - Chest - Butterfly
+	567		Weight Workout - Chest - Cable Crossover
+	578		Weight Workout - Chest - Cable press- one arm, rotate
+	568		Weight Workout - Chest - Dips- chest bersion
+	583		Weight Workout - Chest - Flyes- Cable, flat bench
+	575		Weight Workout - Chest - Flyes- Cable, inclined bench
+	574		Weight Workout - Chest - Flyes- Dumbbell, inclined bench
+	591		Weight Workout - Chest - Flyes- dumbbell, declined
+	587		Weight Workout - Chest - Flyes- dumbbell, flat
+	590		Weight Workout - Chest - Fron raise and pullover
+	571		Weight Workout - Chest - Other
+	566		Weight Workout - Chest - Push-ups
+	592		Weight Workout - Chest - Push-ups- dumbbell
+	585		Weight Workout - Chest - Push-ups- feet on exercise ball
+	586		Weight Workout - Chest - Push-ups- modified
+	570		Weight Workout - Chest - Push-ups- pike up
+	576		Weight Workout - Chest - Push-ups- spiderman
+	579		Weight Workout - Chest - incline flyes- with a twist
+	62		Weight Workout - Forearms
+	560		Weight Workout - Forearms - Dumbbell lying pronation
+	562		Weight Workout - Forearms - Other
+	553		Weight Workout - Forearms - Reverse Barbell Curl
+	551		Weight Workout - Forearms - Reverse cable curl
+	555		Weight Workout - Forearms - Tyson shakers
+	554		Weight Workout - Forearms - Wrist Curl- Barbell, Palms-up
+	563		Weight Workout - Forearms - Wrist Curl- Dumbbell, palms up
+	556		Weight Workout - Forearms - Wrist Curl- barbell, palms-down
+	557		Weight Workout - Forearms - Wrist curl- barbell, standing, behind the back
+	552		Weight Workout - Forearms - Wrist curl- cable
+	559		Weight Workout - Forearms - Wrist curl- dumbbell, palms-down
+	558		Weight Workout - Forearms - Wrist roller
+	561		Weight Workout - Forearms - Zottman Curl
+	67		Weight Workout - Hamstrings
+	435		Weight Workout - Hamstrings - BOSU Step over
+	431		Weight Workout - Hamstrings - Flutter Kicks
+	437		Weight Workout - Hamstrings - Leg curls- Lying
+	439		Weight Workout - Hamstrings - Leg curls- seated
+	442		Weight Workout - Hamstrings - Leg curls- standing
+	433		Weight Workout - Hamstrings - Lunge with Rotation
+	434		Weight Workout - Hamstrings - Medicine ball lunges
+	440		Weight Workout - Hamstrings - Other
+	432		Weight Workout - Hamstrings - Romanian Deadlift
+	438		Weight Workout - Hamstrings - Stiff-legged barbell deadlift
+	430		Weight Workout - Hamstrings - lunge matrix
+	436		Weight Workout - Hamstrings - lunges- dumbbell
+	441		Weight Workout - Hamstrings - stiff-legged dumbbell deadlift
+	847		Weight Workout - Kettlebell
+	37		Weight Workout - Lower Back
+	513		Weight Workout - Lower Back - Back Extensions
+	515		Weight Workout - Lower Back - Ball Floor Bridge
+	512		Weight Workout - Lower Back - Bird Dogs
+	514		Weight Workout - Lower Back - Other
+	511		Weight Workout - Lower Back - Romanian Deadlift
+	516		Weight Workout - Lower Back - Stiff-legged barbell deadlift
+	518		Weight Workout - Lower Back - Stiff-legged dumbbell deadlift
+	517		Weight Workout - Lower Back - Supermans
+	519		Weight Workout - Lower Back - Weighted ball hyperextension
+	39		Weight Workout - Lower Body
+	447		Weight Workout - Lower Body - General
+	446		Weight Workout - Lower Body - Other
+	70		Weight Workout - Middle Back
+	656		Weight Workout - Middle Back - Bent over dumbbell row
+	655		Weight Workout - Middle Back - Cable Pulls- Alternating
+	659		Weight Workout - Middle Back - Cable chop
+	654		Weight Workout - Middle Back - Inverted row
+	662		Weight Workout - Middle Back - Lat pulldown- cable, alternating
+	658		Weight Workout - Middle Back - One-arm dumbbell row
+	657		Weight Workout - Middle Back - Other
+	661		Weight Workout - Middle Back - Seated cable rows
+	663		Weight Workout - Middle Back - T-Bar row- Lying
+	660		Weight Workout - Middle Back - T-bar row- standing
+	27		Weight Workout - Neck
+	503		Weight Workout - Neck - Lying face-up plate neck resistance
+	504		Weight Workout - Neck - Other
+	505		Weight Workout - Neck - lying face down plate neck resistance
+	42		Weight Workout - Quads
+	479		Weight Workout - Quads - 8 count body builders
+	477		Weight Workout - Quads - BOSU Step over
+	480		Weight Workout - Quads - Barbell deadlift
+	492		Weight Workout - Quads - Barbell step ups
+	495		Weight Workout - Quads - Body weight squats
+	476		Weight Workout - Quads - Dumbbell rear lunge
+	491		Weight Workout - Quads - Front barbell squat
+	475		Weight Workout - Quads - Hack squat
+	486		Weight Workout - Quads - Iron cross
+	494		Weight Workout - Quads - Leg extensions
+	484		Weight Workout - Quads - Leg press
+	489		Weight Workout - Quads - Lunge matrix
+	485		Weight Workout - Quads - Lunge with roation
+	482		Weight Workout - Quads - Lunges- dumbbell
+	497		Weight Workout - Quads - Medicine ball lunges
+	493		Weight Workout - Quads - Other
+	496		Weight Workout - Quads - Plie Dumbbell squat
+	490		Weight Workout - Quads - Qwuats- ball
+	488		Weight Workout - Quads - Split Squat push press
+	483		Weight Workout - Quads - Split squats
+	474		Weight Workout - Quads - Squat press and rotate
+	478		Weight Workout - Quads - Squats- barbell
+	481		Weight Workout - Quads - Step up with curl
+	487		Weight Workout - Quads - Thigh abductor
+	48		Weight Workout - Shoulders
+	350		Weight Workout - Shoulders - Arnold Dumbbell press
+	352		Weight Workout - Shoulders - Byron Front raises
+	362		Weight Workout - Shoulders - Cable internal rotation
+	356		Weight Workout - Shoulders - Cable seated rear lateral raise
+	357		Weight Workout - Shoulders - Cuban Press
+	354		Weight Workout - Shoulders - External Rotation
+	348		Weight Workout - Shoulders - Front Cable Raise
+	353		Weight Workout - Shoulders - Front Dumbbell Raise
+	355		Weight Workout - Shoulders - Front incline shoulder raise
+	342		Weight Workout - Shoulders - Front plate raise
+	349		Weight Workout - Shoulders - Incline shoulder raise
+	363		Weight Workout - Shoulders - Medicine ball lunges
+	344		Weight Workout - Shoulders - Other
+	337		Weight Workout - Shoulders - Rear Delt row - barbell, standing
+	339		Weight Workout - Shoulders - Rear delt raise - Dumbbell, lying
+	340		Weight Workout - Shoulders - Rear delt raise - dumbbell, bent-over
+	338		Weight Workout - Shoulders - Reverse flyes
+	346		Weight Workout - Shoulders - Shoulder Press- dumbbell, palms in
+	351		Weight Workout - Shoulders - Shoulder press- barbell, sitting
+	359		Weight Workout - Shoulders - Shoulder press- barbell, standing
+	360		Weight Workout - Shoulders - Shoulder press- dumbbell, one arm
+	345		Weight Workout - Shoulders - Shoulder press- dumbbell, seated
+	364		Weight Workout - Shoulders - Shoulder press- machine
+	343		Weight Workout - Shoulders - Side lateral raise
+	361		Weight Workout - Shoulders - Side lateral raise - seated
+	358		Weight Workout - Shoulders - Splint squat push press
+	341		Weight Workout - Shoulders - Squat press and rotate
+	347		Weight Workout - Shoulders - Standing low-pulley deltoid raise
+	35		Weight Workout - Strength Training
+	444		Weight Workout - Strength Training - General
+	443		Weight Workout - Strength Training - Other
+	26		Weight Workout - Total Body
+	651		Weight Workout - Total Body - General
+	650		Weight Workout - Total Body - Other
+	40		Weight Workout - Traps
+	608		Weight Workout - Traps - Calf-machine shoulder shrug
+	611		Weight Workout - Traps - Low pulley row to neck
+	610		Weight Workout - Traps - Other
+	606		Weight Workout - Traps - Shrugs- Barbell, behind back
+	612		Weight Workout - Traps - Shrugs- Cable
+	605		Weight Workout - Traps - Shrugs- Dumbbell
+	613		Weight Workout - Traps - Shrugs- barbell
+	609		Weight Workout - Traps - Upright Rows- barbell
+	614		Weight Workout - Traps - Upright rows- cable
+	607		Weight Workout - Traps - Upright rows- dumbbell
+	66		Weight Workout - Triceps
+	388		Weight Workout - Triceps - Bench Dips
+	393		Weight Workout - Triceps - Bench Press- Barbell, flat, close-grip
+	383		Weight Workout - Triceps - Dips
+	390		Weight Workout - Triceps - Dips- Machine
+	377		Weight Workout - Triceps - Other
+	392		Weight Workout - Triceps - Pushups- hands close together
+	374		Weight Workout - Triceps - Skull Crushers
+	391		Weight Workout - Triceps - Tricep Extension- Barbell, lying
+	382		Weight Workout - Triceps - Tricep Extension- Dumbbell, lying
+	395		Weight Workout - Triceps - Tricep Extension- Dumbbell, lying, supine
+	384		Weight Workout - Triceps - Tricep Extension- Dumbbell, one arm
+	394		Weight Workout - Triceps - Tricep Extension- Dumbbell, pronated
+	386		Weight Workout - Triceps - Tricep Extension- Dumbbell, standing
+	380		Weight Workout - Triceps - Tricep Extension- EZ-Bar, seated, overhead
+	389		Weight Workout - Triceps - Tricep Extension- lying, cable
+	396		Weight Workout - Triceps - Tricep Extension- overhead, dable
+	378		Weight Workout - Triceps - Tricep Kickbacks- Dumbbell
+	379		Weight Workout - Triceps - Tricep Press- Dumbbell, seated
+	385		Weight Workout - Triceps - Tricep Pushdowns- One Arm
+	387		Weight Workout - Triceps - Tricep Pushdowns- Rope
+	381		Weight Workout - Triceps - Tricep Pushdowns- Straight Bar
+	376		Weight Workout - Triceps - Tricep Pushdowns- V-bar
+	375		Weight Workout - Triceps - Tricep pushdowns- Incline Bench
+	49		Weight Workout - Upper Back
+	528		Weight Workout - Upper Back - Atraight-arm pulldown
+	539		Weight Workout - Upper Back - Cable Pulls- Alternating
+	532		Weight Workout - Upper Back - Cable rope rear- Delt rows
+	538		Weight Workout - Upper Back - Chin-ups
+	527		Weight Workout - Upper Back - Full range-of-motion Lat pulldown
+	536		Weight Workout - Upper Back - Gironda sternum chins
+	535		Weight Workout - Upper Back - Inverted row
+	537		Weight Workout - Upper Back - Lat Pulldown- underhand
+	531		Weight Workout - Upper Back - Lat Pulldown- wide grip
+	530		Weight Workout - Upper Back - Lat pulldown- V-bar
+	541		Weight Workout - Upper Back - Lat pulldown- cable, alternating
+	534		Weight Workout - Upper Back - Lat pulldown- close-grip
+	540		Weight Workout - Upper Back - Other
+	533		Weight Workout - Upper Back - Pullups
+	529		Weight Workout - Upper Back - Pullups- v-bar
+	69		Weight Workout - Upper Body
+	598		Weight Workout - Upper Body - General
+	597		Weight Workout - Upper Body - Other
+
+
+
+Winter Sport / Activity
+	10		Winter Sport / Activity
+	63		Winter Sport / Activity - Cross Country
+	502		Winter Sport / Activity - Cross Country - Skate
+	501		Winter Sport / Activity - Cross Country - Traditional
+	86		Winter Sport / Activity - Ice Skating
+	58		Winter Sport / Activity - Mountaineering
+	467		Winter Sport / Activity - Mountaineering - Snow / Ice
+	74		Winter Sport / Activity - Skiing
+	397		Winter Sport / Activity - Skiing - Backcountry
+	398		Winter Sport / Activity - Skiing - Downhill
+	399		Winter Sport / Activity - Skiing - General
+	175		Winter Sport / Activity - Snow Shoeing
+	107		Winter Sport / Activity - Snowboarding
+	189		Winter Sport / Activity - Snowmobile Riding
+	119		Winter Sport / Activity - Snowshoeing
