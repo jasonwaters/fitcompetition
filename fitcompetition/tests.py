@@ -100,9 +100,9 @@ class EmailTests(TestCase):
         c = Client()
         auth = c.login(username='alf', password='user')
         self.assertTrue(auth, 'failed to authenticate alf/user')
-        response = c.post('/account-cash-out/', {
-            'emailAddress': "jake@jones.net",
-            'cashValue': '100'
+        response = c.get('/account-cash-out', {
+            'email': "jake@jones.net",
+            'amount': 100
         })
 
         self.assertEqual(200, response.status_code)
