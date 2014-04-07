@@ -12,6 +12,7 @@ from fitcompetition.settings import STATIC_URL, TIME_ZONE
 from django.conf import settings
 import pytz
 import locale
+from rest_framework.renderers import JSONRenderer
 
 
 MILLIS_PER_SECOND = 1000
@@ -69,6 +70,14 @@ def avatar(url):
 
     return STATIC_URL + 'img/blank-avatar.png'
 
+
+@register.filter(javascriptis_safe=True)
+def serialize(obj, serializer):
+    mod = __import__('fitcompetition.serializers', fromlist=[serializer])
+    klass = getattr(mod, serializer)
+
+    serializedObj = klass(obj)
+    return mark_safe(JSONRenderer().render(serializedObj.data))
 
 @register.filter
 def toMiles(meters):
@@ -229,7 +238,7 @@ def commaSeparated(list, word="or"):
     return "%s %s %s" % (all_but_last, word, list[-1])
 
 
-@register.filter(is_safe=True)
+@register.filter(javascriptis_safe=True)
 def activityIcons(activities):
     result = ""
     for activity in activities:

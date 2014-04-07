@@ -7,17 +7,10 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = (
-            'id',
-            'description',
-            'balance'
-        )
 
 
 class UserSerializer(serializers.ModelSerializer):
     account = AccountSerializer(required=False)
-
-    transactions = serializers.HyperlinkedIdentityField('transactions', view_name='usertransactions-list')
 
     class Meta:
         model = FitUser
@@ -40,38 +33,13 @@ class ChallengeSerializer(serializers.ModelSerializer):
         #account
         #teams
         #players
-        fields = ('id',
-                  'name',
-                  'type',
-                  'style',
-                  'description',
-                  'distance',
-                  'startdate',
-                  'enddate',
-                  'ante'
-        )
 
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = FitnessActivity
-        fields = ('id',
-                  'user',
-                  'duration',
-                  'date',
-                  'calories',
-                  'distance',
-                  'photo',
-                  'hasEvidence'
-        )
 
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ('id',
-                  'date',
-                  'description',
-                  'amount',
-                  'isCashflow',
-        )

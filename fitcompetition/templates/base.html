@@ -9,6 +9,19 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+		<script type="text/javascript">
+			var FC = {
+				'maxApiRecords': {{ "MAX_API_RECORDS"|fromSettings }},
+			};
+
+			{% if user.is_authenticated %}
+				FC['user'] = {{ user|serialize:"UserSerializer" }};
+				FC['user']['account']['balance'] = parseFloat(FC['user']['account']['balance']);
+			{% else %}
+				FC['user'] = null;
+			{% endif %}
+		</script>
+
         {% block head_misc %}{% endblock %}
 
         {% compressed_css 'all-css' %}

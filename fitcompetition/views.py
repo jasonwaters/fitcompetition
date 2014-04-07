@@ -7,9 +7,11 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from fitcompetition import tasks
 from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
+from fitcompetition.serializers import UserSerializer
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
+from rest_framework.renderers import JSONRenderer
 
 
 def challenges(request):

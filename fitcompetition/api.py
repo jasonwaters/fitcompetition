@@ -6,7 +6,7 @@ from fitcompetition.serializers import ChallengeSerializer, ActivitySerializer, 
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction
+from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account
 from django.conf import settings
 import mailchimp
 from rest_framework import viewsets, generics
@@ -133,8 +133,8 @@ def user_details_update(request):
 
 @login_required
 def account_cash_out(request):
-    paypalEmailAddress = request.POST.get('emailAddress')
-    cashValue = float(request.POST.get('cashValue'))
+    paypalEmailAddress = request.GET.get('email')
+    cashValue = float(request.GET.get('amount'))
 
     if request.user.email is None or len(request.user.email) == 0:
         request.user.email = paypalEmailAddress
@@ -149,45 +149,29 @@ def account_cash_out(request):
 ##  Django REST Framework views
 #################################
 
-class UserTransactionsList(generics.ListAPIView):
-    model = Transaction
-    serializer_class = TransactionSerializer
-    paginate_by = 10
 
-    def get_queryset(self):
-        queryset = super(UserTransactionsList, self).get_queryset()
-        user_pk = self.kwargs.get('pk')
-        user = FitUser.objects.get(pk=user_pk)
-        return queryset.filter(account=user.account).order_by('-date')
+class AccountViewSet(viewsets.ReadOnlyModelViewSet):
+    model = Account
 
 
 class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows activities to be viewed or edited.
-    """
-    queryset = FitnessActivity.objects.all()
-    serializer_class = ActivitySerializer
+    model = FitnessActivity
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = FitUser.objects.all()
+    model = FitUser
     serializer_class = UserSerializer
 
 
 class ChallengeViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows challenges to be viewed or edited.
-    """
-    queryset = Challenge.objects.all()
-    serializer_class = ChallengeSerializer
+    model = Challenge
 
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows tranactions to be viewed or edited.
-    """
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+    model = Transaction
+
+    def get_queryset(self):
+        queryset = super(TransactionViewSet, self).get_queryset()
+        return queryset.filter(account=self.request.user.account)
+
+

@@ -130,10 +130,14 @@ INSTALLED_APPS = (
     'fitcompetition',
 )
 
+MAX_API_RECORDS = 50
+
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
-    'PAGINATE_BY': 40
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend', 'rest_framework.filters.OrderingFilter'),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',),
+
+    'PAGINATE_BY': MAX_API_RECORDS
 }
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'
@@ -156,7 +160,9 @@ PIPELINE_JS = {
             'js/jquery.js',
             'js/angular.js',
             'js/angular-resource.js',
+            'js/angular-cookies.js',
             'js/angular-ui-bootstrap-tpls.js',
+            'js/ng/*.js',
             'js/jquery.cookie.js',
             'js/jquery.validate.js',
             'js/additional-methods.js',

@@ -1,17 +1,17 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from fitcompetition import ajax
-from fitcompetition.ajax import UserTransactionsList
+from fitcompetition.api import TransactionViewSet, ChallengeViewSet, UserViewSet, ActivityViewSet, AccountViewSet
 from rest_framework import routers
 
 admin.autodiscover()
 
 
 router = routers.DefaultRouter()
-router.register(r'activities', ajax.ActivityViewSet)
-router.register(r'users', ajax.UserViewSet)
-router.register(r'challenges', ajax.ChallengeViewSet)
-router.register(r'transactions', ajax.TransactionViewSet)
+router.register(r'account', AccountViewSet)
+router.register(r'activities', ActivityViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'challenges', ChallengeViewSet)
+router.register(r'transactions', TransactionViewSet)
 
 urlpatterns = patterns('',
                        #VIEWS
@@ -31,13 +31,13 @@ urlpatterns = patterns('',
 
 
                        #AJAX
-                       url(r'^c/join/(?P<id>\d+)/$', 'fitcompetition.ajax.join_challenge', name="join_challenge"),
-                       url(r'^c/join/(?P<challenge_id>\d+)/team/(?P<team_id>\d+)/$', 'fitcompetition.ajax.join_team', name="join_team"),
-                       url(r'^c/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.ajax.create_team', name="create_team"),
-                       url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.ajax.withdraw_challenge', name="withdraw_challenge"),
-                       url(r'^update-user-details/$', 'fitcompetition.ajax.user_details_update', name="user_details_update"),
-                       url(r'^account-cash-out/$', 'fitcompetition.ajax.account_cash_out', {'SSL':True}, name="account_cash_out"),
-                       url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.ajax.upload_activity_image', name="activity_upload_photo"),
+                       url(r'^c/join/(?P<id>\d+)/$', 'fitcompetition.api.join_challenge', name="join_challenge"),
+                       url(r'^c/join/(?P<challenge_id>\d+)/team/(?P<team_id>\d+)/$', 'fitcompetition.api.join_team', name="join_team"),
+                       url(r'^c/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.api.create_team', name="create_team"),
+                       url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.api.withdraw_challenge', name="withdraw_challenge"),
+                       url(r'^update-user-details/$', 'fitcompetition.api.user_details_update', name="user_details_update"),
+                       url(r'^api/account-cash-out$', 'fitcompetition.api.account_cash_out', {'SSL':True}, name="account_cash_out"),
+                       url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.api.upload_activity_image', name="activity_upload_photo"),
 
                        #OTHER
                        url(r'^grappelli/', include('grappelli.urls')),
@@ -47,6 +47,5 @@ urlpatterns = patterns('',
 
                        #Django REST Framework
                        url(r'^api/', include(router.urls)),
-                       url(r'^api/users/(?P<pk>\d+)/transactions$', UserTransactionsList.as_view(), name='usertransactions-list'),
                        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 )
