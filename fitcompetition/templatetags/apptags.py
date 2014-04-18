@@ -22,9 +22,11 @@ SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR
 SECONDS_PER_DAY = SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY
 
+
 @register.filter
 def abs(value):
     return math.fabs(value)
+
 
 @register.filter
 def achievedGoal(meters, goal_miles):
@@ -98,8 +100,12 @@ def twoDecimals(value):
 
 @register.filter
 def duration(secs):
-    m, s = divmod(secs, 60)
-    h, m = divmod(m, 60)
+    if secs is None:
+        m, s, h, m = 0, 0, 0, 0
+    else:
+        m, s = divmod(secs, 60)
+        h, m = divmod(m, 60)
+
     return "%d:%02d:%02d" % (h, m, s)
 
 
