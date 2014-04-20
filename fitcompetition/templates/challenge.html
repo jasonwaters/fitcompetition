@@ -11,7 +11,11 @@
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
     <meta property="og:title" content="{{ challenge.name }} | Fit Crown" />
-    <meta property="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
+	{% if isFootRace %}
+    	<meta property="og:image" content="{{ request|hostUrl }}/static/img/running.jpg" />
+	{% else %}
+		<meta property="og:image" content="{{ request|hostUrl }}/static/img/riding.jpg" />
+	{% endif %}
 {% endblock %}
 
 {% block content %}

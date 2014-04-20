@@ -105,6 +105,12 @@ def challenge(request, id):
 
     approvedTypes = challenge.approvedActivities.all()
 
+    footFilter = Q(name__contains="Running")
+    footFilter |= Q(name__contains="Walking")
+    footFilter |= Q(name__contains="Hiking")
+
+    isFootRace = len(challenge.approvedActivities.filter(footFilter)) > 0
+
     params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
@@ -116,6 +122,7 @@ def challenge(request, id):
         'numPlayers': challenge.numPlayers,
         'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities()[:5],
+        'isFootRace': isFootRace
     }
 
     if challenge.isTypeIndividual:
