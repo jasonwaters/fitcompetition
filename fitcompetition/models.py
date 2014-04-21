@@ -575,7 +575,7 @@ class FitnessActivityManager(models.Manager):
                         dbo.date = activity.get('date')
                         dbo.calories = activity.get('calories')
                         dbo.distance = activity.get('distance')
-                        dbo.hasEvidence = activity.get('hasEvidence')
+                        dbo.hasGPS = activity.get('hasGPS')
                         dbo.save()
 
         except (ExternalIntegrationException, RequestException), e:
@@ -601,7 +601,7 @@ class FitnessActivity(models.Model):
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
     photo = models.ImageField(upload_to=get_file_path, default=None, null=True)
-    hasEvidence = models.BooleanField(default=False)
+    hasGPS = models.BooleanField(default=False)
 
     objects = FitnessActivityManager()
 

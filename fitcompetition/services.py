@@ -84,7 +84,7 @@ class Activity(object):
 
             self.calories = activity.get('total_calories')
             self.distance = activity.get('total_distance')
-            self.hasEvidence = activity.get('has_path')
+            self.hasGPS = activity.get('has_path')
         elif service == Integration.MAPMYFITNESS:
             #this is a dictionary to match the various mmf workout ids to useful ones
             types = {
@@ -261,7 +261,7 @@ class Activity(object):
 
             self.calories = aggregates.get('metabolic_engergy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
-            self.hasEvidence = activity.get('has_time_series')
+            self.hasGPS = activity.get('has_time_series')
 
         super(Activity, self).__init__()
 

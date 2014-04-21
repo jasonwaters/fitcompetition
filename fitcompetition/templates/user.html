@@ -30,7 +30,7 @@
                     <td>{{ activity.distance|toMiles|twoDecimals }}</td>
                     <td class="hidden-xs">{{ activity.duration|duration }}</td>
 					<td class="evidence">
-						{% if activity.hasEvidence %}<i class="fa fa-map-marker" title="Tracked via GPS"></i>{% endif %}
+						{% if activity.hasGPS %}<i class="fa fa-map-marker" title="Tracked via GPS"></i>{% endif %}
 						{% if activity.photo %}
 							<i title="View Image" class="fa fa-picture-o show-activity-image" data-imgurl="{{ activity.photo.url }}"></i>
 						{% else %}
