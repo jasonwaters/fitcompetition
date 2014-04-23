@@ -218,6 +218,8 @@ SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 255
 AUTHENTICATION_BACKENDS = (
     'fitcompetition.backends.runkeeper.RunkeeperOauth2',
     'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
+    'fitcompetition.backends.strava.StravaOAuth',
+
     'django.contrib.auth.backends.ModelBackend'
 )
 

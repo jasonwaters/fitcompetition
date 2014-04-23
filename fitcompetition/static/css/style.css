@@ -274,7 +274,12 @@ tr.team .team-total {
 	background: url('/static/img/mapmyfitness-logo.png') no-repeat;
 	width: 230px;
 	height: 67px;
+}
 
+.btn-sign-in.strava .logo {
+	background: url('/static/img/strava-logo.png') no-repeat;
+	width: 230px;
+	height: 67px;
 }
 
 .list-challenges.dimmed {

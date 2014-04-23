@@ -57,6 +57,7 @@ class FitUser(AbstractUser):
     runkeeperToken = models.CharField(max_length=255, blank=True, null=True, default=None)
     mapmyfitnessToken = models.CharField(max_length=255, blank=True, null=True, default=None)
     mapmyfitnessTokenSecret = models.CharField(max_length=255, blank=True, null=True, default=None)
+    stravaToken = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     fullname = models.CharField(max_length=255, blank=True, null=True, default=None)
     gender = models.CharField(max_length=1, blank=True, null=True, default=None)
@@ -116,6 +117,7 @@ class FitUser(AbstractUser):
         self.runkeeperToken = None
         self.mapmyfitnessToken = None
         self.mapmyfitnessTokenSecret = None
+        self.stravaToken = None
         self.save()
 
     def healthGraphStale(self):

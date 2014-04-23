@@ -59,6 +59,9 @@ def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivi
     if Integration.RUNKEEPER in integrations:
         filter |= Q(runkeeperToken__isnull=False)
 
+    if Integration.STRAVA in integrations:
+        filter |= Q(stravaToken__isnull=False)
+
     if Integration.MAPMYFITNESS in integrations:
         filter |= Q(mapmyfitnessToken__isnull=False)
 

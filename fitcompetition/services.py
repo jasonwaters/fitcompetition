@@ -11,10 +11,11 @@ from django.conf import settings
 class Integration(object):
     RUNKEEPER = "Runkeeper"
     MAPMYFITNESS = "MapmyFitness"
+    STRAVA = "Strava"
 
     @staticmethod
     def all():
-        return [Integration.RUNKEEPER, Integration.MAPMYFITNESS]
+        return [Integration.RUNKEEPER, Integration.MAPMYFITNESS, Integration.STRAVA]
 
 
 class ExternalIntegrationException(Exception):
@@ -36,6 +37,8 @@ def getExternalIntegrationService(user):
         return RunkeeperService(user)
     elif user.integrationName == Integration.MAPMYFITNESS:
         return MapMyFitnessService(user)
+    elif user.integrationName == Integration.STRAVA:
+        return StravaService(user)
 
 
 class Profile(object):
@@ -459,3 +462,22 @@ class MapMyFitnessService:
             self.getActivityTypes(result.get('_links').get('next')[0].get('href'))
 
         return activity_types
+
+
+class StravaService(object):
+    def __init__(self, user):
+        self.user = user
+        super(StravaService, self).__init__()
+
+    def hasTokens(self):
+        return self.user.stravaToken is not None and len(self.user.stravaToken) > 0
+
+    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
+        return []
+
+    def getChangeLog(self, modifiedNoEarlierThan=None, modifiedNoLaterThan=None):
+        return []
+
+    def getUserProfile(self):
+        return None
+
