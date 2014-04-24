@@ -11,7 +11,7 @@ from django.conf import settings
 
 class Integration(object):
     RUNKEEPER = "Runkeeper"
-    MAPMYFITNESS = "MapmyFitness"
+    MAPMYFITNESS = "MapMyFitness"
     STRAVA = "Strava"
 
     @staticmethod
@@ -259,7 +259,7 @@ class Activity(object):
             self.uri = links.get('self')[0].get('href')
             self.duration = aggregates.get('active_time_total')
 
-            #preserve the timezone entered by the user in MapmyFitness
+            #preserve the timezone entered by the user in MapMyFitness
             activityTimezone = pytz.timezone(activity.get('start_locale_timezone'))
             self.date = activityTimezone.normalize(parser.parse(activity.get('start_datetime')).astimezone(pytz.utc))
 
