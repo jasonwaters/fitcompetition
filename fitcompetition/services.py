@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 from dateutil import parser
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.util.DateUtil import unix_time
 from fitcompetition.util.ListUtil import attr
 import pytz
 import requests
@@ -265,6 +266,34 @@ class Activity(object):
             self.calories = aggregates.get('metabolic_engergy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
             self.hasGPS = activity.get('has_time_series')
+        elif service == Integration.STRAVA:
+            types = {
+                "Walk": "Walking",
+                "Hike": "Hiking",
+                "Ride": "Cycling",
+                "NordicSki": "Cross-Country Skiing",
+                "AlpineSki": "Downhill Skiing",
+                "BackcountrySki": "Cross-Country Skiing",
+                "IceSkate": "Skating",
+                "InlineSkate": "Skating",
+                "Kitesurf": "Other",
+                "RollerSki": "Other",
+                "Windsurf": "Other",
+                "Workout": "Other",
+                "Snowboard": "Snowboarding",
+                "Snowshoe": "Nordic Walking",
+                "Swim": "Swimming"
+            }
+
+            self.type = types.get(activity.get('type'), "Other")
+            self.uri = "http://www.strava.com/activities/%s" % activity.get('id')
+            self.duration = activity.get('moving_time')
+
+            self.date = activity.get('start_date')
+
+            self.calories = 0
+            self.distance = activity.get('distance')
+            self.hasGPS = not activity.get('manual')
 
         super(Activity, self).__init__()
 
@@ -465,6 +494,8 @@ class MapMyFitnessService:
 
 
 class StravaService(object):
+    API_URL = 'https://www.strava.com/api/v3'
+
     def __init__(self, user):
         self.user = user
         super(StravaService, self).__init__()
@@ -473,7 +504,36 @@ class StravaService(object):
         return self.user.stravaToken is not None and len(self.user.stravaToken) > 0
 
     def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
-        return []
+        params = {
+            'access_token': self.user.stravaToken,
+            "per_page": 200,
+        }
+        # before, after, page, per_page
+
+        if noEarlierThan is not None:
+            params['after'] = unix_time(noEarlierThan)
+
+        if noLaterThan is not None:
+            params['before'] = unix_time(noLaterThan)
+
+        # if modifiedSince is not None:
+        #     params['updated_after'] = modifiedSince
+
+        headers = {}
+
+        url = "%s/athlete/activities" % self.API_URL
+        r = requests.get(url, params=params, headers=headers)
+
+        more = {'hasMore': False, 'url': None}
+
+        if r.status_code == 304:
+            # status = 304 ~ not modified
+            return [], more
+        elif r.status_code != 200:
+            raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
+
+        result = r.json()
+        return result, more
 
     def getChangeLog(self, modifiedNoEarlierThan=None, modifiedNoLaterThan=None):
         return []

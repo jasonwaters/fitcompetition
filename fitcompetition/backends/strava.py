@@ -12,6 +12,7 @@ class StravaOAuth(BaseOAuth2):
     AUTHORIZATION_URL = 'https://www.strava.com/oauth/authorize'
     ACCESS_TOKEN_URL = 'https://www.strava.com/oauth/token'
     ACCESS_TOKEN_METHOD = 'POST'
+    REDIRECT_STATE = False
 
     def get_user_id(self, details, response):
         return response['athlete']['id']
