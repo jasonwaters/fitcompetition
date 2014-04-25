@@ -454,3 +454,7 @@ input[name=activity-image] {
 .evidence i {
 	margin-right: 5px;
 }
+
+.light-blue {
+	background-color: #e7f4fb !important;
+}

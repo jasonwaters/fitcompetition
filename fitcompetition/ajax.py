@@ -23,8 +23,8 @@ class ChallengeViewSet(viewsets.ModelViewSet):
 def addChallenger(challenge_id, user):
     try:
         challenge = Challenge.objects.get(id=challenge_id)
-        if challenge.hasStarted:
-            raise Exception('Challenge Already Started')
+        if not challenge.canJoin:
+            raise Exception('Challenge Cannot be Joined')
         challenge.addChallenger(user)
         return True, challenge
     except Challenge.DoesNotExist:

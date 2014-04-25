@@ -8,7 +8,7 @@
 		</h3>
 		<div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
 			{% for challenge in challenges %}
-				<div class="list-group-item row">
+				<div class="list-group-item row {% if challenge|isChallenger:user %}light-blue{% endif %}">
 					<div class="col-xs-4 col-sm-3">
 						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 						<div class="challenge-stats">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
@@ -34,18 +34,21 @@
 					<div class="col-xs-5 col-sm-5">
 						{% if challenge.hasStarted %}
 							{% if not challenge.hasEnded %}
-								<div class="challenge-label">{{ challenge.enddate|daysUntil }} left</div>
+								<div class="challenge-label">Ends {{ challenge.enddate|naturalday:"F jS" }}</div>
 							{% else %}
-								<div class="challenge-label">Ended {{ challenge.enddate|date:"m.d.y" }}</div>
+								<div class="challenge-label">Ended {{ challenge.enddate|naturalday:"F jS" }}</div>
 							{% endif %}
-							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 						{% else %}
-							<div class="challenge-label">Starts in {{ challenge.startdate|daysUntil }}</div>
+							<div class="challenge-label">Starts {{ challenge.startdate|naturalday:"F jS" }}</div>
+						{% endif %}
 
+						{% if challenge.canJoin and not challenge|isChallenger:user %}
 							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
+						{% else %}
+							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 						{% endif %}
 					</div>
-			</div>
+				</div>
 			{% endfor %}
 		</div>
 	</div>

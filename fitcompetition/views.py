@@ -115,7 +115,7 @@ def challenge(request, id):
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'canJoin': not challenge.hasStarted and not competitor,
+        'canJoin': challenge.canJoin and not competitor,
         'competitor': competitor,
         'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),

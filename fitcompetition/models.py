@@ -409,11 +409,20 @@ class Challenge(models.Model):
 
     @property
     def hasEnded(self):
-        return self.enddate < datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.enddate < datetime.now(tz=pytz.utc)
 
     @property
     def hasStarted(self):
-        return self.startdate <= datetime.now(tz=pytz.timezone(TIME_ZONE))
+        return self.startdate <= datetime.now(tz=pytz.utc)
+
+    @property
+    def lastPossibleJoinDate(self):
+        dropDeadDays = self.numDays / 4
+        return self.startdate + timedelta(days=dropDeadDays)
+
+    @property
+    def canJoin(self):
+        return datetime.now(tz=pytz.utc).date() <= self.lastPossibleJoinDate.date()
 
     def __unicode__(self):
         return self.name

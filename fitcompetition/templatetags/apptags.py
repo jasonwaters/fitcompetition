@@ -3,6 +3,7 @@ from decimal import Decimal
 from math import floor
 import math
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from django.template import Node
 from django.template.defaultfilters import register
 from django.utils import timezone
@@ -122,6 +123,17 @@ def daysSince(targetdate):
     delta = now - targetdate
     return "%s days" % delta.days
 
+@register.filter()
+def isChallenger(challenge, user):
+    if not user.is_authenticated():
+        return False
+
+    try:
+        competitor = challenge.challenger_set.get(fituser=user)
+    except ObjectDoesNotExist:
+        competitor = None
+
+    return competitor is not None
 
 @register.filter
 def deltaDate(targetDate, kind):
