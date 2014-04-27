@@ -8,7 +8,7 @@
 		</h3>
 		<div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
 			{% for challenge in challenges %}
-				<div class="list-group-item row {% if challenge|isChallenger:user %}light-blue{% endif %}">
+				<div class="list-group-item row {% if hilight and challenge|isChallenger:user %}light-blue{% endif %}">
 					<div class="col-xs-4 col-sm-3">
 						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 						<div class="challenge-stats">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>

@@ -47,6 +47,8 @@ DISQUS_SHORTNAME = ""
 ALLOWED_HOSTS = []
 BASE_URL = 'http://localhost'
 
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
 #celery broker (RabbitMQ)
 BROKER_URL = "amqp://"
 

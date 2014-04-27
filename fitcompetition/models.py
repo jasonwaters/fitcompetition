@@ -146,11 +146,11 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', '-num_players')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', '-num_players')
 
     def currentChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('startdate', '-num_players')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('startdate', '-num_players')
 
     def pastChallenges(self, daysAgo=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -159,7 +159,7 @@ class ChallengeManager(models.Manager):
         if daysAgo is not None:
             filters &= Q(enddate__gt=now-timedelta(days=daysAgo))
 
-        return self.annotate(num_players=Count('players')).filter(filters).order_by('-startdate')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by('-startdate')
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -172,7 +172,7 @@ class ChallengeManager(models.Manager):
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.annotate(num_players=Count('players')).filter(players__id=userid).order_by('startdate')
+            allUserChallenges = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(players__id=userid).order_by('startdate')
 
             for challenge in allUserChallenges:
                 if challenge.hasEnded:
@@ -285,7 +285,7 @@ class Challenge(models.Model):
 
     @property
     def challengers(self):
-        return FitUser.objects.filter(challenge=self).order_by('fullname')
+        return self.players.order_by('fullname')
 
     def addChallenger(self, user):
         try:
@@ -306,12 +306,9 @@ class Challenge(models.Model):
 
 
     @property
-    def teams(self):
-        return Team.objects.filter(challenge=self).annotate(num_members=Count('members'))
-
-    @property
     def rankedTeams(self):
-        return ListUtil.multikeysort(self.teams, ['-averageDistance'], getter=operator.attrgetter)
+        teams = self.teams.filter(challenge=self).select_related('captain').prefetch_related('members').annotate(num_members=Count('members'))
+        return ListUtil.multikeysort(teams, ['-averageDistance'], getter=operator.attrgetter)
 
     def getAchievedGoal(self, fituser):
         if not fituser.is_authenticated():
@@ -332,7 +329,7 @@ class Challenge(models.Model):
 
     def getAchievers(self):
         if self.isTypeIndividual:
-            winners = self.challengers.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
+            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
                                                                                    latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
 
             if self.isStyleWinnerTakesAll:
@@ -383,12 +380,12 @@ class Challenge(models.Model):
         yesterday = now + relativedelta(hours=-24)
 
         filter = self.getActivitiesFilter(generic=True)
-        filter = filter & Q(date__gt=yesterday) & Q(user__in=self.challengers)
+        filter = filter & Q(date__gt=yesterday) & Q(user__in=self.players.all())
 
-        return FitnessActivity.objects.filter(filter).order_by('-date')
+        return FitnessActivity.objects.filter(filter).select_related('type', 'user').order_by('-date')
 
     def getChallengersWithActivities(self):
-        return getAnnotatedUserListWithActivityData(self, self.challengers, self.getActivitiesFilter())
+        return getAnnotatedUserListWithActivityData(self, self.players.all(), self.getActivitiesFilter())
 
     @property
     def moneyInThePot(self):
@@ -400,7 +397,7 @@ class Challenge(models.Model):
         if np is not None:
             return np
         else:
-            return self.challengers.count()
+            return self.players.count()
 
     @property
     def numDays(self):
@@ -468,11 +465,15 @@ class TeamManager(models.Manager):
 
 class Team(models.Model):
     name = models.CharField(max_length=256)
-    challenge = models.ForeignKey(Challenge)
+    challenge = models.ForeignKey(Challenge, related_name="teams")
     members = models.ManyToManyField(FitUser, blank=True, null=True, default=None, related_name='members')
     captain = models.ForeignKey(FitUser, blank=True, null=True, default=None, related_name='captain')
 
     objects = TeamManager()
+
+    def __init__(self, *args, **kwargs):
+        self._distanceCache = None
+        super(Team, self).__init__(*args, **kwargs)
 
     def getMembersWithActivities(self):
         return getAnnotatedUserListWithActivityData(self.challenge,
@@ -488,17 +489,21 @@ class Team(models.Model):
 
     @property
     def distance(self):
-        filter = self.challenge.getActivitiesFilter(generic=True)
+        if self._distanceCache is None:
+            filter = self.challenge.getActivitiesFilter(generic=True)
 
-        userFilter = Q()
+            userFilter = Q()
 
-        for member in self.members.all():
-            userFilter |= Q(user=member)
+            for member in self.members.all():
+                userFilter |= Q(user=member)
 
-        filter = filter & userFilter
+            filter = filter & userFilter
+            #TODO: Fix this N+1 Select
+            result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
+            self._distanceCache = result.get('distance__sum') if result.get('distance__sum') is not None else 0
 
-        result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
-        return result.get('distance__sum') if result.get('distance__sum') is not None else 0
+        return self._distanceCache
+
 
     @property
     def averageDistance(self):

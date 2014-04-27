@@ -128,12 +128,7 @@ def isChallenger(challenge, user):
     if not user.is_authenticated():
         return False
 
-    try:
-        competitor = challenge.challenger_set.get(fituser=user)
-    except ObjectDoesNotExist:
-        competitor = None
-
-    return competitor is not None
+    return user in challenge.players.all()
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -312,12 +307,13 @@ class AggregateNode(Node):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=False)
-def challenges_table(user, challenges, title, iconClass=None, deemphasize=False):
+def challenges_table(user, challenges, title, iconClass=None, deemphasize=False, hilight=True):
     return {'user': user,
             'challenges': challenges,
             'title': title,
             'iconClass': iconClass,
-            'deemphasize': deemphasize}
+            'deemphasize': deemphasize,
+            'hilight': hilight}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=False)
