@@ -3,6 +3,7 @@ from decimal import Decimal
 from math import floor
 import math
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from django.template import Node
 from django.template.defaultfilters import register
 from django.utils import timezone
@@ -122,6 +123,12 @@ def daysSince(targetdate):
     delta = now - targetdate
     return "%s days" % delta.days
 
+@register.filter()
+def isChallenger(challenge, user):
+    if not user.is_authenticated():
+        return False
+
+    return user in challenge.players.all()
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -300,12 +307,13 @@ class AggregateNode(Node):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=False)
-def challenges_table(user, challenges, title, iconClass=None, deemphasize=False):
+def challenges_table(user, challenges, title, iconClass=None, deemphasize=False, hilight=True):
     return {'user': user,
             'challenges': challenges,
             'title': title,
             'iconClass': iconClass,
-            'deemphasize': deemphasize}
+            'deemphasize': deemphasize,
+            'hilight': hilight}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=False)
