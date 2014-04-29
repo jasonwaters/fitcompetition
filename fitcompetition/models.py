@@ -109,7 +109,9 @@ class FitUser(AbstractUser):
             self.gender = profile.get('gender')
             self.profile_url = profile.get('profile_url')
             self.save()
-        except(ExternalIntegrationException, RequestException), e:
+        except RequestException, e:
+            print "There was a Request Exception"
+        except ExternalIntegrationException, e:
             successful = False
             if e.forbidden or e.unauthorized:
                 self.stripTokens()
