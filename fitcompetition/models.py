@@ -101,6 +101,9 @@ class FitUser(AbstractUser):
         successful = True
         try:
             profile = getExternalIntegrationService(self).getUserProfile()
+            self.first_name = profile.get('firstname')
+            self.last_name = profile.get('lastname')
+            self.fullname = profile.fullname
             self.medium_picture = profile.get('medium_picture')
             self.normal_picture = profile.get('normal_picture')
             self.gender = profile.get('gender')
@@ -525,6 +528,9 @@ class Challenger(models.Model):
     def user(self):
         return self.fituser
 
+    def __unicode__(self):
+        return "%s - %s" % (self.challenge.name, self.user.fullname)
+
     class Meta:
         db_table = 'fitcompetition_challenge_players'
         unique_together = (('fituser', 'challenge'))
@@ -533,13 +539,13 @@ class Challenger(models.Model):
 class FitnessActivityManager(models.Manager):
     def pruneActivities(self, user):
         successful = True
-        thirtyDaysAgo = datetime.now(tz=pytz.utc) + timedelta(days=-30)
+        sixtyDaysAgo = datetime.now(tz=pytz.utc) + timedelta(days=-60)
         service = getExternalIntegrationService(user)
 
         try:
             if user.integrationName == Integration.RUNKEEPER:
                 #delete the activities cached in the database that have been deleted on the health graph
-                changelog = service.getChangeLog(modifiedNoEarlierThan=thirtyDaysAgo)
+                changelog = service.getChangeLog(modifiedNoEarlierThan=sixtyDaysAgo)
                 deletedActivities = changelog.get('fitness_activities', {}).get('deleted', [])
 
                 for deletedUri in deletedActivities:
@@ -548,19 +554,21 @@ class FitnessActivityManager(models.Manager):
                         activity.delete()
                     except FitnessActivity.DoesNotExist:
                         pass
-            elif user.integrationName == Integration.MAPMYFITNESS:
-                apiActivities = service.getFitnessActivities(noEarlierThan=thirtyDaysAgo)
-                dbActivities = self.filter(user=user, date__gt=thirtyDaysAgo)
+            elif user.integrationName == Integration.MAPMYFITNESS or user.integrationName == Integration.STRAVA:
+                next = {'hasMore': True, 'url': None}
 
-                if len(apiActivities) != len(dbActivities):
+                while next.get('hasMore'):
+                    apiActivities, next = service.getFitnessActivities(noEarlierThan=sixtyDaysAgo, url=next.get('url'))
+                    dbActivities = self.filter(user=user, date__gte=sixtyDaysAgo)
+
                     uris = {}
                     for apiActivity in apiActivities:
-                        uri = apiActivity.get('_links').get('self')[0].get('href')
-                        uris[uri] = True
+                        activity = Activity(apiActivity, user.integrationName)
+                        uris[activity.get('uri')] = True
 
                     for dbActivity in dbActivities:
                         if not uris.get(dbActivity.uri, False):
-                            #it was deleted from mapmyfitness
+                            #it was deleted from the external service, so we should follow suit
                             dbActivity.delete()
 
         except(ExternalIntegrationException, RequestException), e:
@@ -618,6 +626,7 @@ class FitnessActivity(models.Model):
     distance = models.FloatField(blank=True, null=True, default=0)
     photo = models.ImageField(upload_to=get_file_path, default=None, null=True)
     hasGPS = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False)
 
     objects = FitnessActivityManager()
 

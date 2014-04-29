@@ -5,7 +5,7 @@ from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from fitcompetition import tasks
-from fitcompetition.models import Challenge, FitnessActivity, FitUser, Transaction, Team
+from fitcompetition.models import Challenge, FitnessActivity, FitUser, Transaction, Team, Challenger
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
@@ -158,6 +158,22 @@ def user_activities(request, userID, challengeID):
     return render(request, 'user_activities.html', {
         'activities': activities
     })
+
+@login_required
+def diagnostics(request):
+
+    if request.GET.get('syncActivities') is not None:
+        tasks.syncExternalActivities(request.user.id)
+    elif request.GET.get('pruneActivities') is not None:
+        tasks.pruneExternalActivities(request.user.id)
+    elif request.GET.get('syncProfile') is not None:
+        tasks.syncExternalProfile(request.user.id)
+    elif request.GET.get('resetSyncDate') is not None:
+        user = FitUser.objects.get(id=request.user.id)
+        user.lastExternalSyncDate = None
+        user.save()
+
+    return render(request, 'diagnostics.html', {})
 
 
 def login_error(request):

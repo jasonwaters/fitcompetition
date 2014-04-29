@@ -121,7 +121,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'grappelli',
     'django.contrib.admin',
-    'debug_toolbar',
     'rest_framework',
     'social.apps.django_app.default',
     'south',
@@ -129,6 +128,7 @@ INSTALLED_APPS = (
     'storages',
     'djcelery',
     'seacucumber',
+    'debug_toolbar',
     'fitcompetition',
 )
 

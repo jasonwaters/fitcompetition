@@ -43,4 +43,5 @@ class Command(BaseCommand):
         tasks.syncExternalDataAllUsers.delay(syncActivities=True,
                                              syncProfile=False,
                                              pruneActivities=False,
-                                             integrations=integrations)
+                                             integrations=integrations,
+                                             nowPlayingOnly=False)

@@ -1,8 +1,9 @@
 import datetime
+import pytz
 
 
 def unix_time(dt):
-    epoch = datetime.datetime.utcfromtimestamp(0)
+    epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=pytz.utc)
     delta = dt - epoch
     return delta.total_seconds()
 
