@@ -34,8 +34,8 @@ class StravaOAuth(BaseOAuth2):
             'last_name': last_name,
             'gender': athlete.get('sex'),
             'profile_url': "http://www.strava.com/athletes/%s" % athlete.get('id'),
-            'medium_picture': athlete.get('profile_medium'),
-            'normal_picture': athlete.get('profile'),
+            'medium_picture': athlete.get('profile_medium') if "medium.png" not in athlete.get('profile_medium') else None,
+            'normal_picture': athlete.get('profile') if "large.png" not in athlete.get('profile') else None,
             'integrationName': Integration.STRAVA
         }
 
