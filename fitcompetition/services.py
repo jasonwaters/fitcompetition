@@ -78,7 +78,7 @@ class Profile(object):
             self.medium_picture = user.get('profile_medium') if "medium.png" not in user.get('profile_medium') else None
             self.normal_picture = user.get('profile') if "large.png" not in user.get('profile') else None
             self.gender = user.get('sex')
-            self.profile_url = "http://www.strava.com/athletes/%s" % user.get('id'),
+            self.profile_url = "http://www.strava.com/athletes/%s" % user.get('id')
 
         super(Profile, self).__init__()
 
