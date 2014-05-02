@@ -83,7 +83,8 @@
         <div class="container main-container">
             {% block content %}{% endblock %}
         </div>
-
+		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
 		{% compressed_js 'all-js' %}
 		{% block javascript %}{% endblock %}
 		{{ inline_javascript }}

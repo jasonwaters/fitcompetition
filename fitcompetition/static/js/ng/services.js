@@ -1,4 +1,6 @@
 (function() {
+	"use strict";
+
 	var api = angular.module('api', ['ngResource', 'ngCookies']);
 
 	api.run(['$http', '$cookies', function($http, $cookies) {
@@ -11,7 +13,7 @@
 		}, {
 			get: {
 				method: 'GET',
-				transformResponse: function(data, headers){
+				transformResponse: function(data, headers) {
 					data = JSON.parse(data);
 					data.account.balance = parseFloat(data.account.balance);
 					return data;
@@ -32,6 +34,7 @@
 				transformResponse: function(data, headers){
 					data = JSON.parse(data);
 					var count = data.results.length;
+
 					for(var i=0;i<count;i++) {
 						data.results[i].date = new Date(data.results[i].date);
 						data.results[i].amount = parseFloat(data.results[i].amount);
@@ -47,4 +50,4 @@
 			go: {method: 'GET'}
 		});
 	}]);
-})();
+}());

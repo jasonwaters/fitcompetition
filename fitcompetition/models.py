@@ -153,18 +153,21 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', '-num_players')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by(
+            '-startdate', '-num_players')
 
     def currentChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('startdate', '-num_players')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now,
+                                                                                                                    enddate__gte=now).order_by(
+            'startdate', '-num_players')
 
     def pastChallenges(self, daysAgo=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         filters = Q(enddate__lt=now)
 
         if daysAgo is not None:
-            filters &= Q(enddate__gt=now-timedelta(days=daysAgo))
+            filters &= Q(enddate__gt=now - timedelta(days=daysAgo))
 
         return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by('-startdate')
 
@@ -179,7 +182,8 @@ class ChallengeManager(models.Manager):
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(players__id=userid).order_by('startdate')
+            allUserChallenges = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(
+                players__id=userid).order_by('startdate')
 
             for challenge in allUserChallenges:
                 if challenge.hasEnded:
@@ -336,8 +340,8 @@ class Challenge(models.Model):
 
     def getAchievers(self):
         if self.isTypeIndividual:
-            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('fitnessactivity__distance', distinct=True),
-                                                                                   latest_activity_date=Max('fitnessactivity__date')).exclude(total_distance__lt=toMeters(self.distance))
+            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('activities__distance', distinct=True),
+                                                                               latest_activity_date=Max('activities__date')).exclude(total_distance__lt=toMeters(self.distance))
 
             if self.isStyleWinnerTakesAll:
                 return winners[:1]
@@ -587,7 +591,8 @@ class FitnessActivityManager(models.Manager):
             next = {'hasMore': True, 'url': None}
 
             while next.get('hasMore'):
-                activities, next = getExternalIntegrationService(user).getFitnessActivities(modifiedSince=user.lastExternalSyncDate, url=next.get('url'))
+                activities, next = getExternalIntegrationService(user).getFitnessActivities(modifiedSince=user.lastExternalSyncDate,
+                                                                                            url=next.get('url'))
 
                 for activity in activities:
                     activity = Activity(activity, user.integrationName)

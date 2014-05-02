@@ -159,8 +159,6 @@ PIPELINE_CSS = {
 PIPELINE_JS = {
     'all-js': {
         'source_filenames': (
-            'js/jquery.js',
-            'js/angular.js',
             'js/angular-resource.js',
             'js/angular-cookies.js',
             'js/angular-ui-bootstrap-tpls.js',

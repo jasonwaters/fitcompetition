@@ -9,7 +9,7 @@
 
 {% block content %}
 	{% verbatim %}
-		<div ng-controller="account-controller" ng-cloak>
+		<div ng-controller="account-controller">
 			<div class="page-header">
 				<h2>Account Summary <small ng-class="{red: account.balance<0}">Balance: {{ account.balance | currency }}</small></h2>
 			</div>
@@ -33,14 +33,14 @@
 					<th>Amount</th>
 				</thead>
 				<tbody>
-					<tr ng-repeat="transaction in transactions | orderBy:'date':true">
+					<tr ng-repeat="transaction in transactions | orderBy:'date':true" ng-cloak>
 						<td title="{{ transaction.date }}">{{ transaction.date | date:"longDate"}}</td>
 						<td>{{ transaction.description }}</td>
 						<td ng-class="{red: transaction.amount<0}">{{ transaction.amount | currency }}</td>
 					</tr>
 				</tbody>
 			</table>
-			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" page="currentPage" items-per-page="maxApiRecords" on-select-page="setPage(page)"></pagination>
+			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" ng-model="currentPage" items-per-page="maxApiRecords" ng-change="pageChanged()"></pagination>
 		</div>
 
 		<script type="text/ng-template" id="cashOutModalContent.html">
@@ -116,8 +116,8 @@
 					$scope.transactions = response.results
 				}
 
-				$scope.setPage = function(pageNum) {
-					Transactions.list({page: pageNum}, handleTransactions);
+				$scope.pageChanged = function() {
+					Transactions.list({page: $scope.currentPage}, handleTransactions);
 				};
 
 				if( $scope.account.balance >= 0) {
