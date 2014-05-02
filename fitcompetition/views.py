@@ -1,17 +1,14 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from fitcompetition import tasks
-from fitcompetition.models import Challenge, FitnessActivity, Challenger, FitUser, Transaction, Team
-from fitcompetition.serializers import UserSerializer
+from fitcompetition.models import Challenge, FitnessActivity, FitUser, Team
 from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
-from rest_framework.renderers import JSONRenderer
 
 
 def challenges(request):
@@ -26,7 +23,6 @@ def challenges(request):
         'upcomingChallenges': upcomingChallenges,
         'pastChallenges': pastChallenges,
         'totalPaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0),
-        'averagePaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0) / attr(challengeStats, 'totalWinnerCount', defaultValue=1)
     })
 
 
@@ -50,7 +46,7 @@ def user(request, id):
 
     thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
 
-    recentActivities = FitnessActivity.objects.filter(date__gte=thirtyDaysAgo, user=user).order_by('-date')
+    recentActivities = FitnessActivity.objects.select_related('type').filter(date__gte=thirtyDaysAgo, user=user).order_by('-date')
 
     return render(request, 'user.html', {
         'userprofile': user,
@@ -63,7 +59,7 @@ def user(request, id):
 
 def team(request, id):
     try:
-        team = Team.objects.get(id=id)
+        team = Team.objects.prefetch_related('members').get(id=id)
     except Team.DoesNotExist:
         team = None
 
@@ -83,17 +79,14 @@ def challenge(request, id):
     now = datetime.now(tz=pytz.utc)
 
     try:
-        challenge = Challenge.objects.get(id=id)
+        challenge = Challenge.objects.prefetch_related('approvedActivities', 'players', 'teams').get(id=id)
     except Challenge.DoesNotExist:
         return redirect('challenges')
 
     competitor = None
 
     if request.user.is_authenticated():
-        try:
-            competitor = challenge.challenger_set.get(fituser=request.user)
-        except Challenger.DoesNotExist:
-            competitor = None
+        competitor = request.user in challenge.players.all()
 
     if competitor and challenge.startdate <= now <= challenge.enddate:
         if request.user.healthGraphStale():
@@ -103,17 +96,23 @@ def challenge(request, id):
 
     approvedTypes = challenge.approvedActivities.all()
 
+    footFilter = Q(name__contains="Running")
+    footFilter |= Q(name__contains="Walking")
+    footFilter |= Q(name__contains="Hiking")
+
+    isFootRace = len(challenge.approvedActivities.filter(footFilter)) > 0
+
     params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'canJoin': not challenge.hasStarted and not competitor,
+        'canJoin': challenge.canJoin and not competitor,
         'competitor': competitor,
-        'userAchievedGoal': competitor and challenge.getAchievedGoal(request.user),
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
-        'canWithdraw': competitor and not competitor.user.delinquent and not challenge.hasStarted,
+        'canWithdraw': competitor and not request.user.delinquent and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities()[:5],
+        'isFootRace': isFootRace
     }
 
     if challenge.isTypeIndividual:
@@ -131,7 +130,7 @@ def challenge(request, id):
                 pass
 
         params['teams'] = challenge.rankedTeams
-        params['canSwitchTeams'] = competitor and not competitor.user.delinquent and not challenge.hasStarted
+        params['canSwitchTeams'] = competitor and not challenge.hasStarted and not request.user.delinquent
 
     return render(request, 'challenge.html', params)
 
@@ -155,6 +154,22 @@ def user_activities(request, userID, challengeID):
     return render(request, 'user_activities.html', {
         'activities': activities
     })
+
+@login_required
+def diagnostics(request):
+
+    if request.GET.get('syncActivities') is not None:
+        tasks.syncExternalActivities(request.user.id)
+    elif request.GET.get('pruneActivities') is not None:
+        tasks.pruneExternalActivities(request.user.id)
+    elif request.GET.get('syncProfile') is not None:
+        tasks.syncExternalProfile(request.user.id)
+    elif request.GET.get('resetSyncDate') is not None:
+        user = FitUser.objects.get(id=request.user.id)
+        user.lastExternalSyncDate = None
+        user.save()
+
+    return render(request, 'diagnostics.html', {})
 
 
 def login_error(request):

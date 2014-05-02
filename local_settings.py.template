@@ -39,6 +39,9 @@ SOCIAL_AUTH_RUNKEEPER_SECRET = ''
 SOCIAL_AUTH_MAPMYFITNESS_KEY = ''
 SOCIAL_AUTH_MAPMYFITNESS_SECRET = ''
 
+SOCIAL_AUTH_STRAVA_KEY = ''
+SOCIAL_AUTH_STRAVA_SECRET = ''
+
 #The unique identifier for your website as registered on Disqus. If undefined, the Disqus embed will not load.
 DISQUS_SHORTNAME = ""
 
@@ -46,6 +49,8 @@ DISQUS_SHORTNAME = ""
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
 BASE_URL = 'http://localhost'
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 #celery broker (RabbitMQ)
 BROKER_URL = "amqp://"

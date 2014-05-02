@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 from dateutil import parser
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.util.DateUtil import unix_time
 from fitcompetition.util.ListUtil import attr
 import pytz
 import requests
@@ -10,11 +11,12 @@ from django.conf import settings
 
 class Integration(object):
     RUNKEEPER = "Runkeeper"
-    MAPMYFITNESS = "MapmyFitness"
+    MAPMYFITNESS = "MapMyFitness"
+    STRAVA = "Strava"
 
     @staticmethod
     def all():
-        return [Integration.RUNKEEPER, Integration.MAPMYFITNESS]
+        return [Integration.RUNKEEPER, Integration.MAPMYFITNESS, Integration.STRAVA]
 
 
 class ExternalIntegrationException(Exception):
@@ -36,6 +38,8 @@ def getExternalIntegrationService(user):
         return RunkeeperService(user)
     elif user.integrationName == Integration.MAPMYFITNESS:
         return MapMyFitnessService(user)
+    elif user.integrationName == Integration.STRAVA:
+        return StravaService(user)
 
 
 class Profile(object):
@@ -43,17 +47,44 @@ class Profile(object):
         self._user = user
 
         if service == Integration.RUNKEEPER:
+            fullname = user.get('name', '')
+
+            if fullname:
+                try:
+                    first_name, last_name = fullname.rsplit(' ', 1)
+                except ValueError:
+                    if fullname is not None and len(fullname) > 0:
+                        first_name = fullname
+                    else:
+                        first_name = "Unnamed"
+                    last_name = ""
+
+            self.firstname = first_name
+            self.lastname = last_name
             self.medium_picture = user.get('medium_picture')
             self.normal_picture = user.get('normal_picture')
             self.gender = user.get('gender')
             self.profile_url = user.get('profile')
         elif service == Integration.MAPMYFITNESS:
-            self.medium_picture = user.get('photos').get('small')[0]['href']
-            self.normal_picture = user.get('photos').get('medium')[0]['href']
+            self.firstname = user.get('first_name')
+            self.lastname = user.get('last_name')
+            self.medium_picture = user.get('photos').get('small')[0]['href'] if "static.mapmyfitness.com/d/website/avatars/" not in user.get('photos').get('small')[0]['href'] else None
+            self.normal_picture = user.get('photos').get('medium')[0]['href'] if "static.mapmyfitness.com/d/website/avatars/" not in user.get('photos').get('medium')[0]['href'] else None
             self.gender = user.get('gender')
             self.profile_url = "%s/profile/%s/" % (MapMyFitnessService.BASE_URL, str(user.get('id')))
+        elif service == Integration.STRAVA:
+            self.firstname = user.get('firstname')
+            self.lastname = user.get('lastname')
+            self.medium_picture = user.get('profile_medium') if "medium.png" not in user.get('profile_medium') else None
+            self.normal_picture = user.get('profile') if "large.png" not in user.get('profile') else None
+            self.gender = user.get('sex')
+            self.profile_url = "http://www.strava.com/athletes/%s" % user.get('id')
 
         super(Profile, self).__init__()
+
+    @property
+    def fullname(self):
+        return "%s %s" % (self.firstname, self.lastname)
 
     def get(self, name):
         return attr(self, name)
@@ -79,12 +110,12 @@ class Activity(object):
             self.type = activity.get('type')
             self.duration = activity.get('duration')
 
-            #translate the date to mst, since runkeeper gives plain jane utc
-            self.date = parser.parse(activity.get('start_time')).replace(tzinfo=pytz.timezone(TIME_ZONE))
+            #runkeeper does not provide timezone data yet.  So we leave it naive
+            self.date = parser.parse(activity.get('start_time'))
 
             self.calories = activity.get('total_calories')
             self.distance = activity.get('total_distance')
-            self.hasEvidence = activity.get('has_path')
+            self.hasGPS = activity.get('has_path')
         elif service == Integration.MAPMYFITNESS:
             #this is a dictionary to match the various mmf workout ids to useful ones
             types = {
@@ -255,13 +286,42 @@ class Activity(object):
             self.uri = links.get('self')[0].get('href')
             self.duration = aggregates.get('active_time_total')
 
-            #preserve the timezone entered by the user in MapmyFitness
+            #preserve the timezone entered by the user in MapMyFitness
             activityTimezone = pytz.timezone(activity.get('start_locale_timezone'))
             self.date = activityTimezone.normalize(parser.parse(activity.get('start_datetime')).astimezone(pytz.utc))
 
             self.calories = aggregates.get('metabolic_engergy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
-            self.hasEvidence = activity.get('has_time_series')
+            self.hasGPS = activity.get('has_time_series')
+        elif service == Integration.STRAVA:
+            types = {
+                "AlpineSki": "Downhill Skiing",
+                "BackcountrySki": "Cross-Country Skiing",
+                "Hike": "Hiking",
+                "IceSkate": "Skating",
+                "InlineSkate": "Skating",
+                "Kitesurf": "Other",
+                "NordicSki": "Cross-Country Skiing",
+                "Ride": "Cycling",
+                "RollerSki": "Other",
+                "Run": "Running",
+                "Snowboard": "Snowboarding",
+                "Snowshoe": "Nordic Walking",
+                "Swim": "Swimming",
+                "Walk": "Walking",
+                "Windsurf": "Other",
+                "Workout": "Other"
+            }
+
+            self.type = types.get(activity.get('type'), "Other")
+            self.uri = "http://www.strava.com/activities/%s" % activity.get('id')
+            self.duration = activity.get('moving_time')
+
+            self.date = activity.get('start_date')
+
+            self.calories = activity.get('calories')
+            self.distance = activity.get('distance')
+            self.hasGPS = not activity.get('manual')
 
         super(Activity, self).__init__()
 
@@ -310,7 +370,6 @@ class RunkeeperService(object):
             headers = {}
 
             if modifiedSince is not None:
-                modifiedSince = modifiedSince - timedelta(days=1)
                 headers['If-Modified-Since'] = modifiedSince.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
             url = "%s%s" % (self.RUNKEEPER_API_URL, self.FITNESS_ACTIVITIES)
@@ -459,3 +518,58 @@ class MapMyFitnessService:
             self.getActivityTypes(result.get('_links').get('next')[0].get('href'))
 
         return activity_types
+
+
+class StravaService(object):
+    API_URL = 'https://www.strava.com/api/v3'
+
+    def __init__(self, user):
+        self.user = user
+        super(StravaService, self).__init__()
+
+    def hasTokens(self):
+        return self.user.stravaToken is not None and len(self.user.stravaToken) > 0
+
+    def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
+        params = {
+            'access_token': self.user.stravaToken,
+            "per_page": 200,
+        }
+        # before, after, page, per_page
+
+        if noEarlierThan is not None:
+            params['after'] = unix_time(noEarlierThan)
+
+        if noLaterThan is not None:
+            params['before'] = unix_time(noLaterThan)
+
+        headers = {}
+
+        url = "%s/athlete/activities" % self.API_URL
+        r = requests.get(url, params=params, headers=headers)
+
+        more = {'hasMore': False, 'url': None}
+
+        if r.status_code == 304:
+            # status = 304 ~ not modified
+            return [], more
+        elif r.status_code != 200:
+            raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
+
+        result = r.json()
+        return result, more
+
+    def getUserProfile(self):
+        params = {
+            'access_token': self.user.stravaToken,
+        }
+
+        url = "%s/athlete" % self.API_URL
+        r = requests.get(url, params=params)
+
+        if r.status_code != 200:
+            raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
+
+        return Profile(r.json(), service=Integration.STRAVA)
+
+

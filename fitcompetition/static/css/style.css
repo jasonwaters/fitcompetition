@@ -274,7 +274,12 @@ tr.team .team-total {
 	background: url('/static/img/mapmyfitness-logo.png') no-repeat;
 	width: 230px;
 	height: 67px;
+}
 
+.btn-sign-in.strava .logo {
+	background: url('/static/img/strava-logo.png') no-repeat;
+	width: 230px;
+	height: 67px;
 }
 
 .list-challenges.dimmed {
@@ -403,7 +408,7 @@ input[name=activity-image] {
 }
 
 .apps-grid {
-	max-width: 680px;
+	max-width: 800px;
 	margin: 0 auto;
 	text-align: center;
 }
@@ -451,6 +456,14 @@ input[name=activity-image] {
 	background: url('/static/img/app_mapmyride.png') no-repeat;
 }
 
+.app-icon.strava {
+	background: url('/static/img/app_strava.png') no-repeat;
+}
+
 .evidence i {
 	margin-right: 5px;
+}
+
+.light-blue {
+	background-color: #e7f4fb !important;
 }

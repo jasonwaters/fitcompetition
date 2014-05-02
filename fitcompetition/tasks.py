@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
 from fitcompetition.celery import app
@@ -50,7 +51,7 @@ def syncExternalData(user_id, syncActivities=True, syncProfile=False, pruneActiv
 
 #hourly
 @app.task(ignore_result=True)
-def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False, integrations=None):
+def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False, integrations=None, nowPlayingOnly=True):
     filter = Q()
 
     if integrations is None:
@@ -59,10 +60,17 @@ def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivi
     if Integration.RUNKEEPER in integrations:
         filter |= Q(runkeeperToken__isnull=False)
 
+    if Integration.STRAVA in integrations:
+        filter |= Q(stravaToken__isnull=False)
+
     if Integration.MAPMYFITNESS in integrations:
         filter |= Q(mapmyfitnessToken__isnull=False)
 
-    users = FitUser.objects.filter(filter)
+    if nowPlayingOnly:
+        now = datetime.now(tz=pytz.utc)
+        users = FitUser.objects.filter(filter, challenger__challenge__startdate__lte=now, challenger__challenge__enddate__gte=now).distinct()
+    else:
+        users = FitUser.objects.filter(filter)
 
     for user in users:
         syncExternalData.delay(user.id, syncActivities=syncActivities, syncProfile=syncProfile, pruneActivities=pruneActivities)

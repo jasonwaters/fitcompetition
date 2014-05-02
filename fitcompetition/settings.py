@@ -91,6 +91,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SSLRedirect',
@@ -119,14 +120,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'grappelli',
-    'rest_framework',
     'django.contrib.admin',
+    'rest_framework',
     'social.apps.django_app.default',
     'south',
     'pipeline',
     'storages',
     'djcelery',
     'seacucumber',
+    'debug_toolbar',
     'fitcompetition',
 )
 
@@ -224,6 +226,7 @@ SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 255
 AUTHENTICATION_BACKENDS = (
     'fitcompetition.backends.runkeeper.RunkeeperOauth2',
     'fitcompetition.backends.mapmyfitness.MapMyFitnessOAuth',
+    'fitcompetition.backends.strava.StravaOAuth',
     'django.contrib.auth.backends.ModelBackend'
 )
 

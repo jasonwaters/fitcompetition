@@ -3,6 +3,7 @@ from decimal import Decimal
 from math import floor
 import math
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from django.template import Node
 from django.template.defaultfilters import register
 from django.utils import timezone
@@ -23,9 +24,11 @@ SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR
 SECONDS_PER_DAY = SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY
 
+
 @register.filter
 def abs(value):
     return math.fabs(value)
+
 
 @register.filter
 def achievedGoal(meters, goal_miles):
@@ -107,8 +110,12 @@ def twoDecimals(value):
 
 @register.filter
 def duration(secs):
-    m, s = divmod(secs, 60)
-    h, m = divmod(m, 60)
+    if secs is None:
+        m, s, h, m = 0, 0, 0, 0
+    else:
+        m, s = divmod(secs, 60)
+        h, m = divmod(m, 60)
+
     return "%d:%02d:%02d" % (h, m, s)
 
 
@@ -125,6 +132,12 @@ def daysSince(targetdate):
     delta = now - targetdate
     return "%s days" % delta.days
 
+@register.filter()
+def isChallenger(challenge, user):
+    if not user.is_authenticated():
+        return False
+
+    return user in challenge.players.all()
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -303,12 +316,13 @@ class AggregateNode(Node):
 
 
 @register.inclusion_tag('inclusions/challenges_table.html', takes_context=False)
-def challenges_table(user, challenges, title, iconClass=None, deemphasize=False):
+def challenges_table(user, challenges, title, iconClass=None, deemphasize=False, hilight=True):
     return {'user': user,
             'challenges': challenges,
             'title': title,
             'iconClass': iconClass,
-            'deemphasize': deemphasize}
+            'deemphasize': deemphasize,
+            'hilight': hilight}
 
 
 @register.inclusion_tag('inclusions/player_row.html', takes_context=False)

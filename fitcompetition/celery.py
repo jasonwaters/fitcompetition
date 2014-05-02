@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-from datetime import timedelta
 from celery.schedules import crontab
 
 import os
@@ -33,7 +32,7 @@ app.conf.update(
 
         "sync-profile-prune-external-activities-daily": {
             "task": "fitcompetition.tasks.syncExternalDataAllUsers",
-            "schedule": crontab(minute=0, hour=0),
+            "schedule": crontab(minute=0, hour=23),
             "kwargs": {
                 'syncActivities': False,
                 'syncProfile': True,

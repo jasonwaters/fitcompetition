@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load staticfiles %}
+
+{% block head_title %}Diagnostics{% endblock %}
+
+{% block head_misc %}
+{% endblock %}
+
+{% block content %}
+	<div>
+		<h3>Service Actions <small>{{ user.integrationName }}</small></h3>
+		<table class="table table-striped">
+			<tbody>
+				<tr>
+					<td>RunKeeper Token</td>
+					<td>{{ user.runkeeperToken }}</td>
+				</tr>
+				<tr>
+					<td>MapMyFitness Tokens</td>
+					<td>{{ user.mapmyfitnessToken }}, {{ user.mapmyfitnessTokenSecret }}</td>
+				</tr>
+				<tr>
+					<td>Strava Token</td>
+					<td>{{ user.stravaToken }}</td>
+				</tr>
+				<tr>
+					<td>Last Sync Date</td>
+					<td>{{ user.lastExternalSyncDate }} &nbsp;&nbsp;&nbsp;<a href="?resetSyncDate">Reset</a></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<a href="?syncActivities" class="btn btn-default">Sync Activities</a>
+		<a href="?pruneActivities" class="btn btn-default">Prune Activities</a>
+		<a href="?syncProfile" class="btn btn-default">Sync Profile</a>
+	</div>
+{% endblock %}
