@@ -132,14 +132,14 @@ INSTALLED_APPS = (
     'fitcompetition',
 )
 
-MAX_API_RECORDS = 50
+API_PAGE_SIZE = 50
 
 REST_FRAMEWORK = {
     'DEFAULT_MODEL_SERIALIZER_CLASS': 'rest_framework.serializers.HyperlinkedModelSerializer',
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend', 'rest_framework.filters.OrderingFilter'),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',),
 
-    'PAGINATE_BY': MAX_API_RECORDS
+    'PAGINATE_BY': API_PAGE_SIZE
 }
 
 PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.yui.YUICompressor'

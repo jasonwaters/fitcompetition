@@ -2,22 +2,15 @@ import base64
 import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
-from fitcompetition.serializers import ChallengeSerializer, ActivitySerializer, UserSerializer, TransactionSerializer
+from fitcompetition.serializers import UserSerializer, ChallengeSerializer
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account
+from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account, ActivityType
 from django.conf import settings
 import mailchimp
-from rest_framework import viewsets, generics
-
-
-class ChallengeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows challenges to be viewed or edited.
-    """
-    queryset = Challenge.objects.all()
-    serializer_class = ChallengeSerializer
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 
 def addChallenger(challenge_id, user):
@@ -150,8 +143,13 @@ def account_cash_out(request):
 #################################
 
 
+class ActivityTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    model = ActivityType
+
+
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     model = Account
+    permission_classes = (IsAuthenticated,)
 
 
 class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -160,15 +158,19 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     model = FitUser
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
 
 class ChallengeViewSet(viewsets.ReadOnlyModelViewSet):
     model = Challenge
+    serializer_class = ChallengeSerializer
 
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     model = Transaction
+    permission_classes = (IsAuthenticated,)
+    paginate_by_param = 'page_size'
 
     def get_queryset(self):
         queryset = super(TransactionViewSet, self).get_queryset()

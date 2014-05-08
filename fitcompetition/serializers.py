@@ -28,8 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ChallengeSerializer(serializers.ModelSerializer):
+    approvedActivities = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
+
     class Meta:
         model = Challenge
+
+        exclude = (
+            'account',
+            'players'
+        )
+
         #account
         #teams
         #players

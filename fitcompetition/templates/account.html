@@ -14,10 +14,10 @@
 				<h2>Account Summary <small ng-class="{red: account.balance<0}">Balance: {{ account.balance | currency }}</small></h2>
 			</div>
 
-			<alert type="alertType">
+			<alert type="{{alertType}}" ng-show="account.balance != 0">
 				<p>{{ alertMessage }}</p>
 				<div class="good-news top-padding" ng-show="account.balance > 0">
-					<a href="#" class="btn btn-primary">Find a Challenge</a>
+					<a href="/challenges" class="btn btn-primary">Find a Challenge</a>
 					<button class="btn btn-link" ng-click="openCashOutModal()">Cash Out</button>
 				</div>
 				<div class="bad-news top-padding" ng-show="account.balance < 0">
@@ -96,7 +96,8 @@
 			accountApp.controller('account-controller', ['$scope', 'User', 'Transactions', 'CashOut', '$modal', function($scope, User, Transactions, CashOut, $modal) {
 				$scope.transactions = [];
 				$scope.account = FC.user.account;
-				$scope.maxApiRecords = FC['maxApiRecords'];
+				$scope.currentPage = 1;
+				$scope.maxApiRecords = 10;
 				$scope.alertType = $scope.account.balance >= 0 ? "info" : 'danger';
 
 				$scope.openCashOutModal = function() {
@@ -117,7 +118,10 @@
 				}
 
 				$scope.pageChanged = function() {
-					Transactions.list({page: $scope.currentPage}, handleTransactions);
+					Transactions.list({
+						page: $scope.currentPage,
+						page_size: $scope.maxApiRecords
+					}, handleTransactions);
 				};
 
 				if( $scope.account.balance >= 0) {
@@ -126,7 +130,7 @@
 					$scope.alertMessage = "Your account balance is negative!  Don't worry, it's easy to settle up."
 				}
 
-				Transactions.list({}, handleTransactions);
+				$scope.pageChanged();
 
 			}]);
 		})();

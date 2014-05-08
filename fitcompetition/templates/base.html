@@ -11,7 +11,7 @@
 
 		<script type="text/javascript">
 			var FC = {
-				'maxApiRecords': {{ "MAX_API_RECORDS"|fromSettings }},
+				'API_PAGE_SIZE': {{ "API_PAGE_SIZE"|fromSettings }},
 			};
 
 			{% if user.is_authenticated %}
@@ -41,7 +41,7 @@
 
                 <nav class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="{% url "home" %}" title="Challenges">Challenges</a></li>
+                        <li><a href="{% url "challenges" %}" title="Challenges">Challenges</a></li>
                         {% if user.is_authenticated %}
                             <li><a href="{% url "user_profile" %}">My Profile</a></li>
                         {% endif %}

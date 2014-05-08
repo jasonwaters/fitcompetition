@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from fitcompetition.api import TransactionViewSet, ChallengeViewSet, UserViewSet, ActivityViewSet, AccountViewSet
+from fitcompetition.api import TransactionViewSet, ChallengeViewSet, UserViewSet, ActivityViewSet, AccountViewSet, ActivityTypeViewSet
 from rest_framework import routers
 from django.conf import settings
 
@@ -13,11 +13,12 @@ router.register(r'activities', ActivityViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'challenges', ChallengeViewSet)
 router.register(r'transactions', TransactionViewSet)
+router.register(r'activitytypes', ActivityTypeViewSet)
 
 urlpatterns = patterns('',
                        #VIEWS
                        url(r'^$', 'fitcompetition.views.challenges', name='home'),
-                       url(r'^$', 'fitcompetition.views.challenges', name='challenges'),
+                       url(r'^challenges/$', 'fitcompetition.views.challenges', name='challenges'),
                        url(r'^challenge/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details"),
                        url(r'^c/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details2"),
                        url(r'^faq/$', 'fitcompetition.views.faq', name="faq"),
