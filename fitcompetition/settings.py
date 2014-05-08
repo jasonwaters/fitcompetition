@@ -161,6 +161,7 @@ PIPELINE_JS = {
         'source_filenames': (
             'js/angular-resource.js',
             'js/angular-cookies.js',
+            'js/angular-payments.js',
             'js/angular-ui-bootstrap-tpls.js',
             'js/ng/*.js',
             'js/jquery.cookie.js',

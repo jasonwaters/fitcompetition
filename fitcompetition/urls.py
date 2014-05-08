@@ -19,7 +19,7 @@ urlpatterns = patterns('',
                        #VIEWS
                        url(r'^$', 'fitcompetition.views.challenges', name='home'),
                        url(r'^challenges/$', 'fitcompetition.views.challenges', name='challenges'),
-                       url(r'^challenge/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details"),
+                       url(r'^challenge/(?P<id>\d+)/$', 'fitcompetition.views.challenge', {'SSL':True}, name="challenge_details"),
                        url(r'^c/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details2"),
                        url(r'^faq/$', 'fitcompetition.views.faq', name="faq"),
                        url(r'^profile/$', 'fitcompetition.views.profile', name="user_profile"),

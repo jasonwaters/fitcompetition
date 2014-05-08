@@ -21,7 +21,7 @@
 					<button class="btn btn-link" ng-click="openCashOutModal()">Cash Out</button>
 				</div>
 				<div class="bad-news top-padding" ng-show="account.balance < 0">
-					<a href="#" class="btn btn-primary">Settle Up Now</a>
+					<button class="btn btn-primary" ng-click="openDepositFundsModal()">Settle Up Now</button>
 				</div>
 			</alert>
 
@@ -43,11 +43,11 @@
 			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" ng-model="currentPage" items-per-page="maxApiRecords" ng-change="pageChanged()"></pagination>
 		</div>
 
-		<script type="text/ng-template" id="cashOutModalContent.html">
+		<script type="text/ng-template" id="cashOutModal.html">
 			<div class="modal-header">
 				<h4 class="modal-title">Cash Out</h4>
 			</div>
-			<form novalidate name="form" show-validation>
+			<form novalidate name="formCashOut" show-validation>
 				<div class="modal-body">
 					<p>We use PayPal to securely send you money. Just tell us the email address that is associated with your PayPal account and how much
 						to send you.</p>
@@ -65,9 +65,72 @@
 				</div>
 			</form>
 			<div class="modal-footer">
-					<button class="btn btn-default" ng-click="cancel()">Nevermind</button>
-					<button class="btn btn-primary" ng-click="ok()" ng-disabled="form.$invalid">Cash Out</button>
+				<button class="btn btn-link" ng-click="cancel()">Nevermind</button>
+				<button class="btn btn-primary" ng-click="ok()" ng-disabled="formCashOut.$invalid">Cash Out</button>
+			</div>
+		</script>
+
+		<script type="text/ng-template" id="depositFundsModal.html">
+			<div class="modal-header">
+				<h4 class="modal-title">Add money to the pot</h4>
+			</div>
+			<form novalidate name="formPayment" stripe-form="handleStripe" show-validation>
+				<div class="modal-body">
+					<h5>Line items</h5>
+					<table class="table">
+						<tbody>
+							<tr>
+								<td>"Walk it Off" challenge</td>
+								<td>$20.00</td>
+							</tr>
+							<tr>
+								<td>Transaction Fee</td>
+								<td>$0.80</td>
+							</tr>
+						</tbody>
+						<tfoot>
+						<tr>
+							<th>Total</th>
+							<th>$20.80</th>
+						</tr>
+						</tfoot>
+					</table>
+					<h5>Card details</h5>
+					<div class="well">
+						<div class="form-group">
+							<label class="sr-only" for="customerName">Name on card </label>
+							<input id="customerName" type="text" class="form-control" placeholder="Name on card" ng-model="customerName" required/>
+						</div>
+
+						<div class="form-group">
+							<label class="sr-only" for="cardNumber">Card number</label>
+							<div class="relative">
+								<input id="cardNumber" type="text" class="form-control" ng-model="number" payments-validate="card" payments-format="card" payments-type-model="type" placeholder="Card number" required/>
+								<span class="card" ng-class="type"></span>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-3">
+								<div class="form-group">
+									<label class="sr-only" for="expiry">Expiry</label>
+									<input id="expiry" type="text" class="form-control" ng-model="expiry" payments-validate="expiry" payments-format="expiry" placeholder="MM/YY" required/>
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="form-group">
+									<label class="sr-only" for="cvc">CVC</label>
+									<input id="cvc" type="text" class="form-control" ng-model="cvc" payments-validate="cvc" payments-format="cvc" payments-type-model="type" placeholder="CVC" required/>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
+			</form>
+			<div class="modal-footer">
+				<button class="btn btn-link" ng-click="cancel()">Cancel</button>
+				<button class="btn btn-primary" ng-click="ok()" ng-disabled="formPayment.$invalid">Pay $20.80</button>
+			</div>
 		</script>
 	{% endverbatim %}
 
@@ -75,7 +138,7 @@
 	<script type="text/javascript">
 		(function() {
 			"use strict";
-			var accountApp = angular.module('account', ['api', 'directives', 'ui.bootstrap']);
+			var accountApp = angular.module('account', ['api', 'directives', 'angularPayments', 'ui.bootstrap']);
 
 			accountApp.controller('cash-out-modal-controller', function ($scope, $modalInstance) {
 				$scope.accountBalance = parseFloat(FC['user']['account']['balance']);
@@ -93,6 +156,25 @@
 				};
 			});
 
+			accountApp.controller('deposit-funds-modal-controller', function ($scope, $modalInstance) {
+				$scope.handleStripe = function(status, response){
+					if(response.error) {
+						// there was an error. Fix it.
+					} else {
+						// got stripe token, now charge it or smt
+						token = response.id
+					}
+				};
+
+				$scope.ok = function () {
+					$modalInstance.close();
+				};
+
+				$scope.cancel = function () {
+					$modalInstance.dismiss('cancel');
+				};
+			});
+
 			accountApp.controller('account-controller', ['$scope', 'User', 'Transactions', 'CashOut', '$modal', function($scope, User, Transactions, CashOut, $modal) {
 				$scope.transactions = [];
 				$scope.account = FC.user.account;
@@ -102,12 +184,23 @@
 
 				$scope.openCashOutModal = function() {
 					var modalInstance = $modal.open({
-						templateUrl: 'cashOutModalContent.html',
+						templateUrl: 'cashOutModal.html',
 						controller: 'cash-out-modal-controller'
 					});
 
 					modalInstance.result.then(function (details) {
 						CashOut.go(details);
+					});
+				};
+
+				$scope.openDepositFundsModal = function() {
+					var modalInstance = $modal.open({
+						templateUrl: 'depositFundsModal.html',
+						controller: 'deposit-funds-modal-controller'
+					});
+
+					modalInstance.result.then(function (details) {
+						console.log(details);
 					});
 				};
 

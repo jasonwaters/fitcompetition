@@ -467,3 +467,40 @@ input[name=activity-image] {
 .light-blue {
 	background-color: #e7f4fb !important;
 }
+
+.relative {
+	position: relative;
+}
+
+.card {
+	width: 32px;
+	height: 20px;
+	position: absolute;
+	display: block;
+	right: 7px;
+	top: 7px;
+}
+
+.card.visa {
+	background: url('/static/img/visa.png') no-repeat;
+}
+
+.card.amex {
+	background: url('/static/img/amex.png') no-repeat;
+}
+
+.card.discover {
+	background: url('/static/img/discover.png') no-repeat;
+}
+
+.card.mastercard {
+	background: url('/static/img/mastercard.png') no-repeat;
+}
+
+.card.diners {
+	background: url('/static/img/diners.png') no-repeat;
+}
+
+.card.jcb {
+	background: url('/static/img/jcb.png') no-repeat;
+}
