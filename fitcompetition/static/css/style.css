@@ -475,32 +475,62 @@ input[name=activity-image] {
 .card {
 	width: 32px;
 	height: 20px;
+	background-size: 32px 20px;
 	position: absolute;
 	display: block;
 	right: 7px;
 	top: 7px;
+	background-repeat: no-repeat;
 }
 
 .card.visa {
-	background: url('/static/img/visa.png') no-repeat;
+	background-image: url('/static/img/visa.png');
 }
 
 .card.amex {
-	background: url('/static/img/amex.png') no-repeat;
+	background-image: url('/static/img/amex.png');
 }
 
 .card.discover {
-	background: url('/static/img/discover.png') no-repeat;
+	background-image: url('/static/img/discover.png');
 }
 
 .card.mastercard {
-	background: url('/static/img/mastercard.png') no-repeat;
+	background-image: url('/static/img/mastercard.png');
 }
 
 .card.diners {
-	background: url('/static/img/diners.png') no-repeat;
+	background-image: url('/static/img/diners.png');
 }
 
 .card.jcb {
-	background: url('/static/img/jcb.png') no-repeat;
+	background-image: url('/static/img/jcb.png');
+}
+
+@media
+(-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+	.card.visa {
+		background-image: url('/static/img/visa@2x.png');
+	}
+
+	.card.amex {
+		background-image: url('/static/img/amex@2x.png');
+	}
+
+	.card.discover {
+		background-image: url('/static/img/discover@2x.png');
+	}
+
+	.card.mastercard {
+		background-image: url('/static/img/mastercard@2x.png');
+	}
+
+	.card.diners {
+		background-image: url('/static/img/diners@2x.png');
+	}
+
+	.card.jcb {
+		background-image: url('/static/img/jcb@2x.png');
+	}
 }
