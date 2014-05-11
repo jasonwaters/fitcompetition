@@ -12,8 +12,8 @@ class SocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
                 'errorMessage': 'There was an authentication error.',
                 'errorDetails': str(exception)
             })
-        # else:
-        #     raise exception
+            # else:
+            #     raise exception
 
 
 SSL = 'SSL'
@@ -27,7 +27,7 @@ class SSLRedirect:
         else:
             secure = False
 
-        if getattr(settings, "SSL_ENABLED") and not secure == self._is_secure(request):
+        if getattr(settings, "SSL_ENABLED") and secure is True and not self._is_secure(request):
             return self._redirect(request, secure)
         else:
             return
@@ -46,7 +46,7 @@ class SSLRedirect:
         protocol = secure and "https" or "http"
         newurl = "%s://%s%s" % (protocol, request.get_host(), request.get_full_path())
         if settings.DEBUG and request.method == 'POST':
-            raise RuntimeError("Django can't perform a SSL redirect while maintaining POST data.  Please structure your views so that redirects only occur during GETs.")
-
+            raise RuntimeError(
+                "Django can't perform a SSL redirect while maintaining POST data.  Please structure your views so that redirects only occur during GETs.")
 
         return HttpResponsePermanentRedirect(newurl)
