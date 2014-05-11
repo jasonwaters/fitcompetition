@@ -9,7 +9,7 @@
 
 	var modals = angular.module('modals', ['api', 'ui.bootstrap', 'angularPayments']);
 
-	modals.controller('cash-out-modal-controller', function ($scope, $modalInstance) {
+	modals.controller('cash-out-modal-controller', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
 		$scope.accountBalance = FC['user']['account']['balance'];
 		$scope.details = {
 			email: '',
@@ -23,7 +23,7 @@
 		$scope.cancel = function () {
 			$modalInstance.dismiss('cancel');
 		};
-	});
+	}]);
 
 	modals.controller('deposit-funds-modal-controller', ['$scope','$modalInstance','modalFactory','lineItems', 'CustomAction', function ($scope, $modalInstance, modalFactory, lineItems, CustomAction) {
 		var subTotal = summarize(lineItems);
@@ -54,10 +54,7 @@
 						$scope.submitting = false;
 					}
 				});
-
-
 			}
-			//$modalInstance.close();
 		}
 
 		$scope.cancel = function () {
