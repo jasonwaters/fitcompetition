@@ -7,6 +7,12 @@
 		$http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
 	}]);
 
+	api.factory('Account', ['$resource', function($resource) {
+		return $resource('/api/accounts/:id', {
+			id: '@id'
+		})
+	}]);
+
 	api.factory('User', ['$resource', function($resource) {
 		return $resource('/api/users/:id', {
 			id: '@id'
@@ -22,21 +28,19 @@
 		});
 	}]);
 
-	api.factory('Transactions', ['$resource', function($resource) {
+	api.factory('Transaction', ['$resource', function($resource) {
 		return $resource('/api/transactions/:id', {
 			id: '@id'
-		}, {
-			list: {
-				method: 'GET',
-				params: {
-					page: 1
-				},
+		},{
+			'query':  {
+				method:'GET',
+				isArray:false,
 				transformResponse: function(data, headers){
 					data = JSON.parse(data);
 					var count = data.results.length;
 
 					for(var i=0;i<count;i++) {
-						data.results[i].date = new Date(data.results[i].date);
+						data.results[i].date = moment(data.results[i].date).toDate();
 						data.results[i].amount = parseFloat(data.results[i].amount);
 					}
 					return data;
@@ -45,9 +49,30 @@
 		});
 	}]);
 
-	api.factory('CashOut', ['$resource', function($resource) {
-		return $resource('/api/account-cash-out', {}, {
-			go: {method: 'GET'}
-		});
+	api.factory('CustomAction', ['$http', function($http) {
+
+		return {
+			'cashOut': function(email, amount) {
+				return $http({
+					url:'/api/account-cash-out',
+					method: "GET",
+					params: {
+						'email': email,
+						'amount': amount
+					}
+				});
+			},
+			'chargeCard': function( netAmount, chargeAmount, stripeToken) {
+				return $http({
+					url:'/api/charge-card',
+					method: "GET",
+					params: {
+						'netAmount': netAmount, //without fee
+						'chargeAmount': chargeAmount,
+						'token': stripeToken
+					}
+				});
+			}
+		};
 	}]);
 }());

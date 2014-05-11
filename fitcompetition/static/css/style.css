@@ -526,7 +526,7 @@ input[name=activity-image] {
 		background-image: url('/static/img/mastercard@2x.png');
 	}
 
-	.card.diners {
+	.card.dinersclub {
 		background-image: url('/static/img/diners@2x.png');
 	}
 

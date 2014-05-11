@@ -1,16 +1,21 @@
 import base64
+from datetime import datetime
 import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
-from fitcompetition.serializers import UserSerializer, ChallengeSerializer
+from fitcompetition.serializers import UserSerializer, ChallengeSerializer, TransactionSerializer, AccountSerializer
+import pytz
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account, ActivityType
 from django.conf import settings
 import mailchimp
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+import stripe
 
 
 def addChallenger(challenge_id, user):
@@ -138,9 +143,47 @@ def account_cash_out(request):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
+@login_required
+def charge_card(request):
+    token = request.GET.get('token')
+    netAmount = float(request.GET.get('netAmount'))
+    chargeAmount = float(request.GET.get('chargeAmount'))
+
+    stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
+
+    # Create the charge on Stripe's servers - this will charge the user's card
+    try:
+        charge = stripe.Charge.create(
+            amount=int(chargeAmount * 100),  # amount in cents
+            currency="usd",
+            card=token,
+            description="Deposit: %s" % request.user.fullname
+        )
+
+        Transaction.objects.deposit(request.user.account, netAmount, token)
+
+        return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+    except stripe.StripeError, e:
+        # The card has been declined
+        return HttpResponse(json.dumps({'success': False, 'message': e.message}), content_type="application/json")
+
+
 #################################
-##  Django REST Framework views
+##  Django REST Framework
 #################################
+
+class IsAdminOrOwner(IsAuthenticated):
+    def has_object_permission(self, request, view, obj):
+        can_edit = False
+        if super(IsAdminOrOwner, self).has_object_permission(request, view, obj):
+            if obj is None:
+                # Either a list or a create, so no author
+                can_edit = True
+            else:
+                can_edit = request.user.account == obj.account
+
+        return can_edit
 
 
 class ActivityTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -150,6 +193,7 @@ class ActivityTypeViewSet(viewsets.ReadOnlyModelViewSet):
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     model = Account
     permission_classes = (IsAuthenticated,)
+    serializer_class = AccountSerializer
 
 
 class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -169,11 +213,10 @@ class ChallengeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     model = Transaction
-    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionSerializer
+    permission_classes = (IsAdminOrOwner,)
     paginate_by_param = 'page_size'
 
     def get_queryset(self):
         queryset = super(TransactionViewSet, self).get_queryset()
-        return queryset.filter(account=self.request.user.account)
-
-
+        return queryset.filter(account=self.request.user.account).order_by('-date')

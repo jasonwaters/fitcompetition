@@ -781,9 +781,6 @@ angular.module('angularPayments', []);angular.module('angularPayments')
           scope.expYear = exp.year
         }
 
-        var button = form.find('button');
-        button.prop('disabled', true);
-
         if(form.hasClass('ng-valid')) {
           
 
@@ -792,15 +789,12 @@ angular.module('angularPayments', []);angular.module('angularPayments')
             scope.$apply(function() {
               scope[attr.stripeForm].apply(scope, args);
             });
-            button.prop('disabled', false);
-
           });
 
         } else {
           scope.$apply(function() {
             scope[attr.stripeForm].apply(scope, [400, {error: 'Invalid form submitted.'}]);
           });
-          button.prop('disabled', false);
         }
 
         scope.expiryMonth = expMonthUsed ? scope.expMonth : null;

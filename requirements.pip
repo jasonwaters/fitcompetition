@@ -19,3 +19,4 @@ requests-oauthlib==0.4.0
 requests==2.2.1
 seacucumber==1.5.1
 South==0.8.4
+stripe==1.14.0

@@ -1,0 +1,66 @@
+<form novalidate name="formPayment" stripe-form="handleStripe" show-validation>
+	<div class="modal-header">
+		<h4 class="modal-title">Add money to the pot</h4>
+	</div>
+	<div class="modal-body">
+		<h5>Line items</h5>
+		<div>
+			<table class="table table-condensed">
+				<tbody>
+				<tr ng-repeat="item in lineItems">
+					<td>{{ item.description }}  <i ng-if="item.info" class="fa fa-info-circle" tooltip-placement="right" tooltip="{{item.info}}"></i></td>
+					<td>{{ item.value|currency }}</td>
+				</tr>
+				</tbody>
+				<tfoot>
+				<tr>
+					<th>Total</th>
+					<th>{{ totalCost|currency }}</th>
+				</tr>
+				</tfoot>
+			</table>
+		</div>
+		<h5>Card details</h5>
+		<div class="alert alert-danger" ng-show="errorMessage">{{ errorMessage }}</div>
+		<div class="well">
+			<div class="form-group">
+				<div>
+					<i class="fa fa-lock"></i> Secured by RapidSSL
+				</div>
+			</div>
+			<div class="form-group">
+				<input ng-disabled="submitting" id="customerName" type="text" class="form-control" placeholder="Name on card" ng-model="name" required/>
+			</div>
+
+			<div class="form-group">
+				<div class="relative">
+					<input ng-disabled="submitting" id="cardNumber" type="text" class="form-control" ng-model="number" payments-validate="card" payments-format="card" payments-type-model="type" placeholder="Card number" required/>
+					<span class="card" ng-class="type"></span>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-3">
+					<div class="form-group">
+						<input ng-disabled="submitting" id="expiry" type="text" class="form-control" ng-model="expiry" payments-validate="expiry" payments-format="expiry" placeholder="MM/YY" required/>
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<div class="form-group">
+						<input ng-disabled="submitting" id="cardCVC" type="text" class="form-control" ng-model="cvc" payments-validate="cvc" payments-format="cvc" payments-type-model="type" placeholder="CVC" required/>
+					</div>
+				</div>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" ng-model="remember"> Remember my payment information
+					<p class="help-block" ng-show="remember">Fit Crown will store your payment information securely for quicker payments in the future.</p>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-link" ng-click="cancel()" ng-disabled="submitting">Cancel</button>
+		<button type="submit" class="btn btn-primary" ng-disabled="formPayment.$invalid || submitting"><i ng-show="submitting" class="fa fa-spinner fa-spin"></i> Pay {{ totalCost|currency }}</button>
+	</div>
+</form>

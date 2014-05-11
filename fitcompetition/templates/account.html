@@ -9,7 +9,7 @@
 
 {% block content %}
 	{% verbatim %}
-		<div ng-controller="account-controller">
+		<div ng-controller="account-controller" ng-cloak>
 			<div class="page-header">
 				<h2>Account Summary <small ng-class="{red: account.balance<0}">Balance: {{ account.balance | currency }}</small></h2>
 			</div>
@@ -33,197 +33,67 @@
 					<th>Amount</th>
 				</thead>
 				<tbody>
-					<tr ng-repeat="transaction in transactions | orderBy:'date':true" ng-cloak>
-						<td title="{{ transaction.date }}">{{ transaction.date | date:"longDate"}}</td>
+					<tr ng-repeat="transaction in transactions | orderBy:'date':true">
+						<td>{{ transaction.date | date:"longDate"}}</td>
 						<td>{{ transaction.description }}</td>
 						<td ng-class="{red: transaction.amount<0}">{{ transaction.amount | currency }}</td>
 					</tr>
 				</tbody>
 			</table>
-			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" ng-model="currentPage" items-per-page="maxApiRecords" ng-change="pageChanged()"></pagination>
+			<pagination class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" total-items="totalTransactions" ng-model="currentPage" items-per-page="maxApiRecords" ng-change="refreshTransactions()"></pagination>
 		</div>
-
-		<script type="text/ng-template" id="cashOutModal.html">
-			<div class="modal-header">
-				<h4 class="modal-title">Cash Out</h4>
-			</div>
-			<form novalidate name="formCashOut" show-validation>
-				<div class="modal-body">
-					<p>We use PayPal to securely send you money. Just tell us the email address that is associated with your PayPal account and how much
-						to send you.</p>
-					<fieldset>
-						<div class="form-group">
-							<label for="inputEmailAddress">PayPal Email Address</label>
-							<input type="email" class="form-control" id="inputEmailAddress" placeholder="Enter email" ng-model="details.email" required>
-						</div>
-						<div class="form-group">
-							<label for="inputAmount">Amount to cash out.</label>
-							<input type="number" class="form-control" id="inputAmount" placeholder="Enter dollar amount ({{ accountBalance|currency }} max)" ng-model="details.amount" min="0" max="{{ accountBalance }}" required>
-						</div>
-					</fieldset>
-					<p>After submitting this form, watch your PayPal account for a credit in the next few days.</p>
-				</div>
-			</form>
-			<div class="modal-footer">
-				<button class="btn btn-link" ng-click="cancel()">Nevermind</button>
-				<button class="btn btn-primary" ng-click="ok()" ng-disabled="formCashOut.$invalid">Cash Out</button>
-			</div>
-		</script>
-
-		<script type="text/ng-template" id="depositFundsModal.html">
-			<div class="modal-header">
-				<h4 class="modal-title">Add money to the pot</h4>
-			</div>
-			<form novalidate name="formPayment" stripe-form="handleStripe" show-validation>
-				<div class="modal-body">
-					<h5>Line items</h5>
-					<table class="table">
-						<tbody>
-							<tr>
-								<td>"Walk it Off" challenge</td>
-								<td>$20.00</td>
-							</tr>
-							<tr>
-								<td>Transaction Fee</td>
-								<td>$0.80</td>
-							</tr>
-						</tbody>
-						<tfoot>
-						<tr>
-							<th>Total</th>
-							<th>$20.80</th>
-						</tr>
-						</tfoot>
-					</table>
-					<h5>Card details</h5>
-					<div class="well">
-						<div class="form-group">
-							<label class="sr-only" for="customerName">Name on card </label>
-							<input id="customerName" type="text" class="form-control" placeholder="Name on card" ng-model="customerName" required/>
-						</div>
-
-						<div class="form-group">
-							<label class="sr-only" for="cardNumber">Card number</label>
-							<div class="relative">
-								<input id="cardNumber" type="text" class="form-control" ng-model="number" payments-validate="card" payments-format="card" payments-type-model="type" placeholder="Card number" required/>
-								<span class="card" ng-class="type"></span>
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="col-sm-3">
-								<div class="form-group">
-									<label class="sr-only" for="expiry">Expiry</label>
-									<input id="expiry" type="text" class="form-control" ng-model="expiry" payments-validate="expiry" payments-format="expiry" placeholder="MM/YY" required/>
-								</div>
-							</div>
-							<div class="col-sm-3">
-								<div class="form-group">
-									<label class="sr-only" for="cvc">CVC</label>
-									<input id="cvc" type="text" class="form-control" ng-model="cvc" payments-validate="cvc" payments-format="cvc" payments-type-model="type" placeholder="CVC" required/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</form>
-			<div class="modal-footer">
-				<button class="btn btn-link" ng-click="cancel()">Cancel</button>
-				<button class="btn btn-primary" ng-click="ok()" ng-disabled="formPayment.$invalid">Pay $20.80</button>
-			</div>
-		</script>
 	{% endverbatim %}
 
 	{% aggregate inline_javascript %}
 	<script type="text/javascript">
 		(function() {
 			"use strict";
-			var accountApp = angular.module('account', ['api', 'directives', 'angularPayments', 'ui.bootstrap']);
+			var accountApp = angular.module('account', ['api', 'directives', 'ui.bootstrap', 'modals']);
 
-			accountApp.controller('cash-out-modal-controller', function ($scope, $modalInstance) {
-				$scope.accountBalance = parseFloat(FC['user']['account']['balance']);
-				$scope.details = {
-					email: '',
-					amount: null
-				}
-
-				$scope.ok = function () {
-					$modalInstance.close($scope.details);
-				};
-
-				$scope.cancel = function () {
-					$modalInstance.dismiss('cancel');
-				};
-			});
-
-			accountApp.controller('deposit-funds-modal-controller', function ($scope, $modalInstance) {
-				$scope.handleStripe = function(status, response){
-					if(response.error) {
-						// there was an error. Fix it.
-					} else {
-						// got stripe token, now charge it or smt
-						token = response.id
-					}
-				};
-
-				$scope.ok = function () {
-					$modalInstance.close();
-				};
-
-				$scope.cancel = function () {
-					$modalInstance.dismiss('cancel');
-				};
-			});
-
-			accountApp.controller('account-controller', ['$scope', 'User', 'Transactions', 'CashOut', '$modal', function($scope, User, Transactions, CashOut, $modal) {
+			accountApp.controller('account-controller', ['$scope', 'User', 'Transaction', 'Account', 'modalFactory', function($scope, User, Transaction, Account, modalFactory) {
 				$scope.transactions = [];
-				$scope.account = FC.user.account;
+				$scope.account = FC.account;
 				$scope.currentPage = 1;
 				$scope.maxApiRecords = 10;
 				$scope.alertType = $scope.account.balance >= 0 ? "info" : 'danger';
 
 				$scope.openCashOutModal = function() {
-					var modalInstance = $modal.open({
-						templateUrl: 'cashOutModal.html',
-						controller: 'cash-out-modal-controller'
-					});
-
-					modalInstance.result.then(function (details) {
-						CashOut.go(details);
-					});
+					modalFactory.showCashOutModal();
 				};
 
 				$scope.openDepositFundsModal = function() {
-					var modalInstance = $modal.open({
-						templateUrl: 'depositFundsModal.html',
-						controller: 'deposit-funds-modal-controller'
-					});
+					var lineItems = [];
+					lineItems.push(modalFactory.createLineItem('Balance Payoff Amount', Math.abs($scope.account.balance)));
 
-					modalInstance.result.then(function (details) {
-						console.log(details);
+					modalFactory.showPaymentModal(lineItems, function () {
+						$scope.account = Account.get({id: $scope.account.id});
+						$scope.currentPage = 1;
+						$scope.refreshTransactions();
 					});
 				};
 
 
-				function handleTransactions(response) {
-					$scope.totalTransactions = response.count;
-					$scope.transactions = response.results
-				}
+				$scope.refreshTransactions = function() {
 
-				$scope.pageChanged = function() {
-					Transactions.list({
+					Transaction.query({
 						page: $scope.currentPage,
 						page_size: $scope.maxApiRecords
-					}, handleTransactions);
+					}).$promise.then(function(response) {
+						$scope.totalTransactions = response.count;
+						$scope.transactions = response.results
+					});
+
 				};
 
-				if( $scope.account.balance >= 0) {
-					$scope.alertMessage = "Nice!  You've got a stash of cash.  You can join another challenge or cash out."
-				}else {
-					$scope.alertMessage = "Your account balance is negative!  Don't worry, it's easy to settle up."
-				}
+				$scope.$watch('account', function() {
+					if( $scope.account.balance >= 0) {
+						$scope.alertMessage = "Nice!  You've got a stash of cash.  You can join another challenge or cash out."
+					}else {
+						$scope.alertMessage = "Your account balance is negative!  Don't worry, it's easy to settle up."
+					}
+				});
 
-				$scope.pageChanged();
+				$scope.refreshTransactions();
 
 			}]);
 		})();

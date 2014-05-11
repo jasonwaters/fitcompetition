@@ -164,6 +164,7 @@ PIPELINE_JS = {
             'js/angular-payments.js',
             'js/angular-ui-bootstrap-tpls.js',
             'js/ng/*.js',
+            'js/ng/**/*.js',
             'js/jquery.cookie.js',
             'js/jquery.validate.js',
             'js/additional-methods.js',

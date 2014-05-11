@@ -3,7 +3,6 @@ from decimal import Decimal
 from math import floor
 import math
 from django import template
-from django.core.exceptions import ObjectDoesNotExist
 from django.template import Node
 from django.template.defaultfilters import register
 from django.utils import timezone

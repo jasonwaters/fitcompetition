@@ -8,7 +8,7 @@ admin.autodiscover()
 
 
 router = routers.DefaultRouter()
-router.register(r'account', AccountViewSet)
+router.register(r'accounts', AccountViewSet)
 router.register(r'activities', ActivityViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'challenges', ChallengeViewSet)
@@ -39,6 +39,7 @@ urlpatterns = patterns('',
                        url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.api.withdraw_challenge', name="withdraw_challenge"),
                        url(r'^update-user-details/$', 'fitcompetition.api.user_details_update', name="user_details_update"),
                        url(r'^api/account-cash-out$', 'fitcompetition.api.account_cash_out', {'SSL':True}, name="account_cash_out"),
+                       url(r'^api/charge-card$', 'fitcompetition.api.charge_card', {'SSL':True}, name="charge_card"),
                        url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.api.upload_activity_image', name="activity_upload_photo"),
 
                        #OTHER

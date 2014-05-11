@@ -12,7 +12,10 @@
 
         {% compressed_css 'all-css' %}
         {% block css %}{% endblock %}
-    </head>
+		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
+		<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+	</head>
     <body ng-app="{% block ng_app %}{% endblock %}">
         <header class="navbar navbar-static-top navbar-inverse" role="navigation">
             <div class="container">
@@ -69,17 +72,14 @@
         <div class="container main-container">
             {% block content %}{% endblock %}
         </div>
-		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
-		<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 		<script type="text/javascript">
 			var FC = {
-				'API_PAGE_SIZE': {{ "API_PAGE_SIZE"|fromSettings }},
+				'API_PAGE_SIZE': {{ "API_PAGE_SIZE"|fromSettings }}
 			};
 
 			{% if user.is_authenticated %}
 				FC['user'] = {{ user|serialize:"UserSerializer" }};
-				FC['user']['account']['balance'] = parseFloat(FC['user']['account']['balance']);
+				FC['account'] = {{ user.account|serialize:"AccountSerializer" }};
 			{% else %}
 				FC['user'] = null;
 			{% endif %}

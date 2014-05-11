@@ -1,0 +1,24 @@
+<div class="modal-header">
+	<h4 class="modal-title">Cash Out</h4>
+</div>
+<form novalidate name="formCashOut" show-validation>
+	<div class="modal-body">
+		<p>We use PayPal to securely send you money. Just tell us the email address that is associated with your PayPal account and how much
+			to send you.</p>
+		<fieldset>
+			<div class="form-group">
+				<label for="inputEmailAddress">PayPal Email Address</label>
+				<input type="email" class="form-control" id="inputEmailAddress" placeholder="Enter email" ng-model="details.email" required>
+			</div>
+			<div class="form-group">
+				<label for="inputAmount">Amount to cash out.</label>
+				<input type="number" class="form-control" id="inputAmount" placeholder="Enter dollar amount ({{ accountBalance|currency }} max)" ng-model="details.amount" min="0" max="{{ accountBalance }}" required>
+			</div>
+		</fieldset>
+		<p>After submitting this form, watch your PayPal account for a credit in the next few days.</p>
+	</div>
+</form>
+<div class="modal-footer">
+	<button class="btn btn-link" ng-click="cancel()">Nevermind</button>
+	<button class="btn btn-primary" ng-click="ok()" ng-disabled="formCashOut.$invalid">Cash Out</button>
+</div>

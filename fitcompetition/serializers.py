@@ -10,8 +10,6 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    account = AccountSerializer(required=False)
-
     class Meta:
         model = FitUser
         fields = (
@@ -23,7 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
             'normal_picture',
             'integrationName',
             'gender',
-            'account',
         )
 
 
@@ -51,3 +48,6 @@ class ActivitySerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
+        exclude = (
+            'token',
+        )
