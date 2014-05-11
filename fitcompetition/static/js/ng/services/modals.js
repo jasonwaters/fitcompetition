@@ -10,7 +10,7 @@
 	var modals = angular.module('modals', ['api', 'ui.bootstrap', 'angularPayments']);
 
 	modals.controller('cash-out-modal-controller', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
-		$scope.accountBalance = FC['user']['account']['balance'];
+		$scope.accountBalance = FC.account.balance;
 		$scope.details = {
 			email: '',
 			amount: null
