@@ -4,9 +4,13 @@ from rest_framework import serializers
 
 class AccountSerializer(serializers.ModelSerializer):
     balance = serializers.DecimalField(source='balance', read_only=True)
+    isStripeCustomer = serializers.BooleanField(source='isStripeCustomer', read_only=True)
 
     class Meta:
         model = Account
+        exclude = (
+            'stripeCustomerID',
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -35,10 +39,6 @@ class ChallengeSerializer(serializers.ModelSerializer):
             'players'
         )
 
-        #account
-        #teams
-        #players
-
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,6 +48,3 @@ class ActivitySerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        exclude = (
-            'token',
-        )

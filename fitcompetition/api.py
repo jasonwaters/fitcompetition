@@ -1,20 +1,16 @@
 import base64
-from datetime import datetime
 import json
 from django.core.files.base import ContentFile
 from fitcompetition.email import EmailFactory
 from fitcompetition.serializers import UserSerializer, ChallengeSerializer, TransactionSerializer, AccountSerializer
-import pytz
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account, ActivityType
 from django.conf import settings
 import mailchimp
-from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 import stripe
 
 
@@ -148,19 +144,40 @@ def charge_card(request):
     token = request.GET.get('token')
     netAmount = float(request.GET.get('netAmount'))
     chargeAmount = float(request.GET.get('chargeAmount'))
+    remember = request.GET.get('remember') in ('true', 'True')
 
     stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
 
     # Create the charge on Stripe's servers - this will charge the user's card
     try:
-        charge = stripe.Charge.create(
-            amount=int(chargeAmount * 100),  # amount in cents
-            currency="usd",
-            card=token,
-            description="Deposit: %s" % request.user.fullname
-        )
+        customerID = request.user.account.stripeCustomerID
+        if remember:
+            if customerID is not None and len(customerID) > 0:
+                customer = stripe.Customer.retrieve(customerID)
+                if token is not None:
+                    customer.cards.create(card=token)
+            else:
+                customer = stripe.Customer.create(
+                    card=token,
+                    description="%s (%s)" % (request.user.fullname, request.user.email)
+                )
+                request.user.account.stripeCustomerID = customer.id
+                request.user.account.save()
 
-        Transaction.objects.deposit(request.user.account, netAmount, token)
+            stripe.Charge.create(
+                amount=int(chargeAmount * 100),  # amount in cents
+                currency="usd",
+                customer=customer.id
+            )
+        else:
+            charge = stripe.Charge.create(
+                amount=int(chargeAmount * 100),  # amount in cents
+                currency="usd",
+                card=token,
+                description="Deposit: %s" % request.user.fullname
+            )
+
+        Transaction.objects.deposit(request.user.account, netAmount)
 
         return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
@@ -169,9 +186,36 @@ def charge_card(request):
         return HttpResponse(json.dumps({'success': False, 'message': e.message}), content_type="application/json")
 
 
+@login_required
+def get_stripe_customer(request):
+    try:
+        stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
+        customer = stripe.Customer.retrieve(request.user.account.stripeCustomerID)
+        return HttpResponse(json.dumps({
+            'success': True,
+            'card': customer.get('active_card')
+        }), content_type="application/json")
+    except stripe.StripeError, e:
+        return HttpResponse(json.dumps({'success': False, 'message': e.message}), content_type="application/json")
+
+
+@login_required
+def delete_stripe_card(request):
+    try:
+        stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
+        customer = stripe.Customer.retrieve(request.user.account.stripeCustomerID)
+        customer.cards.retrieve(customer.active_card.id).delete()
+        return HttpResponse(json.dumps({
+            'success': True,
+        }), content_type="application/json")
+    except stripe.StripeError, e:
+        return HttpResponse(json.dumps({'success': False, 'message': e.message}), content_type="application/json")
+
+
 #################################
 ##  Django REST Framework
 #################################
+
 
 class IsAdminOrOwner(IsAuthenticated):
     def has_object_permission(self, request, view, obj):

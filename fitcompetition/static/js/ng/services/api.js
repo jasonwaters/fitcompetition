@@ -62,15 +62,28 @@
 					}
 				});
 			},
-			'chargeCard': function( netAmount, chargeAmount, stripeToken) {
+			'chargeCard': function( netAmount, chargeAmount, stripeToken, remember) {
 				return $http({
 					url:'/api/charge-card',
 					method: "GET",
 					params: {
 						'netAmount': netAmount, //without fee
 						'chargeAmount': chargeAmount,
-						'token': stripeToken
+						'token': stripeToken,
+						'remember': remember
 					}
+				});
+			},
+			'deleteCard': function() {
+				return $http({
+					url: '/api/del-stripe-card',
+					method: 'GET'
+				});
+			},
+			'getStripeCustomer': function() {
+				return $http({
+					url:'/api/stripe-customer',
+					method: 'GET'
 				});
 			}
 		};

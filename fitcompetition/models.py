@@ -643,6 +643,11 @@ class FitnessActivity(models.Model):
 
 class Account(models.Model):
     description = models.CharField(max_length=255)
+    stripeCustomerID = models.CharField(max_length=255, blank=True, null=True, default=None)
+
+    @property
+    def isStripeCustomer(self):
+        return self.stripeCustomerID is not None and len(self.stripeCustomerID) > 0
 
     @property
     def balance(self):
@@ -667,15 +672,14 @@ class TransactionManager(models.Manager):
                     description=toMemo,
                     amount=amount)
 
-    def deposit(self, account, amount, token=None):
+    def deposit(self, account, amount):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
 
         self.create(date=now,
                     account=account,
                     description="Deposit",
                     amount=amount,
-                    isCashflow=True,
-                    token=token)
+                    isCashflow=True)
 
     def withdraw(self, account, amount):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -693,6 +697,5 @@ class Transaction(models.Model):
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
     isCashflow = models.BooleanField(verbose_name="Is Cashflow In/Out", default=False)
-    token = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     objects = TransactionManager()

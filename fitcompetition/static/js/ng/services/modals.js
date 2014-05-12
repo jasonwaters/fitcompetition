@@ -7,7 +7,7 @@
 		},0);
 	}
 
-	var modals = angular.module('modals', ['api', 'ui.bootstrap', 'angularPayments']);
+	var modals = angular.module('modals', ['api', 'ui.bootstrap', 'angularPayments', 'slugifier']);
 
 	modals.controller('cash-out-modal-controller', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
 		$scope.accountBalance = FC.account.balance;
@@ -25,37 +25,93 @@
 		};
 	}]);
 
-	modals.controller('deposit-funds-modal-controller', ['$scope','$modalInstance','modalFactory','lineItems', 'CustomAction', function ($scope, $modalInstance, modalFactory, lineItems, CustomAction) {
+	modals.controller('deposit-funds-modal-controller', ['$scope','$modalInstance','modalFactory','lineItems', 'CustomAction', 'Common', function ($scope, $modalInstance, modalFactory, lineItems, CustomAction, Common) {
 		var subTotal = summarize(lineItems);
-		var transactionFee = (subTotal*0.029)+0.30;
+
+		$scope.details = {
+			'remember': true,
+			'submitting': false,
+			'errorMessage': null,
+			'existingCard': null,
+			'isCustomer': FC.account.isStripeCustomer
+		};
+
+		$scope.newcard = {
+			'name': null,
+			'number': null,
+			'expiry': null,
+			'cvc': null
+		};
+
+		var transactionFee = ((subTotal +.30)/(1-0.029)) - subTotal;
 		transactionFee = Math.round(transactionFee*100)/100; //round to two decimal places
 
 		lineItems.push(modalFactory.createLineItem("Transaction Fee", transactionFee, "Transaction fees apply only when you put money in the pot."));
-		$scope.lineItems = lineItems;
-		$scope.totalCost = summarize($scope.lineItems);
-		$scope.number = '4242424242424242';
+		$scope.details.lineItems = lineItems;
 
-		$scope.handleStripe = function(status, response){
-			$scope.errorMessage = null;
-			$scope.submitting = true;
+		$scope.details.totalCost = summarize($scope.details.lineItems);
 
+		if(FC.account.isStripeCustomer) {
+			CustomAction.getStripeCustomer().then(function(response) {
+				if(response.data.success) {
+					$scope.details.existingCard = response.data.card;
+				}
+			});
+		}
+
+		function handleStripe(status, response){
 			if(response.error) {
 				// there was an error. Fix it.
-				$scope.submitting = false;
-				$scope.errorMessage = response.error.message;
+				$scope.details.submitting = false;
+				$scope.details.errorMessage = response.error.message;
 			} else {
 				var token = response.id;
 
-				CustomAction.chargeCard(subTotal, $scope.totalCost, token).then(function(response) {
+				CustomAction.chargeCard(subTotal, $scope.details.totalCost, token, $scope.details.remember).then(function(response) {
 					if(response.data.success) {
 						$modalInstance.close();
 					}else {
-						$scope.errorMessage = response.data.message;
-						$scope.submitting = false;
+						$scope.details.errorMessage = response.data.message;
+						$scope.details.submitting = false;
 					}
 				});
 			}
 		}
+
+		$scope.replaceCardDetails = function() {
+			CustomAction.deleteCard();
+			$scope.details.existingCard = null;
+		};
+
+		$scope.ok = function() {
+			$scope.details.errorMessage = null;
+			$scope.details.submitting = true;
+
+			if($scope.details.existingCard != null) {
+				CustomAction.chargeCard(subTotal, $scope.details.totalCost, null, true).then(function(response) {
+					if(response.data.success) {
+						$modalInstance.close();
+					}else {
+						$scope.details.errorMessage = response.data.message;
+						$scope.details.submitting = false;
+					}
+				});
+			}else {
+				var exp = Common.parseExpiry($scope.newcard.expiry);
+				Stripe.card.createToken({
+					'name': $scope.newcard.name,
+					'number': $scope.newcard.number.replace(/ /g, ''),
+					'exp_month': exp.month,
+					'exp_year': exp.year,
+					'cvc': $scope.newcard.cvc
+				}, function () {
+					var args = arguments;
+					$scope.$apply(function () {
+						handleStripe.apply($scope, args);
+					});
+				});
+			}
+		};
 
 		$scope.cancel = function () {
 			$modalInstance.dismiss('cancel');

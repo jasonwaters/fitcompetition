@@ -162,6 +162,7 @@ PIPELINE_JS = {
             'js/angular-resource.js',
             'js/angular-cookies.js',
             'js/angular-payments.js',
+            'js/angular-slugify.js',
             'js/angular-ui-bootstrap-tpls.js',
             'js/ng/*.js',
             'js/ng/**/*.js',

@@ -6,7 +6,6 @@ from django.conf import settings
 
 admin.autodiscover()
 
-
 router = routers.DefaultRouter()
 router.register(r'accounts', AccountViewSet)
 router.register(r'activities', ActivityViewSet)
@@ -19,11 +18,11 @@ urlpatterns = patterns('',
                        #VIEWS
                        url(r'^$', 'fitcompetition.views.challenges', name='home'),
                        url(r'^challenges/$', 'fitcompetition.views.challenges', name='challenges'),
-                       url(r'^challenge/(?P<id>\d+)/$', 'fitcompetition.views.challenge', {'SSL':True}, name="challenge_details"),
+                       url(r'^challenge/(?P<id>\d+)/$', 'fitcompetition.views.challenge', {'SSL': True}, name="challenge_details"),
                        url(r'^c/(?P<id>\d+)/$', 'fitcompetition.views.challenge', name="challenge_details2"),
                        url(r'^faq/$', 'fitcompetition.views.faq', name="faq"),
                        url(r'^profile/$', 'fitcompetition.views.profile', name="user_profile"),
-                       url(r'^account/$', 'fitcompetition.views.account', {'SSL':True}, name="account"),
+                       url(r'^account/$', 'fitcompetition.views.account', {'SSL': True}, name="account"),
                        url(r'^user/(?P<id>\d+)/$', 'fitcompetition.views.user', name="user_details"),
                        url(r'^team/(?P<id>\d+)/$', 'fitcompetition.views.team', name="team_details"),
                        url(r'^login/$', 'fitcompetition.views.login', name="login"),
@@ -38,8 +37,10 @@ urlpatterns = patterns('',
                        url(r'^c/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.api.create_team', name="create_team"),
                        url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.api.withdraw_challenge', name="withdraw_challenge"),
                        url(r'^update-user-details/$', 'fitcompetition.api.user_details_update', name="user_details_update"),
-                       url(r'^api/account-cash-out$', 'fitcompetition.api.account_cash_out', {'SSL':True}, name="account_cash_out"),
-                       url(r'^api/charge-card$', 'fitcompetition.api.charge_card', {'SSL':True}, name="charge_card"),
+                       url(r'^api/account-cash-out$', 'fitcompetition.api.account_cash_out', {'SSL': True}, name="account_cash_out"),
+                       url(r'^api/charge-card$', 'fitcompetition.api.charge_card', {'SSL': True}, name="charge_card"),
+                       url(r'^api/stripe-customer$', 'fitcompetition.api.get_stripe_customer', {'SSL': True}, name="get_stripe_customer"),
+                       url(r'^api/del-stripe-card', 'fitcompetition.api.delete_stripe_card', {'SSL': True}, name="delete_stripe_card"),
                        url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.api.upload_activity_image', name="activity_upload_photo"),
 
                        #OTHER
@@ -51,10 +52,11 @@ urlpatterns = patterns('',
                        #Django REST Framework
                        url(r'^api/', include(router.urls)),
                        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-                       )
+)
 
 if settings.DEBUG:
     import debug_toolbar
+
     urlpatterns += patterns('',
                             url(r'^__debug__/', include(debug_toolbar.urls)),
-                            )
+    )

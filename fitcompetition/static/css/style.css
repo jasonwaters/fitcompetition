@@ -476,18 +476,22 @@ input[name=activity-image] {
 	width: 32px;
 	height: 20px;
 	background-size: 32px 20px;
+	background-repeat: no-repeat;
+	display: inline-block;
+}
+
+.card-input {
 	position: absolute;
 	display: block;
 	right: 7px;
 	top: 7px;
-	background-repeat: no-repeat;
 }
 
 .card.visa {
 	background-image: url('/static/img/visa.png');
 }
 
-.card.amex {
+.card.amex, .card.american-express {
 	background-image: url('/static/img/amex.png');
 }
 
@@ -499,7 +503,7 @@ input[name=activity-image] {
 	background-image: url('/static/img/mastercard.png');
 }
 
-.card.diners {
+.card.diners, .card.diners-club {
 	background-image: url('/static/img/diners.png');
 }
 
@@ -514,7 +518,7 @@ input[name=activity-image] {
 		background-image: url('/static/img/visa@2x.png');
 	}
 
-	.card.amex {
+	.card.amex, .card.american-express {
 		background-image: url('/static/img/amex@2x.png');
 	}
 
@@ -526,11 +530,18 @@ input[name=activity-image] {
 		background-image: url('/static/img/mastercard@2x.png');
 	}
 
-	.card.dinersclub {
+	.card.diners, .card.diners-club {
 		background-image: url('/static/img/diners@2x.png');
 	}
 
 	.card.jcb {
 		background-image: url('/static/img/jcb@2x.png');
 	}
+}
+
+.existing-payment-method {
+}
+.existing-payment-method .card {
+	position: relative;
+	top: 5px;
 }
