@@ -20,17 +20,12 @@
 				</tfoot>
 			</table>
 		</div>
-		<h5>Payment method</h5>
+		<h5><i class="fa fa-lock"></i> Payment method</h5>
 		<div class="alert alert-danger" ng-show="details.errorMessage">{{ details.errorMessage }}</div>
-		<div class="existing-payment-method" ng-if="details.existingCard">
+		<div class="existing-payment-method" ng-if="details.isCustomer && details.existingCard">
 			<span class="card" ng-class="details.existingCard.type|slugify"></span><span> ending in {{ details.existingCard.last4 }} <a class="btn-link" ng-click="replaceCardDetails();">Change</a></span>
 		</div>
-		<div class="well" ng-if="!details.existingCard">
-				<div class="form-group">
-					<div>
-						<i class="fa fa-lock"></i> Secured by RapidSSL
-					</div>
-				</div>
+		<div class="well" ng-if="!details.isCustomer || !details.existingCard">
 				<div class="form-group">
 					<input ng-disabled="details.submitting" id="customerName" type="text" class="form-control" placeholder="Name on card" ng-model="newcard.name" required/>
 				</div>
@@ -61,6 +56,7 @@
 					</label>
 				</div>
 		</div>
+		<div class="stripe-powered small-margin-top"></div>
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-link" ng-click="cancel()" ng-disabled="details.submitting">Cancel</button>

@@ -32,16 +32,16 @@ urlpatterns = patterns('',
                        url(r'^diagnostics/$', 'fitcompetition.views.diagnostics', name='diagnostics'),
 
                        #AJAX
-                       url(r'^c/join/(?P<id>\d+)/$', 'fitcompetition.api.join_challenge', name="join_challenge"),
-                       url(r'^c/join/(?P<challenge_id>\d+)/team/(?P<team_id>\d+)/$', 'fitcompetition.api.join_team', name="join_team"),
-                       url(r'^c/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.api.create_team', name="create_team"),
-                       url(r'^c/withdraw/(?P<id>\d+)/$', 'fitcompetition.api.withdraw_challenge', name="withdraw_challenge"),
-                       url(r'^update-user-details/$', 'fitcompetition.api.user_details_update', name="user_details_update"),
+                       url(r'^api/join_challenge$', 'fitcompetition.api.join_challenge', name="join_challenge"),
+                       url(r'^api/join/(?P<challenge_id>\d+)/team/(?P<team_id>\d+)/$', 'fitcompetition.api.join_team', name="join_team"),
+                       url(r'^api/join/(?P<challenge_id>\d+)/team-create/$', 'fitcompetition.api.create_team', name="create_team"),
+                       url(r'^api/withdraw/(?P<id>\d+)/$', 'fitcompetition.api.withdraw_challenge', name="withdraw_challenge"),
+                       url(r'^api/update-user-details$', 'fitcompetition.api.user_details_update', name="user_details_update"),
                        url(r'^api/account-cash-out$', 'fitcompetition.api.account_cash_out', {'SSL': True}, name="account_cash_out"),
                        url(r'^api/charge-card$', 'fitcompetition.api.charge_card', {'SSL': True}, name="charge_card"),
                        url(r'^api/stripe-customer$', 'fitcompetition.api.get_stripe_customer', {'SSL': True}, name="get_stripe_customer"),
                        url(r'^api/del-stripe-card', 'fitcompetition.api.delete_stripe_card', {'SSL': True}, name="delete_stripe_card"),
-                       url(r'^activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.api.upload_activity_image', name="activity_upload_photo"),
+                       url(r'^api/activity-photo-upload/(?P<activity_id>\d+)/$', 'fitcompetition.api.upload_activity_image', name="activity_upload_photo"),
 
                        #OTHER
                        url(r'^grappelli/', include('grappelli.urls')),

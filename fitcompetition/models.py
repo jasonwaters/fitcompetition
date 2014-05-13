@@ -654,6 +654,9 @@ class Account(models.Model):
         result = Transaction.objects.filter(account=self).aggregate(balance=Sum('amount'))
         return ListUtil.attr(result, 'balance', 0.0)
 
+    def canAfford(self, challenge):
+        return self.balance >= challenge.ante
+
     def __unicode__(self):
         return "%s ( $%s )" % (self.description, self.balance)
 

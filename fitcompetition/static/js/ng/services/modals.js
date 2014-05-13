@@ -43,14 +43,6 @@
 			'cvc': null
 		};
 
-		var transactionFee = ((subTotal +.30)/(1-0.029)) - subTotal;
-		transactionFee = Math.round(transactionFee*100)/100; //round to two decimal places
-
-		lineItems.push(modalFactory.createLineItem("Transaction Fee", transactionFee, "Transaction fees apply only when you put money in the pot."));
-		$scope.details.lineItems = lineItems;
-
-		$scope.details.totalCost = summarize($scope.details.lineItems);
-
 		if(FC.account.isStripeCustomer) {
 			CustomAction.getStripeCustomer().then(function(response) {
 				if(response.data.success) {
@@ -58,6 +50,14 @@
 				}
 			});
 		}
+
+		var transactionFee = ((subTotal +.30)/(1-0.029)) - subTotal;
+		transactionFee = Math.round(transactionFee*100)/100; //round to two decimal places
+
+		lineItems.push(modalFactory.createLineItem("Transaction Fee", transactionFee, "Transaction fees apply only when you put money in the pot."));
+		$scope.details.lineItems = lineItems;
+
+		$scope.details.totalCost = summarize($scope.details.lineItems);
 
 		function handleStripe(status, response){
 			if(response.error) {

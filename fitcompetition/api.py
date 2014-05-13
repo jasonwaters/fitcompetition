@@ -17,7 +17,7 @@ import stripe
 def addChallenger(challenge_id, user):
     try:
         challenge = Challenge.objects.get(id=challenge_id)
-        if not challenge.canJoin:
+        if not user.account.canAfford(challenge) or not challenge.canJoin:
             raise Exception('Challenge Cannot be Joined')
         challenge.addChallenger(user)
         return True, challenge
@@ -57,8 +57,10 @@ def upload_activity_image(request, activity_id):
 
 
 @login_required
-def join_challenge(request, id):
-    added_challenger, challenge = addChallenger(id, request.user)
+def join_challenge(request):
+    challengeID = request.GET.get('challengeID')
+
+    added_challenger, challenge = addChallenger(challengeID, request.user)
     return HttpResponse(json.dumps({'success': added_challenger}), content_type="application/json")
 
 

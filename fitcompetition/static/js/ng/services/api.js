@@ -85,6 +85,15 @@
 					url:'/api/stripe-customer',
 					method: 'GET'
 				});
+			},
+			'joinChallenge': function(challengeID) {
+				return $http({
+					url:'/api/join_challenge',
+					method:'GET',
+					params: {
+						'challengeID': challengeID
+					}
+				});
 			}
 		};
 	}]);

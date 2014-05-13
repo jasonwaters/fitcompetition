@@ -5,6 +5,8 @@
 
 {% block head_title %}{{ challenge.name }} : {{ challenge.distance|floatformat:"-1" }} mile exercise challenge: {{ approvedActivities|commaSeparated}}{% endblock %}
 
+{% block ng_app %}challenge{% endblock %}
+
 {% block head_misc %}
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
@@ -19,165 +21,158 @@
 {% endblock %}
 
 {% block content %}
-    <div class="page-header">
-        <h2>{{ challenge.name }}</h2>
-    </div>
+	<div ng-controller="challenge-controller">
+		<div class="page-header">
+			<h2>{{ challenge.name }}</h2>
+		</div>
 
-	<p class="lead">{{ challenge.description|safe }}</p>
+		<p class="lead">{{ challenge.description|safe }}</p>
 
-	<p class="lead">
-		{% if not challenge.hasStarted %}
-			This Challenge will start in {{ challenge.startdate|timeuntil }}.
-		{% elif challenge.hasEnded %}
-			This Challenge ended {{ challenge.enddate|timesince }} ago.
-			{% if challenge.reconciled and challenge.disbursementAmount > 0 %}
-				<strong>{{ challenge.numWinners }} player{{ challenge.numWinners|pluralize }} won ${{ challenge.disbursementAmount|floatformat:"-2" }}{{ challenge.numWinners|pluralize:" each" }}.</strong>
-			{% endif %}
-		{% else%}
-			<span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
-                This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
-            </span>
-		{% endif %}
-	</p>
-
-	<h4>Challenge Details</h4>
-	<div class="challenge-header">
-		<div class="row">
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Distance</div>
-				<div class="challenge-value">{{ challenge.distance|floatformat:"-1" }} miles</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Activities</div>
-				<div class="challenge-value">{{ approvedActivities|activityIcons }}</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Duration</div>
-				<div class="challenge-value">{{ challenge.numDays }} Days</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				{% if not challenge.hasStarted %}
-					<div class="challenge-label">Starts on</div>
-					<div class="challenge-value">{{ challenge.startdate|date:"l, N j" }}</div>
-				{% elif not challenge.hasEnded %}
-					<div class="challenge-label">Ends on</div>
-					<div class="challenge-value">{{ challenge.enddate|date:"l, N j" }}</div>
-				{% else %}
-					<div class="challenge-label">Ended on</div>
-					<div class="challenge-value">{{ challenge.enddate|date:"N j, y" }}</div>
+		<p class="lead">
+			{% if not challenge.hasStarted %}
+				This Challenge will start in {{ challenge.startdate|timeuntil }}.
+			{% elif challenge.hasEnded %}
+				This Challenge ended {{ challenge.enddate|timesince }} ago.
+				{% if challenge.reconciled and challenge.disbursementAmount > 0 %}
+					<strong>{{ challenge.numWinners }} player{{ challenge.numWinners|pluralize }} won ${{ challenge.disbursementAmount|floatformat:"-2" }}{{ challenge.numWinners|pluralize:" each" }}.</strong>
 				{% endif %}
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Bet</div>
-				<div class="challenge-value">${{ challenge.ante|floatformat:"-2"|intcomma }}</div>
-			</div>
+			{% else%}
+				<span data-waters="countdown" data-targetdate="{{ challenge.enddate|fullDate }}" data-numberpadding="1">
+					This Challenge is under way, there's <span class="days-value"></span> Days, <span class="hours-value"></span> Hours, <span class="minutes-value"></span> Minutes and <span class="seconds-value"></span> Seconds left!
+				</span>
+			{% endif %}
+		</p>
 
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">In the pot</div>
-				<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Players</div>
-				<div class="challenge-value">{{ challenge.numPlayers }}</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Type</div>
-				<div class="challenge-value">
-					{% if challenge.isTypeIndividual %}
-						<i class="fa fa-user"></i> Individual
-					{% elif challenge.isTypeTeam %}
-						<i class="fa fa-users"></i> Team
+		<h4>Challenge Details</h4>
+		<div class="challenge-header">
+			<div class="row">
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Distance</div>
+					<div class="challenge-value">{{ challenge.distance|floatformat:"-1" }} miles</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Activities</div>
+					<div class="challenge-value">{{ approvedActivities|activityIcons }}</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Duration</div>
+					<div class="challenge-value">{{ challenge.numDays }} Days</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					{% if not challenge.hasStarted %}
+						<div class="challenge-label">Starts on</div>
+						<div class="challenge-value">{{ challenge.startdate|date:"l, N j" }}</div>
+					{% elif not challenge.hasEnded %}
+						<div class="challenge-label">Ends on</div>
+						<div class="challenge-value">{{ challenge.enddate|date:"l, N j" }}</div>
+					{% else %}
+						<div class="challenge-label">Ended on</div>
+						<div class="challenge-value">{{ challenge.enddate|date:"N j, y" }}</div>
 					{% endif %}
 				</div>
-			</div>
-			<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-				<div class="challenge-label">Style</div>
-				<div class="challenge-value">
-					{% if challenge.isStyleAllCanWin %}
-						All Can Win
-					{% elif challenge.isStyleWinnerTakesAll %}
-						Winner Takes All
-					{% endif %}
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Bet</div>
+					<div class="challenge-value">${{ challenge.ante|floatformat:"-2"|intcomma }}</div>
+				</div>
+
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">In the pot</div>
+					<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Players</div>
+					<div class="challenge-value">{{ challenge.numPlayers }}</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Type</div>
+					<div class="challenge-value">
+						{% if challenge.isTypeIndividual %}
+							<i class="fa fa-user"></i> Individual
+						{% elif challenge.isTypeTeam %}
+							<i class="fa fa-users"></i> Team
+						{% endif %}
+					</div>
+				</div>
+				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
+					<div class="challenge-label">Style</div>
+					<div class="challenge-value">
+						{% if challenge.isStyleAllCanWin %}
+							All Can Win
+						{% elif challenge.isStyleWinnerTakesAll %}
+							Winner Takes All
+						{% endif %}
+					</div>
 				</div>
 			</div>
 		</div>
+
+		{% include "inclusions/player_email.html" %}
+
+		{% if canJoin %}
+			{% if user.is_authenticated %}
+				{% if challenge.isTypeTeam %}
+					<div class="btn-group vertical-padding ">
+						<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
+							Join this Challenge <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							{% for team in open_teams %}
+								<li><a href="#" class="join-team" data-id="{{ team.id }}">Join "{{ team.name }}"</a></li>
+							{% endfor %}
+							{% if open_teams|length > 0 %}
+								<li role="presentation" class="divider"></li>
+							{% endif %}
+							<li><a href="#" class="create-team">Start a new Team</a></li>
+						</ul>
+					</div>
+				{% else %}
+					<button type="button" ng-click="joinChallenge()" class="join-challenge vertical-padding btn btn-primary btn-lg" type="button" title="This challenge is open to join until {{ challenge.lastPossibleJoinDate|naturalday }}.">Join this Challenge</button>
+				{% endif %}
+			{% else %}
+				<a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Sign In to Play</a>
+			{% endif %}
+		{% elif canSwitchTeams %}
+			<div class="btn-group vertical-padding ">
+				<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
+					Switch  to a different team <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					{% for team in open_teams %}
+						<li><a href="#" class="join-team" data-id="{{ team.id }}">Switch to "{{ team.name }}"</a></li>
+					{% endfor %}
+					{% if open_teams|length > 0 %}
+						<li role="presentation" class="divider"></li>
+					{% endif %}
+					<li><a href="#" class="create-team">Start a new Team</a></li>
+					<li role="presentation" class="divider"></li>
+					<li><a href="#" class="withdraw-challenge">Withdraw from this challenge.</a></li>
+				</ul>
+			</div>
+		{% endif %}
+
+		{% if canWithdraw %}
+			<p><small>Having second thoughts?  You can <a href="#" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
+		{% endif %}
+
+		{% if show_social %}
+			{% include "inclusions/social.html" %}
+		{% endif %}
 	</div>
 
-	{% include "inclusions/player_email.html" %}
-	{% include "inclusions/player_ante.html" %}
-
-	{% if canJoin %}
-        {% if user.is_authenticated %}
-            {% if challenge.isTypeTeam %}
-                <div class="btn-group vertical-padding ">
-                    <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
-                        Join this Challenge <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        {% for team in open_teams %}
-                            <li><a href="#" class="join-team" data-id="{{ team.id }}">Join "{{ team.name }}"</a></li>
-                        {% endfor %}
-						{% if open_teams|length > 0 %}
-							<li role="presentation" class="divider"></li>
-						{% endif %}
-						<li><a href="#" class="create-team">Start a new Team</a></li>
-					</ul>
-                </div>
-            {% else %}
-                <button class="join-challenge vertical-padding btn btn-primary btn-lg" type="button" title="This challenge is open to join until {{ challenge.lastPossibleJoinDate|naturalday }}.">Join this Challenge</button>
-            {% endif %}
-        {% else %}
-            <a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Sign In to Play</a>
-        {% endif %}
-	{% elif canSwitchTeams %}
-		<div class="btn-group vertical-padding ">
-			<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
-				Switch  to a different team <span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-				{% for team in open_teams %}
-					<li><a href="#" class="join-team" data-id="{{ team.id }}">Switch to "{{ team.name }}"</a></li>
-				{% endfor %}
-				{% if open_teams|length > 0 %}
-					<li role="presentation" class="divider"></li>
-				{% endif %}
-				<li><a href="#" class="create-team">Start a new Team</a></li>
-				<li role="presentation" class="divider"></li>
-				<li><a href="#" class="withdraw-challenge">Withdraw from this challenge.</a></li>
-			</ul>
-		</div>
-    {% endif %}
-
-	{% if canWithdraw %}
-		<p><small>Having second thoughts?  You can <a href="#" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
-	{% endif %}
-
-    {% if show_social %}
-		{% include "inclusions/social.html" %}
-    {% endif %}
-
-    <div class="tabbable">
-        <ul class="nav nav-tabs" id="challenge_tabs">
-            <li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    More <b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#disqus" data-toggle="tab">Smack talk</a></li>
-                    <li><a href="#rules" data-toggle="tab">The Rules</a> </li>
-                </ul>
-            </li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane active" id="leaderboard">
+	<div class="tabbable">
+		<ul class="nav nav-tabs" id="challenge_tabs">
+			<li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
+			<li><a href="#disqus" data-toggle="tab">Discussion</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="leaderboard">
 				{% if "DISQUS_SHORTNAME"|fromSettings %}
 					<div class="bottom-padding">
-                    	<a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
+						<a id="disqus_count" href="#disqus_thread" data-disqus-identifier="{{ disqus_identifier }}">&nbsp;</a>
 					</div>
-                {% endif %}
+				{% endif %}
 
-			    {% if numPlayers > 0 or teams|length > 0 %}
+				{% if numPlayers > 0 or teams|length > 0 %}
 					<ul class="list-unstyled">
 						{% for activity in recentActivities %}
 							<li class="bottom-padding">
@@ -190,88 +185,98 @@
 						{% endfor %}
 					</ul>
 
-                    <table class="table table-striped leaderboard">
-                        <thead>
-                            <tr>
-                                <th class="rank-column"></th>
-                                <th class="avatar-column"></th>
-                                <th></th>
-                                <th class="miles-column">Miles</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% if challenge.isTypeTeam %}
-                            {% for team in teams %}
-                                <tr class="team">
-                                    <td colspan="3">
-                                        <span class="name">{{ team.name }}</span>
-                                        <span class="team-rank">{{ forloop.counter|ordinal }} Place</span>
-                                    </td>
-                                    <td><a href="#" class="popover-link team-total-link" data-toggle="popover" data-html="true" data-trigger="manual" data-placement="left" data-title="{{ team.name }}" data-container="body" data-content='{% spaceless %}
-                                    <table class="table table-condensed no-margin-bottom">
-                                    	<tr><td>Total Miles</td><td>{{ team.distance|toMiles|twoDecimals }}</td></tr>
+					<table class="table table-striped leaderboard">
+						<thead>
+							<tr>
+								<th class="rank-column"></th>
+								<th class="avatar-column"></th>
+								<th></th>
+								<th class="miles-column">Miles</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% if challenge.isTypeTeam %}
+							{% for team in teams %}
+								<tr class="team">
+									<td colspan="3">
+										<span class="name">{{ team.name }}</span>
+										<span class="team-rank">{{ forloop.counter|ordinal }} Place</span>
+									</td>
+									<td><a href="#" class="popover-link team-total-link" data-toggle="popover" data-html="true" data-trigger="manual" data-placement="left" data-title="{{ team.name }}" data-container="body" data-content='{% spaceless %}
+									<table class="table table-condensed no-margin-bottom">
+										<tr><td>Total Miles</td><td>{{ team.distance|toMiles|twoDecimals }}</td></tr>
 										<tr><td> Average Miles</td><td>{{ team.averageDistance|toMiles|twoDecimals }}</td></tr>
 									</table>
-                                    {% endspaceless %}'>{{ team.averageDistance|toMiles|twoDecimals }}</a></td>
-                                </tr>
-                                {% for player in team.getMembersWithActivities %}
-                                    {% player_row user player challenge forloop.counter %}
-                                {% endfor %}
-                            {% endfor %}
-                        {% elif challenge.isTypeIndividual %}
-                            {% for player in players %}
-                                {% player_row user player challenge forloop.counter %}
-                            {% endfor %}
-                        {% endif %}
-                        </tbody>
-                    </table>
-                    <ul class="list-inline">
-                        <li><i class="fa fa-heart red" title="Active today"></i> &mdash; Active today.</li>
-                        <li><i class="fa fa-trophy"></i> &mdash; Achieved the goal.</li>
-                        <li><i class="fa fa-star bronze"></i> &mdash; Achieved 1.5 times the goal.</li>
-                        <li><i class="fa fa-star silver"></i> &mdash; Doubled the goal distance.</li>
-                        <li><i class="fa fa-star gold"></i> &mdash; Tripled the goal distance.</li>
-                    </ul>
-                {% else %}
-                    <p>
-                        This challenge is now open to join.  You could be the first!
-                    </p>
-                {% endif %}
-            </div>
-            <div class="tab-pane" id="disqus">
-                {% if "DISQUS_SHORTNAME"|fromSettings %}
-                    <div id="disqus_thread"></div>
-                    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-                {% else %}
-                    DISQUS not available.
-                {% endif %}
-            </div>
-            <div class="tab-pane" id="rules">
-				{% if challenge.isTypeIndividual %}
-					<ul>
-						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapMyFitness">MapMyFitness</a>.</li>
-						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
-						<li>Get Paid.  The money pot is dispersed evenly to those who finished the challenge.</li>
+									{% endspaceless %}'>{{ team.averageDistance|toMiles|twoDecimals }}</a></td>
+								</tr>
+								{% for player in team.getMembersWithActivities %}
+									{% player_row user player challenge forloop.counter %}
+								{% endfor %}
+							{% endfor %}
+						{% elif challenge.isTypeIndividual %}
+							{% for player in players %}
+								{% player_row user player challenge forloop.counter %}
+							{% endfor %}
+						{% endif %}
+						</tbody>
+					</table>
+					<ul class="list-inline">
+						<li><i class="fa fa-heart red" title="Active today"></i> &mdash; Active today.</li>
+						<li><i class="fa fa-trophy"></i> &mdash; Achieved the goal.</li>
+						<li><i class="fa fa-star bronze"></i> &mdash; Achieved 1.5 times the goal.</li>
+						<li><i class="fa fa-star silver"></i> &mdash; Doubled the goal distance.</li>
+						<li><i class="fa fa-star gold"></i> &mdash; Tripled the goal distance.</li>
 					</ul>
-				{% elif challenge.isTypeTeam %}
-					<ul>
-						<li>Put ${{ challenge.ante|intcomma }} in the pot.</li>
-						<li>Join a team.  Teams can have a maximum of 5 players.</li>
-						<li>Track your activity with <a href="http://runkeeper.com/" title="Runkeeper">Runkeeper</a> or <a href="http://www.mapmyfitness.com/" title="MapMyFitness">MapMyFitness</a>.</li>
-						<li>Complete {{ challenge.distance|floatformat:"-1" }} miles in {{ challenge.numDays }} days by {{ approvedActivities|commaSeparated:"or" }} between {{ challenge.startdate|date:"F jS, Y" }} and {{ challenge.enddate|date:"F jS, Y" }}.</li>
-						<li>A team can only win if everyone on the team has completed the {{ challenge.distance|floatformat:"-1" }} mile challenge.</li>
-						<li>Get Paid. The team with the highest average miles per player wins the challenge.  The money pot is dispersed evenly to members of that team.</li>
-					</ul>
+				{% else %}
+					<p>
+						This challenge is now open to join.  You could be the first!
+					</p>
 				{% endif %}
-            </div>
-        </div>
-    </div>
+			</div>
+			<div class="tab-pane" id="disqus">
+				{% if "DISQUS_SHORTNAME"|fromSettings %}
+					<div id="disqus_thread"></div>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+					<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+				{% else %}
+					DISQUS not available.
+				{% endif %}
+			</div>
+		</div>
+	</div>
 
 	{% aggregate inline_javascript %}
 		<script type="text/javascript">
 			(function() {
+				"use strict";
+				var challenge = {{ challenge|serialize:"ChallengeSerializer" }};
+
+				var challengeApp = angular.module('challenge', ['api', 'modals']);
+
+				challengeApp.controller('challenge-controller', ['$scope', 'CustomAction', 'modalFactory', function($scope, CustomAction, modalFactory) {
+					$scope.joinChallenge = function() {
+						if(FC.account.balance < challenge.ante) {
+							var lineItems = [];
+							lineItems.push(modalFactory.createLineItem('"' + challenge.name + '" challenge.', parseFloat(challenge.ante)));
+
+							modalFactory.showPaymentModal(lineItems, function () {
+								CustomAction.joinChallenge(challenge.id).then(function(result) {
+									if(result.data.success) {
+										window.location.reload();
+									}
+								});
+							});
+						}else {
+							//just join the challenge
+							CustomAction.joinChallenge(challenge.id).then(function(result) {
+								if(result.data.success) {
+									window.location.reload();
+								}
+							});
+						}
+					};
+				}]);
+
 				function round(value) {
 					return Math.ceil(value * 100) / 100
 				}
@@ -371,13 +376,6 @@
 				});
 
 
-				$('.join-challenge').click(function(evt) {
-					evt.preventDefault();
-					$.get("{% url 'join_challenge' challenge.id %}", function(result) {
-						window.location.reload();
-					});
-				});
-
 				$('.join-team').click(function(evt) {
 					evt.preventDefault();
 					var teamID = $(this).data('id');
@@ -404,11 +402,6 @@
 							window.location.reload();
 						});
 					}
-				});
-
-				$('#challenge_tabs .dropdown-menu a').on('shown.bs.tab', function(evt) {
-					var text = $(this).text();
-					$(this).closest('.dropdown').find('.dropdown-toggle').html(text + ' <b class="caret"></b>');
 				});
 
 				$('a#disqus_count').click(function(evt) {

@@ -110,7 +110,7 @@ def challenge(request, id):
         'competitor': competitor,
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
-        'canWithdraw': competitor and not request.user.delinquent and not challenge.hasStarted,
+        'canWithdraw': competitor and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities()[:5],
         'isFootRace': isFootRace
     }
@@ -130,7 +130,7 @@ def challenge(request, id):
                 pass
 
         params['teams'] = challenge.rankedTeams
-        params['canSwitchTeams'] = competitor and not challenge.hasStarted and not request.user.delinquent
+        params['canSwitchTeams'] = competitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)
 

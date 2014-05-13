@@ -68,6 +68,10 @@ a.activities-link {
     color: gold;
 }
 
+.small-margin-top {
+	margin-top: 20px;
+}
+
 .activity-icon {
     width: 18px;
 	height: 18px;
@@ -511,9 +515,16 @@ input[name=activity-image] {
 	background-image: url('/static/img/jcb.png');
 }
 
+.stripe-powered {
+	background-image: url('/static/img/stripe_powered.png');
+	width: 119px;
+	height: 26px;
+	background-size: 119px 26px;
+}
+
 @media
 (-webkit-min-device-pixel-ratio: 2),
-(min-resolution: 192dpi) {
+(min-resolution: 192dppx) {
 	.card.visa {
 		background-image: url('/static/img/visa@2x.png');
 	}
@@ -536,6 +547,10 @@ input[name=activity-image] {
 
 	.card.jcb {
 		background-image: url('/static/img/jcb@2x.png');
+	}
+
+	.stripe-powered {
+		background-image: url('/static/img/stripe_powered@2x.png');
 	}
 }
 
