@@ -111,18 +111,18 @@
 		{% if canJoin %}
 			{% if user.is_authenticated %}
 				{% if challenge.isTypeTeam %}
-					<div class="btn-group vertical-padding ">
-						<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
+					<div class="btn-group vertical-padding " dropdown is-open="ui.dropdownOpen">
+						<button type="button" class="btn btn-primary btn-lg dropdown-toggle">
 							Join this Challenge <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu" role="menu">
 							{% for team in open_teams %}
-								<li><a href="#" class="join-team" data-id="{{ team.id }}">Join "{{ team.name }}"</a></li>
+								<li><a href ng-click="joinTeam({{ team.id }})">Join "{{ team.name }}"</a></li>
 							{% endfor %}
 							{% if open_teams|length > 0 %}
 								<li role="presentation" class="divider"></li>
 							{% endif %}
-							<li><a href="#" class="create-team">Start a new Team</a></li>
+							<li><a href ng-click="joinTeam(-1)">Start a new Team</a></li>
 						</ul>
 					</div>
 				{% else %}
@@ -132,26 +132,26 @@
 				<a class="vertical-padding btn btn-primary btn-lg" href="#loginModal" data-toggle="modal" title="Sign In">Sign In to Play</a>
 			{% endif %}
 		{% elif canSwitchTeams %}
-			<div class="btn-group vertical-padding ">
-				<button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown">
+			<div class="btn-group vertical-padding " dropdown is-open="ui.dropdownOpen">
+				<button type="button" class="btn btn-primary btn-lg dropdown-toggle">
 					Switch  to a different team <span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					{% for team in open_teams %}
-						<li><a href="#" class="join-team" data-id="{{ team.id }}">Switch to "{{ team.name }}"</a></li>
+						<li><a href ng-click="joinTeam({{ team.id }})" class="join-team">Switch to "{{ team.name }}"</a></li>
 					{% endfor %}
 					{% if open_teams|length > 0 %}
 						<li role="presentation" class="divider"></li>
 					{% endif %}
-					<li><a href="#" class="create-team">Start a new Team</a></li>
+					<li><a href ng-click="joinTeam(-1)" class="create-team">Start a new Team</a></li>
 					<li role="presentation" class="divider"></li>
-					<li><a href="#" class="withdraw-challenge">Withdraw from this challenge.</a></li>
+					<li><a href ng-click="withdrawChallenge()" class="withdraw-challenge">Withdraw from this challenge.</a></li>
 				</ul>
 			</div>
 		{% endif %}
 
 		{% if canWithdraw %}
-			<p><small>Having second thoughts?  You can <a href="#" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
+			<p><small>Having second thoughts?  You can <a href ng-click="withdrawChallenge()" class="withdraw-challenge">withdraw</a> any time before the challenge begins.</small></p>
 		{% endif %}
 
 		{% if show_social %}
@@ -251,29 +251,65 @@
 				"use strict";
 				var challenge = {{ challenge|serialize:"ChallengeSerializer" }};
 
-				var challengeApp = angular.module('challenge', ['api', 'modals']);
+				var challengeApp = angular.module('challenge', ['api', 'modals', 'ui.bootstrap']);
 
 				challengeApp.controller('challenge-controller', ['$scope', 'CustomAction', 'modalFactory', function($scope, CustomAction, modalFactory) {
-					$scope.joinChallenge = function() {
-						if(FC.account.balance < challenge.ante) {
+					$scope.ui = {
+						dropdownOpen: false
+					};
+
+					var isCompetitor = function() {
+						return {{ isCompetitor|yesno:'true,false' }};
+					}
+
+					var canAfford = function() {
+						return isCompetitor() || parseFloat(FC.account.balance) >= parseFloat(challenge.ante);
+					}
+
+					var promptPayment = function(callback) {
+						if(!canAfford()) {
 							var lineItems = [];
 							lineItems.push(modalFactory.createLineItem('"' + challenge.name + '" challenge.', parseFloat(challenge.ante)));
 
 							modalFactory.showPaymentModal(lineItems, function () {
-								CustomAction.joinChallenge(challenge.id).then(function(result) {
-									if(result.data.success) {
-										window.location.reload();
-									}
-								});
+								callback.apply($scope);
 							});
 						}else {
-							//just join the challenge
-							CustomAction.joinChallenge(challenge.id).then(function(result) {
-								if(result.data.success) {
-									window.location.reload();
-								}
-							});
+							callback.apply($scope);
 						}
+					};
+
+					//lame, but required for now.
+					var reloadWindow = function(result) {
+						if(result.data.success) {
+							window.location.reload();
+						}
+					};
+
+					$scope.joinChallenge = function() {
+						$scope.ui.dropdownOpen = false;
+
+						promptPayment(function() {
+							CustomAction.joinChallenge(challenge.id).then(reloadWindow);
+						});
+					};
+
+					$scope.joinTeam = function(teamID) {
+						$scope.ui.dropdownOpen = false;
+
+						promptPayment(function() {
+							if(teamID >= 0) {
+								CustomAction.joinTeam(challenge.id, teamID).then(reloadWindow);
+							}else {
+								CustomAction.createTeam(challenge.id).then(reloadWindow);
+							}
+						});
+					};
+
+					$scope.withdrawChallenge = function() {
+						$scope.ui.dropdownOpen = false;
+
+						CustomAction.withdrawChallenge(challenge.id).then(reloadWindow);
 					};
 				}]);
 
@@ -372,35 +408,6 @@
 								'width=626,height=436');
 					}else if(service === 'google') {
 						window.open('https://plus.google.com/share?url={{ request.build_absolute_uri|urlencode }}', '', 'width=485,height=450')
-					}
-				});
-
-
-				$('.join-team').click(function(evt) {
-					evt.preventDefault();
-					var teamID = $(this).data('id');
-
-					var url = "{% url 'join_team' challenge.id '000000' %}".replace(/000000/, teamID.toString());
-					$.get(url, function(result) {
-						window.location.reload();
-					});
-				});
-
-				$('.create-team').click(function(evt) {
-					evt.preventDefault();
-					$.get('{% url 'create_team' challenge.id %}', function(result) {
-						window.location.reload();
-					});
-				});
-
-				$('.withdraw-challenge').click(function(evt) {
-					evt.preventDefault();
-					var withdraw = window.confirm("Are you sure you want to withdraw from this challenge?")
-
-					if(withdraw) {
-						$.get("{% url 'withdraw_challenge' challenge.id %}", function(result) {
-							window.location.reload();
-						});
 					}
 				});
 

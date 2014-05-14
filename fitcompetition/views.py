@@ -83,12 +83,12 @@ def challenge(request, id):
     except Challenge.DoesNotExist:
         return redirect('challenges')
 
-    competitor = None
+    isCompetitor = False
 
     if request.user.is_authenticated():
-        competitor = request.user in challenge.players.all()
+        isCompetitor = request.user in challenge.players.all()
 
-    if competitor and challenge.startdate <= now <= challenge.enddate:
+    if isCompetitor and challenge.startdate <= now <= challenge.enddate:
         if request.user.healthGraphStale():
             request.user.syncExternalActivities()
         else:
@@ -106,11 +106,11 @@ def challenge(request, id):
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
         'challenge': challenge,
-        'canJoin': challenge.canJoin and not competitor,
-        'competitor': competitor,
+        'canJoin': challenge.canJoin and not isCompetitor,
+        'isCompetitor': isCompetitor,
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
-        'canWithdraw': competitor and not challenge.hasStarted,
+        'canWithdraw': isCompetitor and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities()[:5],
         'isFootRace': isFootRace
     }
@@ -130,7 +130,7 @@ def challenge(request, id):
                 pass
 
         params['teams'] = challenge.rankedTeams
-        params['canSwitchTeams'] = competitor and not challenge.hasStarted
+        params['canSwitchTeams'] = isCompetitor and not challenge.hasStarted
 
     return render(request, 'challenge.html', params)
 

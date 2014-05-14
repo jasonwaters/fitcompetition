@@ -7,4 +7,7 @@
 
 	<p>We're letting you know that we've credited <strong>{{ transaction.amount|currency }}</strong> to your FitCrown account.</p>
 	<p>That brings <a href="{{ "BASE_URL"|fromSettings }}{% url 'account' %}">your account</a> balance to {{ account.balance|currency }}.</p>
+	{% if transaction.stripeID %}
+	<p>For reference, your transaction ID is <strong>{{ transaction.stripeID }}</strong></p>
+	{% endif %}
 {% endblock %}

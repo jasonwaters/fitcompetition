@@ -675,14 +675,15 @@ class TransactionManager(models.Manager):
                     description=toMemo,
                     amount=amount)
 
-    def deposit(self, account, amount):
+    def deposit(self, account, amount, stripeID=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
 
         self.create(date=now,
                     account=account,
                     description="Deposit",
                     amount=amount,
-                    isCashflow=True)
+                    isCashflow=True,
+                    stripeID=stripeID)
 
     def withdraw(self, account, amount):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -695,10 +696,11 @@ class TransactionManager(models.Manager):
 
 
 class Transaction(models.Model):
-    date = models.DateField(blank=True)
+    date = models.DateTimeField(blank=True)
     account = models.ForeignKey(Account)
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
     isCashflow = models.BooleanField(verbose_name="Is Cashflow In/Out", default=False)
+    stripeID = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     objects = TransactionManager()

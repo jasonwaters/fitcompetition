@@ -91,7 +91,7 @@ class EmailFactory(object):
         context = {
             'transaction': transaction,
             'user': user,
-            'account': account,
+            'account': account
         }
 
         email.html("email/cashDeposit.html", context)

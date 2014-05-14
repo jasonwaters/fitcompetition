@@ -94,6 +94,34 @@
 						'challengeID': challengeID
 					}
 				});
+			},
+			'joinTeam': function(challengeID, teamID) {
+				return $http({
+					url:'/api/join_team',
+					method:'GET',
+					params: {
+						'challengeID': challengeID,
+						'teamID': teamID
+					}
+				});
+			},
+			'createTeam': function(challengeID) {
+				return $http({
+					url:'/api/create_team',
+					method:'GET',
+					params: {
+						'challengeID': challengeID
+					}
+				});
+			},
+			'withdrawChallenge': function(challengeID) {
+				return $http({
+					url:'/api/withdraw_challenge',
+					method:'GET',
+					params: {
+						'challengeID': challengeID
+					}
+				});
 			}
 		};
 	}]);

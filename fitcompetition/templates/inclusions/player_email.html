@@ -9,7 +9,7 @@
 					{% csrf_token %}
 					<div class="form-group">
 						<label for="inputEmailAddress">Email address</label>
-                        <input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email" value="{{ user.email|notNone }}">
+                        <input type="text" class="form-control" name="emailAddress" id="inputEmailAddress" placeholder="Enter email" value="{{ user.email|default_if_none:"" }}">
 					</div>
                     <button type="submit" class="btn btn-default btn-primary">Submit</button>
 				</fieldset>

@@ -6,7 +6,7 @@ from fitcompetition.serializers import UserSerializer, ChallengeSerializer, Tran
 import re
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account, ActivityType
+from fitcompetition.models import Challenge, Team, FitnessActivity, FitUser, Transaction, Account, ActivityType, Challenger
 from django.conf import settings
 import mailchimp
 from rest_framework import viewsets
@@ -17,8 +17,15 @@ import stripe
 def addChallenger(challenge_id, user):
     try:
         challenge = Challenge.objects.get(id=challenge_id)
+        try:
+            Challenger.objects.get(fituser=user, challenge=challenge)
+            return True, challenge
+        except Challenger.DoesNotExist:
+            pass
+
         if not user.account.canAfford(challenge) or not challenge.canJoin:
             raise Exception('Challenge Cannot be Joined')
+
         challenge.addChallenger(user)
         return True, challenge
     except Challenge.DoesNotExist:
@@ -65,7 +72,10 @@ def join_challenge(request):
 
 
 @login_required
-def join_team(request, challenge_id, team_id):
+def join_team(request):
+    challenge_id = request.GET.get('challengeID')
+    team_id = request.GET.get('teamID')
+
     added_challenger, challenge = addChallenger(challenge_id, request.user)
 
     if added_challenger:
@@ -79,7 +89,9 @@ def join_team(request, challenge_id, team_id):
 
 
 @login_required
-def create_team(request, challenge_id):
+def create_team(request):
+    challenge_id = request.GET.get('challengeID')
+
     added_challenger, challenge = addChallenger(challenge_id, request.user)
 
     if added_challenger:
@@ -89,9 +101,11 @@ def create_team(request, challenge_id):
 
 
 @login_required
-def withdraw_challenge(request, id):
+def withdraw_challenge(request):
+    challenge_id = request.GET.get('challengeID')
+
     try:
-        challenge = Challenge.objects.get(id=id)
+        challenge = Challenge.objects.get(id=challenge_id)
         challenge.removeChallenger(request.user)
         Team.objects.withdrawAll(challenge, request.user)
     except Challenge.DoesNotExist:
@@ -166,7 +180,7 @@ def charge_card(request):
                 request.user.account.stripeCustomerID = customer.id
                 request.user.account.save()
 
-            stripe.Charge.create(
+            charge = stripe.Charge.create(
                 amount=int(chargeAmount * 100),  # amount in cents
                 currency="usd",
                 customer=customer.id
@@ -179,7 +193,8 @@ def charge_card(request):
                 description="Deposit: %s" % request.user.fullname
             )
 
-        Transaction.objects.deposit(request.user.account, netAmount)
+        if charge.get('paid', False):
+            Transaction.objects.deposit(request.user.account, netAmount, charge.get('id'))
 
         return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
