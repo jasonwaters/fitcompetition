@@ -700,7 +700,18 @@ class Transaction(models.Model):
     account = models.ForeignKey(Account)
     description = models.CharField(max_length=255)
     amount = CurrencyField(max_digits=16, decimal_places=2)
+    balance = CurrencyField(max_digits=16, decimal_places=2, default=None, blank=True, null=True)
     isCashflow = models.BooleanField(verbose_name="Is Cashflow In/Out", default=False)
     stripeID = models.CharField(max_length=255, blank=True, null=True, default=None)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        filters = Q(account=self.account) & Q(date__lte=self.date)
+
+        if self.id is not None:
+            filters &= Q(id__lt=self.id)
+
+        result = Transaction.objects.filter(filters).aggregate(balance=Sum('amount'))
+        self.balance = ListUtil.attr(result, 'balance', 0.0) + self.amount
+        super(Transaction, self).save(force_insert, force_update, using, update_fields)
 
     objects = TransactionManager()

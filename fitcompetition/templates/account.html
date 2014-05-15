@@ -31,12 +31,14 @@
 					<th>Date</th>
 					<th>Description</th>
 					<th>Amount</th>
+					<th>Balance</th>
 				</thead>
 				<tbody>
 					<tr ng-repeat="transaction in transactions | orderBy:'date':true">
-						<td title='{{ transaction.date|date:"medium" }}'>{{ transaction.date | date:"longDate"}}</td>
+						<td title='{{ transaction.date|date:"medium" }}'>{{ transaction.date | date:"shortDate"}}</td>
 						<td>{{ transaction.description }} <i class="fa fa-credit-card" ng-show="transaction.stripeID" title="{{ transaction.stripeID }}"></i></td>
 						<td ng-class="{red: transaction.amount<0}">{{ transaction.amount | currency }}</td>
+						<td ng-class="{red: transaction.balance<0}">{{ transaction.balance | currency }}</td>
 					</tr>
 				</tbody>
 			</table>

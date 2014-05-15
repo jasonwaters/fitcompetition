@@ -280,4 +280,4 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super(TransactionViewSet, self).get_queryset()
-        return queryset.filter(account=self.request.user.account).order_by('-date')
+        return queryset.filter(account=self.request.user.account).order_by('-date', 'id')

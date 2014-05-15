@@ -268,12 +268,17 @@
 
 					var promptPayment = function(callback) {
 						if(!canAfford()) {
+
 							var lineItems = [];
 							lineItems.push(modalFactory.createLineItem('"' + challenge.name + '" challenge.', parseFloat(challenge.ante)));
+							if(parseFloat(FC.account.balance) > 0) {
+								lineItems.push(modalFactory.createLineItem('Existing account balance', -1*Math.abs(parseFloat(FC.account.balance))));
+							}
 
 							modalFactory.showPaymentModal(lineItems, function () {
 								callback.apply($scope);
 							});
+
 						}else {
 							callback.apply($scope);
 						}
