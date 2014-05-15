@@ -711,7 +711,7 @@ class Transaction(models.Model):
             filters &= Q(id__lt=self.id)
 
         result = Transaction.objects.filter(filters).aggregate(balance=Sum('amount'))
-        self.balance = ListUtil.attr(result, 'balance', 0.0) + self.amount
+        self.balance = Decimal(ListUtil.attr(result, 'balance', 0.0)).quantize(Decimal("0.01")) + self.amount
         super(Transaction, self).save(force_insert, force_update, using, update_fields)
 
     objects = TransactionManager()
