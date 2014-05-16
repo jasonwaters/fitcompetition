@@ -132,6 +132,10 @@ def daysSince(targetdate):
     return "%s days" % delta.days
 
 @register.filter()
+def https(value):
+    return value.replace("http://", "https://", 1)
+
+@register.filter()
 def isChallenger(challenge, user):
     if not user.is_authenticated():
         return False

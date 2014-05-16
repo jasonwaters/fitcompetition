@@ -10,7 +10,7 @@
         <h2>{{ userprofile.fullname }} {% if userprofile.integrationName %}<small><a href="{{ userprofile.profile_url }}" target="_blank">view {{ userprofile.integrationName }} profile &raquo;</a></small>{% endif %}</h2>
     </div>
     <div class="user-photo">
-        <img src="{{ userprofile.normal_picture|avatar }}" class="thumbnail" />
+        <img src="{{ userprofile.normal_picture|https|avatar }}" class="thumbnail" />
     </div>
 
     <h2>Recent Activities</h2>
