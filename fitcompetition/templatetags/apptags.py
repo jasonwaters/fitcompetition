@@ -133,7 +133,9 @@ def daysSince(targetdate):
 
 @register.filter()
 def https(value):
-    return value.replace("http://", "https://", 1)
+    if value is not None:
+        value = value.replace("http://", "https://", 1)
+    return value
 
 @register.filter()
 def isChallenger(challenge, user):
