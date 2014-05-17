@@ -39,3 +39,42 @@ class TransactionTests(TestCase):
 
         self.assertEqual(0, self.challenge.account.balance, "Transaction for challenge was not created on user withdrawal.")
         self.assertEqual(25, self.user.account.balance, "Transaction for user was not created on user withdrawal.")
+
+    def testBalance(self):
+        self.assertEqual(0, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, 3)
+
+        self.assertEqual(3, t.balance)
+        self.assertEqual(3, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, 9)
+
+        self.assertEqual(12, t.balance)
+        self.assertEqual(12, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, -10)
+
+        self.assertEqual(2, t.balance)
+        self.assertEqual(2, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, 35)
+
+        self.assertEqual(37, t.balance)
+        self.assertEqual(37, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, -50)
+
+        self.assertEqual(-13, t.balance)
+        self.assertEqual(-13, self.user.account.balance)
+
+        t = Transaction.objects.deposit(self.user.account, 100)
+
+        self.assertEqual(87, t.balance)
+        self.assertEqual(87, self.user.account.balance)
+
+        t.amount = 31
+        t.save()
+
+        self.assertEqual(18, t.balance)
+        self.assertEqual(18, self.user.account.balance)

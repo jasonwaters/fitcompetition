@@ -95,6 +95,7 @@ MIDDLEWARE_CLASSES = (
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SSLRedirect',
+    'dealer.contrib.django.Middleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -242,6 +243,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
+    'dealer.contrib.django.context_processor',
 )
 
 SOCIAL_AUTH_PIPELINE = (

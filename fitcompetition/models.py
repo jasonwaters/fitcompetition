@@ -678,21 +678,21 @@ class TransactionManager(models.Manager):
     def deposit(self, account, amount, stripeID=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
 
-        self.create(date=now,
-                    account=account,
-                    description="Deposit",
-                    amount=amount,
-                    isCashflow=True,
-                    stripeID=stripeID)
+        return self.create(date=now,
+                           account=account,
+                           description="Deposit",
+                           amount=amount,
+                           isCashflow=True,
+                           stripeID=stripeID)
 
     def withdraw(self, account, amount):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
 
-        self.create(date=now,
-                    account=account,
-                    description="Withdrawal",
-                    amount=math.fabs(amount) * -1,
-                    isCashflow=True)
+        return self.create(date=now,
+                           account=account,
+                           description="Withdrawal",
+                           amount=math.fabs(amount) * -1,
+                           isCashflow=True)
 
 
 class Transaction(models.Model):

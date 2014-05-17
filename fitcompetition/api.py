@@ -158,9 +158,12 @@ def account_cash_out(request):
 @login_required
 def charge_card(request):
     token = request.GET.get('token')
-    netAmount = float(request.GET.get('netAmount'))
-    chargeAmount = float(request.GET.get('chargeAmount'))
+    netAmount = float(request.GET.get('netAmount', 0))
+    chargeAmount = float(request.GET.get('chargeAmount', 0))
     remember = request.GET.get('remember') in ('true', 'True')
+
+    if chargeAmount == 0 or (token is None and request.user.account.stripeCustomerID is None):
+        return HttpResponse(json.dumps({'success': False, 'message': "Missing transaction details"}), content_type="application/json")
 
     stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
 
@@ -205,6 +208,9 @@ def charge_card(request):
 
 @login_required
 def get_stripe_customer(request):
+    if request.user.account.stripeCustomerID is None:
+        return HttpResponse(json.dumps({'success': False, 'message': "No Stripe Customer ID"}), content_type="application/json")
+
     try:
         stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
         customer = stripe.Customer.retrieve(request.user.account.stripeCustomerID)
@@ -218,6 +224,9 @@ def get_stripe_customer(request):
 
 @login_required
 def delete_stripe_card(request):
+    if request.user.account.stripeCustomerID is None:
+        return HttpResponse(json.dumps({'success': False, 'message': "No Stripe Customer ID"}), content_type="application/json")
+
     try:
         stripe.api_key = getattr(settings, "STRIPE_SECRET_KEY")
         customer = stripe.Customer.retrieve(request.user.account.stripeCustomerID)

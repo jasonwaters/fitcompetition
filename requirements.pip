@@ -1,5 +1,6 @@
 boto==2.27.0
 celery==3.1.11
+dealer==1.1.1
 django-celery==3.1.10
 django-debug-toolbar==1.2
 django-filter==0.7

@@ -7,6 +7,24 @@
 		$http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
 	}]);
 
+
+	api.config(['$provide', '$httpProvider', function($provide, $httpProvider) {
+		$provide.factory('FCHttpInterceptor', ['$q', function($q) {
+			return {
+				'request': function(config) {
+					if(config.url.match(/.*static.+\.htm(l)*$/)) {
+						config.url+=config.url.indexOf('?') === -1 ? '?' : '&'
+						config.url += 'rev='+FC['REVISION'];
+					}
+
+					return config || $q.when(config);
+				}
+			};
+		}]);
+
+		$httpProvider.interceptors.push('FCHttpInterceptor');
+	}]);
+
 	api.factory('Account', ['$resource', function($resource) {
 		return $resource('/api/accounts/:id', {
 			id: '@id'
@@ -88,7 +106,7 @@
 			},
 			'joinChallenge': function(challengeID) {
 				return $http({
-					url:'/api/join_challenge',
+					url:'/api/join-challenge',
 					method:'GET',
 					params: {
 						'challengeID': challengeID
@@ -97,7 +115,7 @@
 			},
 			'joinTeam': function(challengeID, teamID) {
 				return $http({
-					url:'/api/join_team',
+					url:'/api/join-team',
 					method:'GET',
 					params: {
 						'challengeID': challengeID,
@@ -107,7 +125,7 @@
 			},
 			'createTeam': function(challengeID) {
 				return $http({
-					url:'/api/create_team',
+					url:'/api/create-team',
 					method:'GET',
 					params: {
 						'challengeID': challengeID
@@ -116,7 +134,7 @@
 			},
 			'withdrawChallenge': function(challengeID) {
 				return $http({
-					url:'/api/withdraw_challenge',
+					url:'/api/withdraw-challenge',
 					method:'GET',
 					params: {
 						'challengeID': challengeID

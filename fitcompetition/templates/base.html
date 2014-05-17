@@ -74,7 +74,8 @@
         </div>
 		<script type="text/javascript">
 			var FC = {
-				'API_PAGE_SIZE': {{ "API_PAGE_SIZE"|fromSettings }}
+				'API_PAGE_SIZE': {{ "API_PAGE_SIZE"|fromSettings }},
+				'REVISION': '{{ REVISION }}'
 			};
 
 			{% if user.is_authenticated %}
