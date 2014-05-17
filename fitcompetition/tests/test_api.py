@@ -96,9 +96,7 @@ class APITests(TestCase):
         self.assertTrue(content.get('success'))
 
     def test_charge_card(self):
-        response = self.client.get('/api/charge-card', {
-            'emailAddress': 'not@valid.net'
-        })
+        response = self.client.get('/api/charge-card')
 
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
