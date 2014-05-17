@@ -31,6 +31,9 @@ SOCIAL_AUTH_RUNKEEPER_SECRET = ''
 SOCIAL_AUTH_MAPMYFITNESS_KEY = ''
 SOCIAL_AUTH_MAPMYFITNESS_SECRET = ''
 
+PIPELINE_ENABLED = False
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+
 DISQUS_SHORTNAME = "invalid"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
