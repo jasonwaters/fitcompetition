@@ -153,14 +153,13 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by(
-            '-startdate', '-num_players')
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', 'distance')
+        return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
     def currentChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now,
-                                                                                                                    enddate__gte=now).order_by(
-            'startdate', '-num_players')
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('-enddate', 'distance')
+        return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
     def pastChallenges(self, daysAgo=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -431,6 +430,13 @@ class Challenge(models.Model):
     @property
     def canJoin(self):
         return datetime.now(tz=pytz.utc).date() <= self.lastPossibleJoinDate.date()
+
+    @property
+    def isFootRace(self):
+        for type in self.approvedActivities.all():
+            if type.name in ('Running', 'Walking', 'Hiking'):
+                return True
+        return False
 
     def __unicode__(self):
         return self.name
