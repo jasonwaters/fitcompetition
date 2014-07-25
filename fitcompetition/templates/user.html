@@ -20,6 +20,7 @@
             <th>Type</th>
             <th>Miles</th>
             <th class="hidden-xs">Duration</th>
+            <th class="hidden-xs">Calories</th>
 			<th>Evidence</th>
         </thead>
         <tbody>
@@ -29,6 +30,7 @@
                     <td>{{ activity.type.name }}</td>
                     <td>{{ activity.distance|toMiles|twoDecimals }}</td>
                     <td class="hidden-xs">{{ activity.duration|duration }}</td>
+                    <td class="hidden-xs">{{ activity.calories }}</td>
 					<td class="evidence">
 						{% if activity.hasGPS %}<i class="fa fa-map-marker" title="Tracked via GPS"></i>{% endif %}
 						{% if activity.photo %}

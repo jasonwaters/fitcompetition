@@ -290,7 +290,7 @@ class Activity(object):
             activityTimezone = pytz.timezone(activity.get('start_locale_timezone'))
             self.date = activityTimezone.normalize(parser.parse(activity.get('start_datetime')).astimezone(pytz.utc))
 
-            self.calories = aggregates.get('metabolic_engergy_total', 0) / float(4180)
+            self.calories = aggregates.get('metabolic_energy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
             self.hasGPS = activity.get('has_time_series')
         elif service == Integration.STRAVA:
@@ -319,7 +319,9 @@ class Activity(object):
 
             self.date = activity.get('start_date')
 
-            self.calories = activity.get('calories')
+            #not available in activity summary form from strava :(
+            self.calories = 0
+
             self.distance = activity.get('distance')
             self.hasGPS = not activity.get('manual')
 

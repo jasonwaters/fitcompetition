@@ -46,7 +46,7 @@ def user(request, id):
 
     thirtyDaysAgo = datetime.today() + relativedelta(days=-30)
 
-    recentActivities = FitnessActivity.objects.select_related('type').filter(date__gte=thirtyDaysAgo, user=user).order_by('-date')
+    recentActivities = FitnessActivity.objects.select_related('type').filter(user=user).order_by('-date')[:20]
 
     return render(request, 'user.html', {
         'userprofile': user,

@@ -39,7 +39,7 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 
 class FitnessActivityAdmin(admin.ModelAdmin):
-    list_display = ('date', 'user', 'type', 'distance', 'hasProof', 'cancelled')
+    list_display = ('date', 'user', 'type', 'distance', 'calories', 'hasProof', 'cancelled')
     ordering = ('-date',)
     list_filter = ('user', 'type')
 
