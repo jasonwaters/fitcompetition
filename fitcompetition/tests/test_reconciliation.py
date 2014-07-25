@@ -46,8 +46,19 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(50))
+                                       distance=toMeters(50),
+                                       hasGPS=True)
 
+        FitnessActivity.objects.create(user=self.elmo,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
+                                       calories=0,
+                                       distance=toMeters(70),
+                                       hasGPS=True)
+
+        #does not count since evidence is required
         FitnessActivity.objects.create(user=self.elmo,
                                        type=self.running,
                                        uri='blah',
@@ -62,7 +73,8 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70))
+                                       distance=toMeters(70),
+                                       hasGPS=True)
 
         FitnessActivity.objects.create(user=self.count,
                                        type=self.running,
@@ -70,7 +82,8 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70))
+                                       distance=toMeters(70),
+                                       photo="moo.gif")
 
         FitnessActivity.objects.create(user=self.bert,
                                        type=self.running,
@@ -78,7 +91,9 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(20))
+                                       distance=toMeters(20),
+                                       hasGPS=True,
+                                       photo="ack.png")
 
         FitnessActivity.objects.create(user=self.bert,
                                        type=self.running,
@@ -86,8 +101,19 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(90))
+                                       distance=toMeters(90),
+                                       hasGPS=True)
 
+        FitnessActivity.objects.create(user=self.ernie,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
+                                       calories=0,
+                                       distance=toMeters(65),
+                                       photo="meh.jpg")
+
+        #does not count since evidence is required
         FitnessActivity.objects.create(user=self.ernie,
                                        type=self.running,
                                        uri='blah',

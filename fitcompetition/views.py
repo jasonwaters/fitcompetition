@@ -111,7 +111,7 @@ def challenge(request, id):
         'approvedActivities': createListFromProperty(approvedTypes, 'name'),
         'numPlayers': challenge.numPlayers,
         'canWithdraw': isCompetitor and not challenge.hasStarted,
-        'recentActivities': challenge.getRecentActivities()[:5],
+        'recentActivities': challenge.getRecentActivities()[:15],
         'isFootRace': isFootRace
     }
 
@@ -140,15 +140,10 @@ def user_activities(request, userID, challengeID):
 
     if challengeID is not None and userID is not None:
         challenge = Challenge.objects.get(id=challengeID)
-        approvedTypes = challenge.approvedActivities.all()
 
-        dateFilter = Q(date__gte=challenge.startdate) & Q(date__lte=challenge.enddate) & Q(user_id=userID)
-        typeFilter = Q()
+        activitiesFilter = challenge.getActivitiesFilter(generic=True)
 
-        for type in approvedTypes:
-            typeFilter |= Q(type=type)
-
-        activitiesFilter = dateFilter & typeFilter
+        activitiesFilter = Q(user_id=userID) & activitiesFilter
         activities = FitnessActivity.objects.filter(activitiesFilter).order_by('-date')
 
     return render(request, 'user_activities.html', {

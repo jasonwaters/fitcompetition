@@ -132,7 +132,8 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now,
                                        calories=0,
-                                       distance=toMeters(120))
+                                       distance=toMeters(120),
+                                       hasGPS=True)
 
         FitnessActivity.objects.create(user=self.user2,
                                        type=self.running,
@@ -140,7 +141,8 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now,
                                        calories=0,
-                                       distance=toMeters(50))
+                                       distance=toMeters(50),
+                                       photo="meh.jpg")
 
         mail.outbox = []
 
@@ -177,7 +179,8 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(120))
+                                       distance=toMeters(120),
+                                       hasGPS=True)
 
         FitnessActivity.objects.create(user=self.user2,
                                        type=self.running,
@@ -185,7 +188,8 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(50))
+                                       distance=toMeters(50),
+                                       photo="bla.jpg")
 
         mail.outbox = []
 
@@ -226,6 +230,16 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
+                                       distance=toMeters(120),
+                                       hasGPS=True)
+
+        #does not count since evidence is required
+        FitnessActivity.objects.create(user=self.user1,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now + datetime.timedelta(days=-5),
+                                       calories=0,
                                        distance=toMeters(120))
 
         FitnessActivity.objects.create(user=self.user2,
@@ -234,8 +248,20 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(101))
+                                       distance=toMeters(101),
+                                       photo="bleh.jpg")
 
+        FitnessActivity.objects.create(user=self.user3,
+                                       type=self.running,
+                                       uri='blah',
+                                       duration=100,
+                                       date=now + datetime.timedelta(days=-5),
+                                       calories=0,
+                                       distance=toMeters(50),
+                                       photo="omg.png",
+                                       hasGPS=True)
+
+        #does not count since evidence is required
         FitnessActivity.objects.create(user=self.user3,
                                        type=self.running,
                                        uri='blah',

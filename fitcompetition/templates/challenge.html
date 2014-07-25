@@ -162,6 +162,9 @@
 	<div class="tabbable">
 		<ul class="nav nav-tabs" id="challenge_tabs">
 			<li class="active"><a href="#leaderboard" data-toggle="tab">Leaderboard</a> </li>
+			{% if not challenge.hasEnded and recentActivities|length > 0 %}
+				<li><a href="#recent-activity" data-toggle="tab">Recent Activity</a></li>
+			{% endif %}
 			<li><a href="#disqus" data-toggle="tab">Discussion</a></li>
 		</ul>
 		<div class="tab-content">
@@ -173,18 +176,6 @@
 				{% endif %}
 
 				{% if numPlayers > 0 or teams|length > 0 %}
-					<ul class="list-unstyled">
-						{% for activity in recentActivities %}
-							<li class="bottom-padding">
-								<a href="{% url "user_details" activity.user.id %}">{{ activity.user.fullname }}</a> {{ activity.type.name|pastTense }} {{ activity.distance|toMiles|twoDecimals }} miles.
-								{% if activity.photo %}
-									<a href="{{ activity.photo.url }}" target="_blank"><i title="View Image" class="fa fa-picture-o show-activity-image"></i></a>
-								{% endif %}
-								<div class="dimmed-text">{{ activity.date|naturaltime|capfirst }} </div>
-							</li>
-						{% endfor %}
-					</ul>
-
 					<table class="table table-striped leaderboard">
 						<thead>
 							<tr>
@@ -233,6 +224,21 @@
 					</p>
 				{% endif %}
 			</div>
+			{% if not challenge.hasEnded and recentActivities|length > 0 %}
+				<div class="tab-pane" id="recent-activity">
+					<ul class="list-unstyled">
+						{% for activity in recentActivities %}
+							<li class="bottom-padding">
+								<a href="{% url "user_details" activity.user.id %}">{{ activity.user.fullname }}</a> {{ activity.type.name|pastTense }} {{ activity.distance|toMiles|twoDecimals }} miles.
+								{% if activity.photo %}
+									<a href="{{ activity.photo.url }}" target="_blank"><i title="View Image" class="fa fa-picture-o show-activity-image"></i></a>
+								{% endif %}
+								<div class="dimmed-text">{{ activity.date|naturaltime|capfirst }} </div>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
 			<div class="tab-pane" id="disqus">
 				{% if "DISQUS_SHORTNAME"|fromSettings %}
 					<div id="disqus_thread"></div>

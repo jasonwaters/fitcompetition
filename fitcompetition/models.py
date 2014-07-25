@@ -247,6 +247,8 @@ class Challenge(models.Model):
     numWinners = models.IntegerField(blank=True, null=True, default=0)
     totalDisbursed = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
 
+    proofRequired = models.BooleanField(default=True)
+
     account = models.ForeignKey('Account', blank=True, null=True, default=None)
 
     objects = ChallengeManager()
@@ -324,15 +326,7 @@ class Challenge(models.Model):
         if not fituser.is_authenticated():
             return False
 
-        dateFilter = Q(date__gte=self.startdate) & Q(date__lte=self.enddate)
-        typeFilter = Q()
-
-        approvedTypes = self.approvedActivities.all()
-
-        for type in approvedTypes:
-            typeFilter |= Q(type=type)
-
-        activityFilter = Q(user=fituser) & dateFilter & typeFilter
+        activityFilter = Q(user=fituser) & self.getActivitiesFilter(generic=True)
 
         dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_distance=Sum('distance'))
         return dbo.get('total_distance') >= toMeters(self.distance)
@@ -383,7 +377,14 @@ class Challenge(models.Model):
         for type in approvedTypes:
             typeFilter |= Q(**{fieldName('type'): type})
 
-        return dateFilter & typeFilter
+        if self.proofRequired:
+            proofFilter = Q(**{fieldName('hasProof'): True})
+        else:
+            proofFilter = Q()
+
+        cancelledFilter = Q(**{fieldName('cancelled'): False})
+
+        return dateFilter & typeFilter & proofFilter & cancelledFilter
 
     def getRecentActivities(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
@@ -637,11 +638,20 @@ class FitnessActivity(models.Model):
     date = models.DateTimeField(blank=True, null=True, default=None)
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
-    photo = models.ImageField(upload_to=get_file_path, default=None, null=True)
+    photo = models.ImageField(upload_to=get_file_path, blank=True, default=None, null=True)
     hasGPS = models.BooleanField(default=False)
+    hasProof = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
 
     objects = FitnessActivityManager()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.hasProof = self.hasGPS or self.photo
+        # print "%s %s %s %s" % (self.user.first_name, self.hasProof, self.hasGPS, self.photo != '')
+        super(FitnessActivity, self).save(force_insert, force_update, using, update_fields)
+
+    class Meta:
+        verbose_name_plural = "Fitness Activities"
 
     def __unicode__(self):
         return "%s %s" % (self.type.name, self.date)
