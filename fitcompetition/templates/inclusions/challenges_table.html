@@ -9,7 +9,7 @@
 		<table class="list-challenges {% if deemphasize %}dimmed{% endif %}">
 			{% for challenge in challenges %}
 				<tr>
-					<td class="challenge-icon {% if challenge.isFootRace %}running{% else %}riding{% endif %}"></td>
+					<td class="challenge-icon {{ challenge.coreActivity }}"></td>
 					<td class="challenge-specifics">
 						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 						<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>

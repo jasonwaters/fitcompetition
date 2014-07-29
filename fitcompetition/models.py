@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField, Sum, Q, Max, Count
+from django.utils.text import slugify
 from fitcompetition.services import ExternalIntegrationException, getExternalIntegrationService, Activity, Integration
 from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
 from fitcompetition.templatetags.apptags import toMeters, toMiles
@@ -431,6 +432,20 @@ class Challenge(models.Model):
     @property
     def canJoin(self):
         return datetime.now(tz=pytz.utc).date() <= self.lastPossibleJoinDate.date()
+
+    @property
+    def coreActivity(self):
+        activityTypes = self.approvedActivities.all()
+
+        for activityType in activityTypes:
+            if activityType.name in ('Running',):
+                return 'running'
+            elif activityType.name in ('Walking',):
+                return 'walking'
+            elif activityType.name in ('Cycling', 'Mountain Biking',):
+                return "cycling"
+
+        return slugify(activityTypes[0].name)
 
     @property
     def isFootRace(self):

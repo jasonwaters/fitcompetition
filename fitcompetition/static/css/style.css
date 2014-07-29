@@ -35,12 +35,17 @@ body {
 	min-width: 80px;
 }
 
+.challenge-icon.walking {
+	background: url(/static/img/challenge_walking.svg) no-repeat center center;
+	background-size: 80%
+}
+
 .challenge-icon.running {
 	background: url(/static/img/challenge_running.svg) no-repeat center center;
 	background-size: 80%
 }
 
-.challenge-icon.riding {
+.challenge-icon.cycling {
 	background: url(/static/img/challenge_riding.svg) no-repeat center center;
 	background-size: 80%
 }
