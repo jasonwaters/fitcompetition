@@ -4,9 +4,7 @@
 <tr class="{% if user == player %}current-player{% endif %} {% if player.total_distance|achievedGoal:challenge.distance %}goal-achieved{% endif %}">
     <td>{{ rank }}.</td>
     <td>
-        <span class="avatar img-rounded">
-            <img src="{{ player.normal_picture|https|avatar }}" class="img-small">
-        </span>
+        <span class="avatar img-rounded" style="background:url('{{ player.normal_picture|https|avatar }}');background-size: cover;"></span>
     </td>
     <td class="player">
         <span class="name"><a href="{% url "user_details" player.id %}">{{ player.fullname }}</a></span>
