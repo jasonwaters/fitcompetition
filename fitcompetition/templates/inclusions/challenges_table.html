@@ -6,32 +6,35 @@
 			{% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
 			{{ title }}
 		</h3>
-		<div class="list-group list-challenges {% if deemphasize %}dimmed{% endif %}">
+		<table class="list-challenges {% if deemphasize %}dimmed{% endif %}">
 			{% for challenge in challenges %}
-				<div class="list-group-item row {% if hilight and challenge|isChallenger:user %}light-blue{% endif %}">
-					<div class="col-xs-4 col-sm-3">
+				<tr>
+					<td class="challenge-icon {% if challenge.isFootRace %}running{% else %}riding{% endif %}"></td>
+					<td class="challenge-specifics">
 						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
-						<div class="challenge-stats">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
+						<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
 						<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
-						<div class="challenge-stats-other">{{ challenge.approvedActivityNames|activityIcons }}</div>
-					</div>
+						{% if hilight and challenge|isChallenger:user %}
+							<div class="challenge-stats-other">You are Competing.</div>
+						{% endif %}
+					</td>
 
-					<div class="col-xs-3 col-sm-1">
+					<td class="hidden-xs">
 						<div class="challenge-label">Miles</div>
 						<div class="challenge-value">{{ challenge.distance|floatformat:"-2"|intcomma }}</div>
-					</div>
+					</td>
 
-					<div class="hidden-xs col-sm-1">
+					<td class="hidden-xs">
 						<div class="challenge-label">Days</div>
 						<div class="challenge-value">{{ challenge.numDays }}</div>
-					</div>
+					</td>
 
-					<div class="hidden-xs col-sm-2">
+					<td>
 						<div class="challenge-label">In the pot</div>
 						<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
-					</div>
+					</td>
 
-					<div class="col-xs-5 col-sm-5">
+					<td>
 						{% if challenge.hasStarted %}
 							{% if not challenge.hasEnded %}
 								<div class="challenge-label">Ends {{ challenge.enddate|naturalday:"F jS" }}</div>
@@ -47,9 +50,9 @@
 						{% else %}
 							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 						{% endif %}
-					</div>
-				</div>
+					</td>
+				</tr>
 			{% endfor %}
-		</div>
+		</table>
 	</div>
 {% endif %}

@@ -1,3 +1,7 @@
+body {
+	font-family: 'Titillium Web', sans-serif;
+}
+
 .main-container {
     padding: 0 10px;
 }
@@ -8,6 +12,92 @@
 .middle {
     margin-left: auto;
     margin-right: auto;
+}
+
+.logo {
+	width: 110px;
+	margin-top: -3px;
+}
+
+.navbar {
+	background-color: #323131;
+	border-color: #727171;
+	text-transform: uppercase;
+}
+
+.dimmed .challenge-icon {
+	opacity: 0.7;
+}
+
+.challenge-icon {
+	width: 80px;
+	height: 75px;
+	min-width: 80px;
+}
+
+.challenge-icon.running {
+	background: url(/static/img/challenge_running.svg) no-repeat center center;
+	background-size: 80%
+}
+
+.challenge-icon.riding {
+	background: url(/static/img/challenge_riding.svg) no-repeat center center;
+	background-size: 80%
+}
+
+
+.btn-primary {
+	color: #cba93a;
+	background-color: transparent;
+	border-color: #cba93a;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open .dropdown-toggle.btn-primary {
+	color: #fff;
+	background-color: #cba93a;
+	border-color: #cba93a;
+}
+
+
+.btn-primary.disabled,
+.btn-primary[disabled],
+fieldset[disabled] .btn-primary,
+.btn-primary.disabled:hover,
+.btn-primary[disabled]:hover,
+fieldset[disabled] .btn-primary:hover,
+.btn-primary.disabled:focus,
+.btn-primary[disabled]:focus,
+fieldset[disabled] .btn-primary:focus,
+.btn-primary.disabled:active,
+.btn-primary[disabled]:active,
+fieldset[disabled] .btn-primary:active,
+.btn-primary.disabled.active,
+.btn-primary[disabled].active,
+fieldset[disabled] .btn-primary.active {
+	color: #a9a9a9;
+	background-color: transparent;
+	border-color: #a9a9a9;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+	text-transform: uppercase;
+	font-weight: 300;
 }
 
 .runkeeper-login-button {
@@ -286,6 +376,27 @@ tr.team .team-total {
 	height: 67px;
 }
 
+.list-challenges {
+	border: none;
+	width: 100%;
+}
+
+.list-challenges .challenge-specifics h4 {
+	margin-bottom: 3px;
+}
+
+.list-challenges tr {
+	background-color: #f7f7f7;
+	border-bottom: 2px solid #ffffff;
+}
+
+.list-challenges td {
+	vertical-align: top;
+	padding: 10px 5px;
+}
+
+
+
 .list-challenges.dimmed {
 	color: #a9a9a9;
 }
@@ -299,15 +410,18 @@ tr.team .team-total {
 }
 
 .challenge-label {
+	text-transform: uppercase;
+	font-weight: 300;
+	font-size: .8em;
 	color: #999999;
 	text-align: left;
-	margin: 10px 0;
+	margin: 10px 0 4px 0;
 }
 
 .challenge-value {
 	text-align: left;
-	font-weight: bold;
-	font-size: 20px;
+	font-weight: 300;
+	font-size: 1.4em;
 }
 
 .challenge-header {
@@ -330,6 +444,13 @@ tr.team .team-total {
 }
 
 @media (max-width: 360px) {
+	.challenge-icon {
+		width: 40px;
+		height: 40px;
+		min-width: 40px;
+		background-position: center 18px !important;
+	}
+
     h1{
         font-size: 30px;
     }
