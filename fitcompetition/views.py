@@ -5,24 +5,37 @@ from django.db.models import Q, Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from fitcompetition import tasks
-from fitcompetition.models import Challenge, FitnessActivity, FitUser, Team
-from fitcompetition.settings import TEAM_MEMBER_MAXIMUM
+from fitcompetition.models import Challenge, FitnessActivity, FitUser, Team, Transaction, Challenger
+from fitcompetition.settings import TEAM_MEMBER_MAXIMUM, TIME_ZONE
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import pytz
 
 
 def challenges(request):
+    now = datetime.now(tz=pytz.timezone(TIME_ZONE))
     currentChallenges = Challenge.objects.currentChallenges()
     upcomingChallenges = Challenge.objects.upcomingChallenges()
     pastChallenges = Challenge.objects.pastChallenges(daysAgo=60)
 
     challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'), totalWinnerCount=Sum('numWinners'))
 
+    accountFilter = Q()
+
+    for challenge in currentChallenges:
+        accountFilter |= Q(account=challenge.account)
+
+    transactionResult = Transaction.objects.filter(accountFilter).aggregate(upForGrabs=Sum('amount'))
+
     return render(request, 'challenges.html', {
         'currentChallenges': currentChallenges,
         'upcomingChallenges': upcomingChallenges,
         'pastChallenges': pastChallenges,
         'totalPaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0),
+        'upForGrabs': transactionResult.get('upForGrabs'),
+        'playingNow': Challenger.objects.filter(challenge__reconciled=False, challenge__startdate__lte=now).count(),
+        'totalAllTimePlayers': Challenger.objects.all().count(),
+        'totalRunningChallenges': Challenge.objects.filter(reconciled=False, startdate__lte=now).count(),
+        'totalCompletedChallenges': Challenge.objects.filter(reconciled=True).count()
     })
 
 

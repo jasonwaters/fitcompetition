@@ -2,57 +2,62 @@
 {% load humanize %}
 {% if challenges and challenges|length > 0 %}
 	<div class="challenges-table">
-		<h3>
-			{% if iconClass %}<i class="{{ iconClass }}"></i>{% endif %}
-			{{ title }}
-		</h3>
 		<table class="list-challenges {% if deemphasize %}dimmed{% endif %}">
-			{% for challenge in challenges %}
+			<thead>
 				<tr>
-					<td class="challenge-icon {{ challenge.coreActivity }}"></td>
-					<td class="challenge-specifics">
-						<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
-						<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
-						<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
-						{% if hilight and challenge|isChallenger:user %}
-							<div class="challenge-stats-other">You are Competing.</div>
-						{% endif %}
-					</td>
-
-					<td class="hidden-xs">
-						<div class="challenge-label">Miles</div>
-						<div class="challenge-value">{{ challenge.distance|floatformat:"-2"|intcomma }}</div>
-					</td>
-
-					<td class="hidden-xs">
-						<div class="challenge-label">Days</div>
-						<div class="challenge-value">{{ challenge.numDays }}</div>
-					</td>
-
-					<td>
-						<div class="challenge-label">In the pot</div>
-						<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
-					</td>
-
-					<td>
-						{% if challenge.hasStarted %}
-							{% if not challenge.hasEnded %}
-								<div class="challenge-label">Ends {{ challenge.enddate|naturalday:"F jS" }}</div>
-							{% else %}
-								<div class="challenge-label">Ended {{ challenge.enddate|naturalday:"F jS" }}</div>
-							{% endif %}
-						{% else %}
-							<div class="challenge-label">Starts {{ challenge.startdate|naturalday:"F jS" }}</div>
-						{% endif %}
-
-						{% if challenge.canJoin and not challenge|isChallenger:user %}
-							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
-						{% else %}
-							<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
-						{% endif %}
-					</td>
+					<th colspan="42">
+						<h3>{{ title }}</h3>
+					</th>
 				</tr>
-			{% endfor %}
+			</thead>
+			<tbody>
+				{% for challenge in challenges %}
+					<tr>
+						<td class="challenge-ornament"><div class="challenge-icon {{ challenge.coreActivity }}"></div></td>
+						<td class="challenge-specifics">
+							<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
+							<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
+							<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
+							{#{% if hilight and challenge|isChallenger:user %}#}
+							{#	<div class="challenge-stats-other">You are Competing.</div>#}
+							{#{% endif %}#}
+						</td>
+
+						<td class="hidden-xs">
+							<div class="challenge-label">Miles</div>
+							<div class="challenge-value">{{ challenge.distance|floatformat:"-2"|intcomma }}</div>
+						</td>
+
+						<td class="hidden-xs">
+							<div class="challenge-label">Days</div>
+							<div class="challenge-value">{{ challenge.numDays }}</div>
+						</td>
+
+						<td>
+							<div class="challenge-label">In the pot</div>
+							<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
+						</td>
+
+						<td>
+							{% if challenge.hasStarted %}
+								{% if not challenge.hasEnded %}
+									<div class="challenge-label">Ends {{ challenge.enddate|naturalday:"F jS" }}</div>
+								{% else %}
+									<div class="challenge-label">Ended {{ challenge.enddate|naturalday:"F jS" }}</div>
+								{% endif %}
+							{% else %}
+								<div class="challenge-label">Starts {{ challenge.startdate|naturalday:"F jS" }}</div>
+							{% endif %}
+
+							{% if challenge.canJoin and not challenge|isChallenger:user %}
+								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
+							{% else %}
+								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
 		</table>
 	</div>
 {% endif %}

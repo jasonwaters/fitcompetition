@@ -29,6 +29,10 @@ body {
 	opacity: 0.7;
 }
 
+.challenge-ornament {
+	width: 105px;
+}
+
 .challenge-icon {
 	width: 80px;
 	height: 75px;
@@ -37,17 +41,14 @@ body {
 
 .challenge-icon.walking {
 	background: url(/static/img/challenge_walking.svg) no-repeat center center;
-	background-size: 80%
 }
 
 .challenge-icon.running {
 	background: url(/static/img/challenge_running.svg) no-repeat center center;
-	background-size: 80%
 }
 
 .challenge-icon.cycling {
 	background: url(/static/img/challenge_riding.svg) no-repeat center center;
-	background-size: 80%
 }
 
 
@@ -386,13 +387,30 @@ tr.team .team-total {
 	width: 100%;
 }
 
+.list-challenges thead tr {
+	background-color: #ffffff;
+	border-bottom: none;
+	color: #3c3b3b;
+}
+
+.list-challenges thead th {
+	padding: 20px;
+}
+
+.list-challenges thead h3 {
+	font-weight: 200;
+	padding: 0;
+	margin: 0;
+}
+
 .list-challenges .challenge-specifics h4 {
 	margin-bottom: 3px;
+	margin-top: 0px;
 }
 
 .list-challenges tr {
 	background-color: #f7f7f7;
-	border-bottom: 2px solid #ffffff;
+	border-bottom: 1px solid #ffffff;
 }
 
 .list-challenges td {
@@ -400,7 +418,13 @@ tr.team .team-total {
 	padding: 10px 5px;
 }
 
+.list-challenges tr td:first-child {
+	padding: 10px 5px 10px 20px;
+}
 
+.list-challenges tr td:last-child {
+	padding: 10px 20px 10px 5px;
+}
 
 .list-challenges.dimmed {
 	color: #a9a9a9;
@@ -416,17 +440,17 @@ tr.team .team-total {
 
 .challenge-label {
 	text-transform: uppercase;
-	font-weight: 300;
+	font-weight: 200;
 	font-size: .8em;
 	color: #999999;
 	text-align: left;
-	margin: 10px 0 4px 0;
+	margin: 4px 0;
 }
 
 .challenge-value {
 	text-align: left;
 	font-weight: 300;
-	font-size: 1.4em;
+	font-size: 2em;
 }
 
 .challenge-header {
@@ -449,11 +473,36 @@ tr.team .team-total {
 }
 
 @media (max-width: 360px) {
+
+	.list-challenges thead th {
+		padding: 10px;
+	}
+
+	.list-challenges td {
+		vertical-align: top;
+		padding: 5px 5px;
+	}
+
+	.list-challenges tr td:first-child {
+		padding: 5px 5px 5px 10px;
+	}
+
+	.list-challenges tr td:last-child {
+		padding: 5px 10px 5px 5px;
+	}
+
+	.challenge-ornament {
+		width: 20px;
+	}
+
 	.challenge-icon {
-		width: 40px;
-		height: 40px;
-		min-width: 40px;
-		background-position: center 18px !important;
+		width: 20px;
+		height: 20px;
+		min-width: 20px;
+	}
+
+	.challenge-value {
+		font-size: 1.2em;
 	}
 
     h1{
@@ -685,4 +734,36 @@ input[name=activity-image] {
 .existing-payment-method .card {
 	position: relative;
 	top: 5px;
+}
+
+body.challenges {
+	background: #535456 url('/static/img/challenges_bg.jpg') no-repeat top center;
+	background-size: cover;
+}
+
+.challenge-metrics {
+	background-color: #cba93a;
+	border-bottom-right-radius: 10px;
+	padding: 40px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.metric {
+	display: inline-block;
+	margin-right: 40px;
+	float: left;
+}
+
+.metric h3 {
+	font-weight: 300;
+	font-size: 2.8em;
+	padding: 0;
+	margin: 0;
+}
+
+.metric label {
+	font-size: 1em;
+	font-weight: 200;
+	text-transform: uppercase;
 }

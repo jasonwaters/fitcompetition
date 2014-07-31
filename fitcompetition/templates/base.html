@@ -12,12 +12,12 @@
 
         {% compressed_css 'all-css' %}
         {% block css %}{% endblock %}
-		<link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,300,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,200,300,700' rel='stylesheet' type='text/css'>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
 		<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 	</head>
-    <body ng-app="{% block ng_app %}{% endblock %}">
+    <body ng-app="{% block ng_app %}{% endblock %}" class="{% block body_class %}{% endblock %}">
         <header class="navbar navbar-static-top navbar-inverse" role="navigation">
             <div class="container">
                 <div class="navbar-header">
