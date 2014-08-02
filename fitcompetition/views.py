@@ -21,7 +21,9 @@ def challenges(request):
 
     accountFilter = Q()
 
-    for challenge in currentChallenges:
+    unReconciledChallenges = Challenge.objects.filter(reconciled=False)
+
+    for challenge in unReconciledChallenges:
         accountFilter |= Q(account=challenge.account)
 
     transactionResult = Transaction.objects.filter(accountFilter).aggregate(upForGrabs=Sum('amount'))
@@ -32,9 +34,9 @@ def challenges(request):
         'pastChallenges': pastChallenges,
         'totalPaid': attr(challengeStats, 'grandTotalDisbursed', defaultValue=0),
         'upForGrabs': transactionResult.get('upForGrabs'),
-        'playingNow': Challenger.objects.filter(challenge__reconciled=False, challenge__startdate__lte=now).count(),
+        'playingNow': Challenger.objects.filter(challenge__reconciled=False).count(),
         'totalAllTimePlayers': Challenger.objects.all().count(),
-        'totalRunningChallenges': Challenge.objects.filter(reconciled=False, startdate__lte=now).count(),
+        'unReconciledChallenges': unReconciledChallenges.count(),
         'totalCompletedChallenges': Challenge.objects.filter(reconciled=True).count()
     })
 

@@ -20,19 +20,19 @@
     {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
 	<div class="challenge-metrics clearfix">
 		<div class="metric">
-			<h3>${{ totalPaid|floatformat:"-2"|intcomma }}</h3>
+			<h3>${{ totalPaid|floatformat:0|intcomma }}</h3>
 			<label>paid out to winners</label>
 		</div>
 		<div class="metric">
 			<h3>{{ totalAllTimePlayers|intcomma }}</h3>
-			<label>all time participants</label>
+			<label>all-time participants</label>
 		</div>
 		<div class="metric">
 			<h3>{{ totalCompletedChallenges|intcomma }}</h3>
 			<label>finished challenges</label>
 		</div>
 		<div class="metric">
-			<h3>${{ upForGrabs|floatformat:"-2"|intcomma }}</h3>
+			<h3>${{ upForGrabs|floatformat:0|intcomma }}</h3>
 			<label>up for grabs</label>
 		</div>
 		<div class="metric">
@@ -40,8 +40,8 @@
 			<label>participating now</label>
 		</div>
 		<div class="metric">
-			<h3>{{ totalRunningChallenges|intcomma }}</h3>
-			<label>in-flight challenges</label>
+			<h3>{{ unReconciledChallenges|intcomma }}</h3>
+			<label>current challenges</label>
 		</div>
 	</div>
 
