@@ -22,6 +22,7 @@ Project Setup
   pip install nodeenv
   nodeenv --python-virtualenv --jobs=1
   npm install -g less
+  npm install -g yuglify
   ```
 
 3. Install dependencies
