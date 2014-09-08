@@ -20,7 +20,7 @@ Project Setup
   ```bash
   source env/bin/activate
   pip install nodeenv
-  nodeenv --python-virtualenv
+  nodeenv --python-virtualenv --jobs=1
   npm install -g less
   ```
 
