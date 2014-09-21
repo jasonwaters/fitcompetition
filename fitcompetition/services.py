@@ -292,7 +292,7 @@ class Activity(object):
 
             self.calories = aggregates.get('metabolic_energy_total', 0) / float(4180)
             self.distance = aggregates.get('distance_total')
-            self.hasGPS = activity.get('has_time_series')
+            self.hasGPS = activity.get('has_time_series') or activity.get('is_verified')
         elif service == Integration.STRAVA:
             types = {
                 "AlpineSki": "Downhill Skiing",

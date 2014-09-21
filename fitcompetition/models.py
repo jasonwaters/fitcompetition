@@ -633,7 +633,7 @@ class FitnessActivityManager(models.Manager):
 
         except (ExternalIntegrationException, RequestException), e:
             successful = False
-            if e.forbidden or e.unauthorized:
+            if getattr(e, 'forbidden') or getattr(e, 'unauthorized'):
                 user.stripTokens()
 
         return successful
