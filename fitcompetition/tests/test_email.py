@@ -165,7 +165,7 @@ class EmailTests(TestCase):
                                                   style="ALL",
                                                   distance=100,
                                                   startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-1),
+                                                  enddate=now + datetime.timedelta(days=-2),
                                                   ante=100)
 
         self.challenge.approvedActivities.add(self.running)
@@ -211,7 +211,7 @@ class EmailTests(TestCase):
                                                   style="ONE",
                                                   distance=100,
                                                   startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-1),
+                                                  enddate=now + datetime.timedelta(days=-2),
                                                   ante=100)
 
         self.challenge.approvedActivities.add(self.running)

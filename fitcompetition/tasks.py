@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
 from fitcompetition.celery import app
@@ -68,7 +68,8 @@ def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivi
 
     if nowPlayingOnly:
         now = datetime.now(tz=pytz.utc)
-        users = FitUser.objects.filter(filter, challenger__challenge__startdate__lte=now, challenger__challenge__enddate__gte=now).distinct()
+        yesterday = now-timedelta(days=1)
+        users = FitUser.objects.filter(filter, challenger__challenge__startdate__lte=now, challenger__challenge__enddate__gte=yesterday).distinct()
     else:
         users = FitUser.objects.filter(filter)
 
@@ -80,6 +81,7 @@ def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivi
 @app.task(ignore_result=True)
 def sendChallengeNotifications():
     now = timezone.localtime(timezone.now())
+    yesterday = now-timedelta(days=1)
 
     challenges = Challenge.objects.filter(reconciled=False)
     for challenge in challenges:
@@ -94,7 +96,7 @@ def sendChallengeNotifications():
                 EmailFactory().challengeHalf(user, challenge)
 
         #check challenged ended
-        elif challenge.enddate.astimezone(pytz.timezone(TIME_ZONE)) < now:
+        elif challenge.enddate.astimezone(pytz.timezone(TIME_ZONE)) < yesterday:
             upcomingChallenges = Challenge.objects.upcomingChallenges()
             challenge.performReconciliation()
             achievers = challenge.getAchievers()
