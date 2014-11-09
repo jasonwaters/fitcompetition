@@ -593,7 +593,7 @@ class FitnessActivityManager(models.Manager):
 
                     uris = {}
                     for apiActivity in apiActivities:
-                        activity = Activity(apiActivity, user.integrationName)
+                        activity = Activity(apiActivity, user.integrationName, user.timezone)
                         uris[activity.get('uri')] = True
 
                     for dbActivity in dbActivities:
@@ -619,7 +619,7 @@ class FitnessActivityManager(models.Manager):
                                                                                             url=next.get('url'))
 
                 for activity in activities:
-                    activity = Activity(activity, user.integrationName)
+                    activity = Activity(activity, user.integrationName, user.timezone)
 
                     type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
 

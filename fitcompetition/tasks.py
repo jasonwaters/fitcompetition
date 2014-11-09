@@ -52,26 +52,26 @@ def syncExternalData(user_id, syncActivities=True, syncProfile=False, pruneActiv
 #hourly
 @app.task(ignore_result=True)
 def syncExternalDataAllUsers(syncActivities=True, syncProfile=False, pruneActivities=False, integrations=None, nowPlayingOnly=True):
-    filter = Q()
+    integrationFilter = Q()
 
     if integrations is None:
         integrations = Integration.all()
 
     if Integration.RUNKEEPER in integrations:
-        filter |= Q(runkeeperToken__isnull=False)
+        integrationFilter |= Q(runkeeperToken__isnull=False)
 
     if Integration.STRAVA in integrations:
-        filter |= Q(stravaToken__isnull=False)
+        integrationFilter |= Q(stravaToken__isnull=False)
 
     if Integration.MAPMYFITNESS in integrations:
-        filter |= Q(mapmyfitnessToken__isnull=False)
+        integrationFilter |= Q(mapmyfitnessToken__isnull=False)
 
     if nowPlayingOnly:
         now = datetime.now(tz=pytz.utc)
         yesterday = now-timedelta(days=1)
-        users = FitUser.objects.filter(filter, challenger__challenge__startdate__lte=now, challenger__challenge__enddate__gte=yesterday).distinct()
+        users = FitUser.objects.filter(integrationFilter, challenger__challenge__startdate__lte=now, challenger__challenge__enddate__gte=yesterday).distinct()
     else:
-        users = FitUser.objects.filter(filter)
+        users = FitUser.objects.filter(integrationFilter)
 
     for user in users:
         syncExternalData.delay(user.id, syncActivities=syncActivities, syncProfile=syncProfile, pruneActivities=pruneActivities)

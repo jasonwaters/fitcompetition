@@ -104,15 +104,26 @@ class Activity(object):
     ELLIPTICAL = "Elliptical"
     OTHER = "Other"
 
-    def __init__(self, activity, service):
+    def __init__(self, activity, service, timezoneString):
         if service == Integration.RUNKEEPER:
             self.uri = activity.get('uri')
             self.type = activity.get('type')
             self.duration = activity.get('duration')
 
-            #runkeeper does not provide timezone data yet.  So we leave it naive
-            self.date = parser.parse(activity.get('start_time'))
+            #runkeeper does not provide timezone data.
+            naive = parser.parse(activity.get('start_time'))
+            activity_date = naive
 
+            if timezoneString is not None:
+                try:
+                    # use the user timezone (if set) to localize the date
+                    user_tz = pytz.timezone(timezoneString)
+                    activity_date = user_tz.localize(naive, is_dst=False)
+                except pytz.UnknownTimeZoneError:
+                    # inadequate user timezone, leave it naive
+                    activity_date = naive
+
+            self.date = activity_date
             self.calories = activity.get('total_calories')
             self.distance = activity.get('total_distance')
             self.hasGPS = activity.get('has_path')
