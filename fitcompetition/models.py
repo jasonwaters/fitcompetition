@@ -68,6 +68,8 @@ class FitUser(AbstractUser):
     phoneNumber = models.CharField(max_length=255, blank=True, null=True, default=None)
     integrationName = models.CharField(verbose_name="Integration", max_length=255, blank=True, null=True, default=None)
 
+    timezone = models.CharField(max_length=255, blank=True, null=True, default=None)
+
     account = models.ForeignKey('Account', blank=True, null=True, default=None)
 
     lastExternalSyncDate = models.DateTimeField(verbose_name="Last Sync", blank=True, null=True, default=None)

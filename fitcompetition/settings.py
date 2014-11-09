@@ -171,6 +171,7 @@ PIPELINE_JS = {
             'js/jquery.validate.js',
             'js/additional-methods.js',
             'js/bootstrap.js',
+            'js/jstz.js',
             'js/moment.js',
             'js/lodash.js',
             "js/binaryajax.js",

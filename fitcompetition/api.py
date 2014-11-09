@@ -238,6 +238,14 @@ def delete_stripe_card(request):
         return HttpResponse(json.dumps({'success': False, 'message': e.message}), content_type="application/json")
 
 
+@login_required
+def user_timezone_update(request):
+    request.user.timezone = request.POST.get('timezone')
+    request.user.save()
+
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
 #################################
 ##  Django REST Framework
 #################################
