@@ -97,14 +97,14 @@
 
 		<script type="text/javascript">
 			$(document).ready(function (jQuery) {
-				var recordedTimezone = '{{ user.timezone|default_if_none:'' }}';
+				if(FC.user != null) {
+					var tz = jstz.determine();
 
-				var tz = jstz.determine();
-
-				if( tz.name() !== recordedTimezone) {
-					$.post('{% url 'user_timezone_update' %}', {
-						'timezone': tz.name()
-					});
+					if( tz.name() !== FC.user.timezone ) {
+						$.post('{% url 'user_timezone_update' %}', {
+							'timezone': tz.name()
+						});
+					}
 				}
 			});
 		</script>

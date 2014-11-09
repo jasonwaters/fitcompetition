@@ -25,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'normal_picture',
             'integrationName',
             'gender',
+            'timezone',
         )
 
 
