@@ -506,7 +506,9 @@ body.challenges {
 	text-transform: uppercase;
 }
 
-@media (max-width: 360px) {
+
+/* iPhone 6 Plus */
+@media (max-width: 414px) {
 
 	.challenge-metrics {
 		padding: 10px;
@@ -555,9 +557,9 @@ body.challenges {
 	}
 
 	.challenge-icon {
-		width: 20px;
-		height: 20px;
-		min-width: 20px;
+		width: 40px;
+		height: 40px;
+		min-width: 40px;
 	}
 
 	.challenge-value {
@@ -606,8 +608,8 @@ body.challenges {
     }
 
     .avatar {
-        width: 30px;
-        height: 30px;
+        width: 60px;
+        height: 60px;
     }
 
     .avatar .icon-check-sign {
@@ -626,6 +628,21 @@ body.challenges {
         height: auto;
     }
 }
+
+/* iPhone 5S < */
+@media (max-width: 360px) {
+	.challenge-icon {
+		width: 20px;
+		height: 20px;
+		min-width: 20px;
+	}
+
+	.avatar {
+		width: 30px;
+		height: 30px;
+	}
+}
+
 
 .show-activity-image, .upload-activity-image {
 	cursor: pointer;
