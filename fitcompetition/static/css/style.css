@@ -629,6 +629,10 @@ body.challenges {
     }
 }
 
+.fb-like {
+	margin-bottom: 20px;
+}
+
 /* iPhone 5S < */
 @media (max-width: 360px) {
 	.challenge-icon {
