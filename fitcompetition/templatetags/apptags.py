@@ -115,7 +115,7 @@ def duration(secs):
         m, s = divmod(secs, 60)
         h, m = divmod(m, 60)
 
-    return "%d:%02d:%02d" % (h, m, s)
+    return "%02d:%02d:%02d" % (h, m, s)
 
 
 @register.filter

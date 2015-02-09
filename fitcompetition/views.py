@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
@@ -99,23 +99,32 @@ def challenge(request, id):
         return redirect('challenges')
 
     isCompetitor = False
+    recentActivitiesWithoutEvidence = []
 
     if request.user.is_authenticated():
         isCompetitor = request.user in challenge.players.all()
 
     if isCompetitor and challenge.startdate <= now <= challenge.enddate:
-        if request.user.healthGraphStale():
-            request.user.syncExternalActivities()
-        else:
-            tasks.syncExternalActivities.delay(request.user.id)
+        tasks.syncExternalActivities.delay(request.user.id)
 
     approvedTypes = challenge.approvedActivities.all()
+
+    if isCompetitor and challenge.proofRequired:
+        recentWithoutEvidenceFilter = Q(user=request.user) & Q(hasProof=False) & Q(date__gte=(now + timedelta(hours=-24)))
+
+        typeFilter = Q()
+        for activityType in approvedTypes:
+            typeFilter |= Q(type=activityType)
+
+        recentWithoutEvidenceFilter &= typeFilter
+        recentActivitiesWithoutEvidence = FitnessActivity.objects.filter(recentWithoutEvidenceFilter)
 
     footFilter = Q(name__contains="Running")
     footFilter |= Q(name__contains="Walking")
     footFilter |= Q(name__contains="Hiking")
 
     isFootRace = len(challenge.approvedActivities.filter(footFilter)) > 0
+
 
     params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
@@ -127,7 +136,8 @@ def challenge(request, id):
         'numPlayers': challenge.numPlayers,
         'canWithdraw': isCompetitor and not challenge.hasStarted,
         'recentActivities': challenge.getRecentActivities()[:15],
-        'isFootRace': isFootRace
+        'isFootRace': isFootRace,
+        'recentActivitiesWithoutEvidence': recentActivitiesWithoutEvidence
     }
 
     if challenge.isTypeIndividual:

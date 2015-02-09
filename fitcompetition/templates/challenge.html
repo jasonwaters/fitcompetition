@@ -157,6 +157,22 @@
 		{% if show_social %}
 			{% include "inclusions/social.html" %}
 		{% endif %}
+		{% if recentActivitiesWithoutEvidence|length > 0 %}
+			<div class="alert alert-info" role="alert">
+			<strong>You have {{ recentActivitiesWithoutEvidence|length }} recent activit{{ recentActivitiesWithoutEvidence|length|pluralize:'y,ies' }} that needs evidence to count:</strong>
+			<ul>
+				{% for activity in recentActivitiesWithoutEvidence %}
+					<li data-id="{{ activity.id }}">
+						{{ activity.type.name }}, {{ activity.distance|toMiles|twoDecimals }} miles, {{ activity.duration|duration }}
+							<span>
+								<input name="activity-image" type="file">
+								<i title="Upload Image" class="fa fa-upload upload-activity-image"></i>
+							</span>
+					</li>
+				{% endfor %}
+			</ul>
+			</div>
+		{% endif %}
 	</div>
 
 	<div class="tabbable">
@@ -425,6 +441,41 @@
 				$('a#disqus_count').click(function(evt) {
 					evt.preventDefault();
 					$('#challenge_tabs a[href="#disqus"]').tab('show');
+				});
+
+				$('.upload-activity-image').click(function() {
+					var $this = $(this);
+
+					$(this).prev('input[type=file]').trigger('click');
+				});
+
+				$('input[name=activity-image]').change(function () {
+					var $this = $(this),
+							file = this.files[0],
+							li = $this.closest('li'),
+							activityID = li.data('id');
+
+					canvasResize(file, {
+						width: 640,
+						quality: 80,
+						callback: function (data, width, height) {
+							var url = "{% url 'activity_upload_photo' '000000' %}".replace(/000000/, activityID.toString());
+							$.ajax({
+								'url': url,
+								'type': 'POST',
+								'data': {
+									'base64image': data,
+									'filename': file.name,
+									'type': file.type
+								}
+							}).done(function(response) {
+								response = JSON.parse(response);
+								if(response.success) {
+									document.location.reload();
+								}
+							});
+						}
+					});
 				});
 
 				{% if "DISQUS_SHORTNAME"|fromSettings %}
