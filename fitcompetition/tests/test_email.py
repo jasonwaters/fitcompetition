@@ -1,11 +1,11 @@
 import datetime
 import json
+
 from django.core import mail
 from django.test import Client, TestCase
 from fitcompetition import tasks
 from fitcompetition.models import FitUser, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
-from fitcompetition.templatetags.apptags import toMeters
 import pytz
 
 
@@ -132,7 +132,7 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now,
                                        calories=0,
-                                       distance=toMeters(120),
+                                       distance=120,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.user2,
@@ -141,7 +141,7 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now,
                                        calories=0,
-                                       distance=toMeters(50),
+                                       distance=50,
                                        photo="meh.jpg")
 
         mail.outbox = []
@@ -151,11 +151,11 @@ class EmailTests(TestCase):
         self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
 
         self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
-        self.assertTrue("120 miles" in mail.outbox[0].alternatives[0][0])
+        self.assertTrue("0.07 mi" in mail.outbox[0].alternatives[0][0])
         self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
 
         self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
-        self.assertTrue("50 miles" in mail.outbox[1].alternatives[0][0])
+        self.assertTrue("0.03 mi" in mail.outbox[1].alternatives[0][0])
         self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
 
     def testChallengeEnd(self):
@@ -179,7 +179,7 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(120),
+                                       distance=120,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.user2,
@@ -188,7 +188,7 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(50),
+                                       distance=50,
                                        photo="bla.jpg")
 
         mail.outbox = []
@@ -197,11 +197,11 @@ class EmailTests(TestCase):
         self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
 
         self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("120 miles" in mail.outbox[0].alternatives[0][0])
+        self.assertTrue("0.07 mi" in mail.outbox[0].alternatives[0][0])
         self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
 
         self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("50 miles" in mail.outbox[1].alternatives[0][0])
+        self.assertTrue("0.03 mi" in mail.outbox[1].alternatives[0][0])
         self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
 
     def testTeamChallengeEnd(self):
@@ -230,17 +230,17 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(120),
+                                       distance=120,
                                        hasGPS=True)
 
-        #does not count since evidence is required
+        # does not count since evidence is required
         FitnessActivity.objects.create(user=self.user1,
                                        type=self.running,
                                        uri='blah',
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(120))
+                                       distance=120)
 
         FitnessActivity.objects.create(user=self.user2,
                                        type=self.running,
@@ -248,7 +248,7 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(101),
+                                       distance=101,
                                        photo="bleh.jpg")
 
         FitnessActivity.objects.create(user=self.user3,
@@ -257,24 +257,24 @@ class EmailTests(TestCase):
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(50),
+                                       distance=50,
                                        photo="omg.png",
                                        hasGPS=True)
 
-        #does not count since evidence is required
+        # does not count since evidence is required
         FitnessActivity.objects.create(user=self.user3,
                                        type=self.running,
                                        uri='blah',
                                        duration=100,
                                        date=now + datetime.timedelta(days=-5),
                                        calories=0,
-                                       distance=toMeters(50))
+                                       distance=50)
 
         mail.outbox = []
 
-        #user 1 : winner
-        #user 2 : loser, but achieved distance
-        #user 3 : loser, failed to achieve distance
+        # user 1 : winner
+        # user 2 : loser, but achieved distance
+        # user 3 : loser, failed to achieve distance
 
         tasks.sendChallengeNotifications()
         self.assertEqual(3, len(mail.outbox), '2 challenge ended emails should have been sent')

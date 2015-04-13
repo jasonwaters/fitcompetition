@@ -1,10 +1,10 @@
 import datetime
 from decimal import Decimal
+
 from django.core import mail
 from django.test import TestCase
 from fitcompetition.models import FitUser, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
-from fitcompetition.templatetags.apptags import toMeters
 import pytz
 
 
@@ -46,7 +46,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(50),
+                                       distance=50,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.elmo,
@@ -55,7 +55,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70),
+                                       distance=70,
                                        hasGPS=True)
 
         #does not count since evidence is required
@@ -65,7 +65,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70))
+                                       distance=70)
 
         FitnessActivity.objects.create(user=self.count,
                                        type=self.running,
@@ -73,7 +73,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70),
+                                       distance=70,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.count,
@@ -82,7 +82,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(70),
+                                       distance=70,
                                        photo="moo.gif")
 
         FitnessActivity.objects.create(user=self.bert,
@@ -91,7 +91,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(20),
+                                       distance=20,
                                        hasGPS=True,
                                        photo="ack.png")
 
@@ -101,7 +101,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(90),
+                                       distance=90,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.ernie,
@@ -110,7 +110,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(65),
+                                       distance=65,
                                        photo="meh.jpg")
 
         #does not count since evidence is required
@@ -120,7 +120,7 @@ class ReconciliationTests(TestCase):
                                        duration=100,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=0,
-                                       distance=toMeters(65))
+                                       distance=65)
 
 
         #elmo 120 miles

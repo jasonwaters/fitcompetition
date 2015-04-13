@@ -358,8 +358,9 @@ class Challenge(models.Model):
 
     def getAchievers(self):
         if self.isTypeIndividual:
-            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_accounting=Sum('activities__distance', distinct=True),
-                                                                               latest_activity_date=Max('activities__date')).exclude(total_distance__lt=self.distance)
+            winners = self.players.filter(self.getActivitiesFilter()).annotate(
+                total_accounting=Sum('activities__%s' % self.accountingType, distinct=True),
+                latest_activity_date=Max('activities__date')).exclude(total_accounting__lt=getattr(self, self.accountingType))
 
             if self.isStyleWinnerTakesAll:
                 return winners[:1]
