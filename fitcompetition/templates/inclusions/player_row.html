@@ -1,7 +1,7 @@
 {% load apptags %}
 {% load humanize %}
 
-<tr class="{% if user == player %}current-player{% endif %} {% if player.total_distance|achievedGoal:challenge.distance %}goal-achieved{% endif %}">
+<tr class="{% if user == player %}current-player{% endif %} {% if player.total_accounting|achievedGoal:challenge %}goal-achieved{% endif %}">
     <td>{{ rank }}.</td>
     <td>
         <span class="avatar img-rounded" style="background:url('{{ player.normal_picture|https|avatar }}');background-size: cover;"></span>
@@ -9,12 +9,12 @@
     <td class="player">
         <span class="name"><a href="{% url "user_details" player.id %}">{{ player.fullname }}</a></span>
         <div class="flair">
-            {% if player.total_distance|achievedGoal:challenge.distance %}
+            {% if player.total_accounting|achievedGoal:challenge %}
                 <i class="fa fa-trophy"></i>
             {% endif %}
 
-            {% if player.total_distance|overAchiever:challenge.distance %}
-                <i class="fa fa-star {% if player.total_distance|tripledGoal:challenge.distance %}gold{% elif player.total_distance|doubledGoal:challenge.distance %}silver{% else %}bronze{% endif %}"></i>
+            {% if player.total_accounting|overAchiever:challenge %}
+                <i class="fa fa-star {% if player.total_accounting|tripledGoal:challenge %}gold{% elif player.total_accounting|doubledGoal:challenge %}silver{% else %}bronze{% endif %}"></i>
             {% endif %}
 
             {% if player.latest_activity_date|isToday %}
@@ -24,7 +24,8 @@
     </td>
     <td>
         <a class="popover-link activities-link distance-enclave" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-html='true' data-trigger="manual" data-placement="left" data-title='{{ player.fullname }}' data-container="body">
-            {{ player.total_distance|toMiles|twoDecimals }}
+            {#{{ player.total_accounting|twoDecimals }}#}
+			{% accounting player.total_accounting challenge.accountingType user %}
         </a>
     </td>
 </tr>

@@ -8,10 +8,10 @@
 	<p>How's it going?  Can you believe the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge is already half over!?</p>
 	<p>
 		{% if achievedGoal %}
-			Wow, you've logged {{ user.total_distance|toMiles|floatformat:"-1" }} mile{{ user.total_distance|toMiles|pluralize }}!
+			Wow, you've logged {{ user.total_accounting|floatformat:"-1" }} mile{{ user.total_accounting|pluralize }}!
 			Way to go, you've already achieved the goal!!  That was easy.  Now it's time to dominate the leaderboard and shoot for the stars by doubling or tripling the goal.  You can do it!
-		{% elif user.total_distance > 0 %}
-			You've already logged {{ user.total_distance|toMiles|floatformat:"-1" }} mile{{ user.total_distance|toMiles|pluralize }}!
+		{% elif user.total_accounting > 0 %}
+			You've already logged {{ user.total_accounting|floatformat:"-1" }} mile{{ user.total_accounting|pluralize }}!
 			You're well on your way to conquer this thing.  And there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!
 		{% else %}
 			Looks like you haven't logged any miles yet! Eek!  Don't worry, there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!

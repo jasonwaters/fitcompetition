@@ -3,8 +3,9 @@ from decimal import Decimal
 from math import floor
 import math
 from django import template
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.template import Node
-from django.template.defaultfilters import register
+from django.template.defaultfilters import register, floatformat
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
@@ -30,31 +31,32 @@ def abs(value):
 
 
 @register.filter
-def achievedGoal(meters, goal_miles):
-    if not meters:
+def achievedGoal(value, challenge):
+    if not value:
         return False
-    return toMiles(meters) > float(goal_miles)
+
+    return value > float(getattr(challenge, challenge.accountingType))
 
 
 @register.filter
-def overAchiever(meters, goal_miles):
+def overAchiever(meters, challenge):
     if not meters:
         return False
-    return toMiles(meters) > float(goal_miles) * 1.5
+    return meters > float(getattr(challenge, challenge.accountingType)) * 1.5
 
 
 @register.filter
-def doubledGoal(meters, goal_miles):
+def doubledGoal(meters, challenge):
     if not meters:
         return False
-    return toMiles(meters) > goal_miles * 2
+    return meters > float(getattr(challenge, challenge.accountingType)) * 2
 
 
 @register.filter
-def tripledGoal(meters, goal_miles):
+def tripledGoal(meters, challenge):
     if not meters:
         return False
-    return toMiles(meters) > goal_miles * 3
+    return meters > float(getattr(challenge, challenge.accountingType)) * 3
 
 
 @register.filter
@@ -83,15 +85,12 @@ def serialize(obj, serializer):
 
 @register.filter
 def toMiles(meters):
-    if not isinstance(meters, float):
-        return 0
-    return meters * 0.00062137
+    return float(meters) * float(0.00062137)
 
 
 @register.filter
 def toMeters(miles):
-    return Decimal(miles) / Decimal(0.00062137)
-
+    return float(miles) / float(0.00062137)
 
 @register.filter
 def toLBS(kg):
@@ -219,6 +218,31 @@ def currency(value):
 def userAchievedChallenge(challenge, user):
     return challenge.getAchievedGoal(user)
 
+
+@register.simple_tag(takes_context=False)
+def accounting(valueHolder, accountingType, user, floatPrecision=-2):
+    if isinstance(valueHolder, float) or isinstance(valueHolder, Decimal) or isinstance(valueHolder, int):
+        value = valueHolder
+    else:
+        value = getattr(valueHolder, accountingType)
+
+    if accountingType == 'distance':
+        unit = user.distanceUnit if user.is_authenticated() else 'mi'
+
+        if unit == 'mi':
+            value = toMiles(value)
+        elif unit == 'km':
+            value = float(value) / float(1000)
+        value = intcomma(floatformat(value, floatPrecision))
+
+    elif accountingType == 'calories':
+        unit = ''
+        value = intcomma(floatformat(value, 0))
+    elif accountingType == 'duration':
+        unit = ''
+        value = duration(value)
+
+    return '%s %s' % (value, unit)
 
 @register.filter
 def challengeType(challenge):

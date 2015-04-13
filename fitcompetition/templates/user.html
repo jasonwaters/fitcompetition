@@ -18,7 +18,7 @@
         <thead>
             <th>Date</th>
             <th>Type</th>
-            <th>Miles</th>
+            <th>Distance</th>
             <th class="hidden-xs">Duration</th>
             <th class="hidden-xs">Calories</th>
 			<th>Evidence</th>
@@ -28,7 +28,7 @@
                 <tr data-id="{{ activity.id }}">
                     <td title="{{ activity.date }}">{{ activity.date|naturalday:"N jS" }}</td>
                     <td>{{ activity.type.name }}</td>
-                    <td>{{ activity.distance|toMiles|twoDecimals }}</td>
+                    <td>{% accounting activity 'distance' user %}</td>
                     <td class="hidden-xs">{{ activity.duration|duration }}</td>
                     <td class="hidden-xs">{{ activity.calories|floatformat:"0" }}</td>
 					<td class="evidence">

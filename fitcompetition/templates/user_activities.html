@@ -5,16 +5,14 @@
         <thead>
         <th></th>
         <th>Date</th>
-        <th>Miles</th>
-        <th>Time</th>
+        <th>{{ challenge.get_accountingType_display }}</th>
         </thead>
         <tbody>
         {% for activity in activities %}
             <tr class="{% if forloop.counter > 4 %}hidden{% endif %}">
                 <td><span class="activity-icon {{ activity.type.name|slugify }}"></span></td>
                 <td>{{ activity.date|naturalday:"M j" }}</td>
-                <td>{{ activity.distance|toMiles|twoDecimals }}</td>
-                <td>{{ activity.duration|duration }}</td>
+                <td>{% accounting activity challenge.accountingType user %}</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -18,14 +18,11 @@
 							<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 							<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
 							<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
-							{#{% if hilight and challenge|isChallenger:user %}#}
-							{#	<div class="challenge-stats-other">You are Competing.</div>#}
-							{#{% endif %}#}
 						</td>
 
 						<td class="hidden-xs">
-							<div class="challenge-label">Miles</div>
-							<div class="challenge-value">{{ challenge.distance|floatformat:"-2"|intcomma }}</div>
+							<div class="challenge-label">{{ challenge.get_accountingType_display }}</div>
+							<div class="challenge-value">{% accounting challenge challenge.accountingType user %}</div>
 						</td>
 
 						<td class="hidden-xs">

@@ -172,7 +172,8 @@ def user_activities(request, userID, challengeID):
         activities = FitnessActivity.objects.filter(activitiesFilter).order_by('-date')
 
     return render(request, 'user_activities.html', {
-        'activities': activities
+        'activities': activities,
+        'challenge': challenge
     })
 
 @login_required

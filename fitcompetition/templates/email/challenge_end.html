@@ -9,10 +9,10 @@
 	<p>
 		{% if challenge.isTypeIndividual %}
 			{% if achievedGoal %}
-				Wow!  You rocked the house and completed the challenge with {{ user.total_distance|toMiles|floatformat:"-1" }} miles!
+				Wow!  You rocked the house and completed the challenge with {{ user.total_accounting|floatformat:"-1" }} miles!
 				Way to go!!  You are one of {{ challenge.numWinners }} people to complete the challenge.  Pat yourself on the back.  We've credited {{ challenge.disbursementAmount|currency }} to <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">your account</a>.<br/>
 			{% else %}
-				You logged {{ user.total_distance|toMiles|floatformat:"-1" }} mile{{ user.total_distance|toMiles|pluralize }}.  That's an "A" for effort.  But sadly you did not complete the challenge.
+				You logged {{ user.total_accounting|floatformat:"-1" }} mile{{ user.total_accounting|pluralize }}.  That's an "A" for effort.  But sadly you did not complete the challenge.
 			{% endif %}
 		{% elif challenge.isTypeTeam and challenge.isStyleWinnerTakesAll %}
 			{% if isWinner %}

@@ -32,7 +32,7 @@ class TransactionInline(admin.TabularInline):
 
 
 class ChallengeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'distance', 'startdate', 'middate', 'enddate')
+    list_display = ('name', 'accountingType', 'distance', 'calories', 'duration', 'startdate', 'middate', 'enddate')
     exclude = ('middate',)
     ordering = ('-startdate', '-enddate',)
     inlines = (TeamInline, ChallengerInline,)

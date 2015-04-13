@@ -3,6 +3,7 @@ from decimal import Decimal, ROUND_DOWN
 import operator
 import uuid
 import math
+
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
@@ -11,12 +12,13 @@ from django.db.models import BooleanField, Sum, Q, Max, Count
 from django.utils.text import slugify
 from fitcompetition.services import ExternalIntegrationException, getExternalIntegrationService, Activity, Integration
 from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
-from fitcompetition.templatetags.apptags import toMeters, toMiles
 from fitcompetition.util import ListUtil
 from fitcompetition.util.ListUtil import createListFromProperty, attr
 import os
 import pytz
 from requests import RequestException
+
+
 
 # noinspection PyUnresolvedReferences
 import signals
@@ -54,6 +56,12 @@ class FitUserManager(UserManager):
     pass
 
 
+DISTANCE_UNITS = (
+    ("mi", "Mile"),
+    ("km", "Kilometer")
+)
+
+
 class FitUser(AbstractUser):
     runkeeperToken = models.CharField(max_length=255, blank=True, null=True, default=None)
     mapmyfitnessToken = models.CharField(max_length=255, blank=True, null=True, default=None)
@@ -69,6 +77,7 @@ class FitUser(AbstractUser):
     integrationName = models.CharField(verbose_name="Integration", max_length=255, blank=True, null=True, default=None)
 
     timezone = models.CharField(max_length=255, blank=True, null=True, default=None)
+    distanceUnit = models.CharField(max_length=6, choices=DISTANCE_UNITS, default='mi')
 
     account = models.ForeignKey('Account', blank=True, null=True, default=None)
 
@@ -156,12 +165,15 @@ class ActivityType(models.Model):
 class ChallengeManager(models.Manager):
     def upcomingChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by('-startdate', 'distance')
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by(
+            '-startdate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
     def currentChallenges(self):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now, enddate__gte=now).order_by('-enddate', 'distance')
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now,
+                                                                                                                      enddate__gte=now).order_by(
+            '-enddate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
     def pastChallenges(self, daysAgo=None):
@@ -206,8 +218,8 @@ def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilte
 
     if challenge.startdate <= now:
         users_with_activities = challengers.filter(activitiesFilter).annotate(
-            total_distance=Sum('activities__distance', distinct=True),
-            latest_activity_date=Max('activities__date')).order_by('-total_distance')
+            total_accounting=Sum('activities__%s' % challenge.accountingType, distinct=True),
+            latest_activity_date=Max('activities__date')).order_by('-total_accounting')
 
         activitySet = set(user.id for user in users_with_activities)
 
@@ -229,13 +241,23 @@ CHALLENGE_STYLES = (
     ('ONE', 'Winner Takes All - The individual or team at the top of the leaderboard wins the pot.'),
 )
 
+ACCOUNTING_TYPES = (
+    ('distance', 'Distance'),
+    ('calories', 'Calories'),
+    ('duration', 'Time')
+)
+
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
     type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='INDV')
     style = models.CharField(max_length=6, choices=CHALLENGE_STYLES, default='ALL')
     description = models.TextField(blank=True)
-    distance = models.DecimalField(max_digits=16, decimal_places=2)
+
+    accountingType = models.CharField(max_length=20, choices=ACCOUNTING_TYPES, default='distance')
+    distance = models.DecimalField(max_digits=20, decimal_places=10, default=0)
+    calories = models.DecimalField(max_digits=20, decimal_places=10, default=0)
+    duration = models.DecimalField(max_digits=20, decimal_places=10, default=0)
 
     startdate = models.DateTimeField(verbose_name='Start Date')
     middate = models.DateTimeField(verbose_name='Mid Date', blank=True, null=True, default=None)
@@ -331,13 +353,13 @@ class Challenge(models.Model):
 
         activityFilter = Q(user=fituser) & self.getActivitiesFilter(generic=True)
 
-        dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_distance=Sum('distance'))
-        return dbo.get('total_distance') >= toMeters(self.distance)
+        dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_accounting=Sum(self.accountingType))
+        return dbo.get('total_accounting') >= getattr(self, self.accountingType)
 
     def getAchievers(self):
         if self.isTypeIndividual:
-            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_distance=Sum('activities__distance', distinct=True),
-                                                                               latest_activity_date=Max('activities__date')).exclude(total_distance__lt=toMeters(self.distance))
+            winners = self.players.filter(self.getActivitiesFilter()).annotate(total_accounting=Sum('activities__distance', distinct=True),
+                                                                               latest_activity_date=Max('activities__date')).exclude(total_distance__lt=self.distance)
 
             if self.isStyleWinnerTakesAll:
                 return winners[:1]
@@ -349,17 +371,17 @@ class Challenge(models.Model):
             if self.isStyleWinnerTakesAll:
                 try:
                     topTeam = list(teams[:1])[0]
-                    if toMiles(topTeam.averageDistance) > self.distance:
+                    if topTeam.averageDistance > self.distance:
                         return topTeam.members.all()
                 except IndexError:
-                    #if there are no teams for the challenge
+                    # if there are no teams for the challenge
                     pass
 
                 return list()
             elif self.isStyleAllCanWin:
                 winners = list()
                 for team in teams:
-                    if toMiles(team.averageDistance) > self.distance:
+                    if team.averageDistance > self.distance:
                         winners += list(team.members.all())
 
                 return winners
@@ -415,7 +437,7 @@ class Challenge(models.Model):
 
     @property
     def numDays(self):
-        #we add 1 because we include the end date in the calculation
+        # we add 1 because we include the end date in the calculation
         return (self.enddate - self.startdate).days + 1
 
     @property
@@ -533,7 +555,7 @@ class Team(models.Model):
                 userFilter |= Q(user=member)
 
             filter = filter & userFilter
-            #TODO: Fix this N+1 Select
+            # TODO: Fix this N+1 Select
             result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
             self._distanceCache = result.get('distance__sum') if result.get('distance__sum') is not None else 0
 
@@ -574,7 +596,7 @@ class FitnessActivityManager(models.Manager):
 
         try:
             if user.integrationName == Integration.RUNKEEPER:
-                #delete the activities cached in the database that have been deleted on the health graph
+                # delete the activities cached in the database that have been deleted on the health graph
                 changelog = service.getChangeLog(modifiedNoEarlierThan=sixtyDaysAgo)
                 deletedActivities = changelog.get('fitness_activities', {}).get('deleted', [])
 
@@ -598,7 +620,7 @@ class FitnessActivityManager(models.Manager):
 
                     for dbActivity in dbActivities:
                         if not uris.get(dbActivity.uri, False):
-                            #it was deleted from the external service, so we should follow suit
+                            # it was deleted from the external service, so we should follow suit
                             dbActivity.delete()
 
         except(ExternalIntegrationException, RequestException), e:
@@ -610,7 +632,7 @@ class FitnessActivityManager(models.Manager):
 
     def syncActivities(self, user):
         successful = True
-        #populate the database with activities from the health graph
+        # populate the database with activities from the health graph
         try:
             next = {'hasMore': True, 'url': None}
 
