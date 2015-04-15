@@ -22,7 +22,7 @@
 				Winner Takes All
 			{% endif %}
 		</li>
-		<li>{% if challenge.isTypeTeam %}Your team{% else %}You{% endif %} must log {% accounting challenge challenge.accountingType user %}</li>
+		<li>{% if challenge.isTypeTeam %}Your team{% else %}You{% endif %} must log {% accounting challenge challenge.accountingType user True%}</li>
 		<li>Approved Activities: {{ approvedActivities|commaSeparated }}</li>
 		<li>Start Date: {{ challenge.startdate|date:"F j, Y" }}</li>
 		<li>End Date: {{ challenge.enddate|date:"F j, Y" }}</li>

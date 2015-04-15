@@ -220,7 +220,7 @@ def userAchievedChallenge(challenge, user):
 
 
 @register.simple_tag(takes_context=False)
-def accounting(valueHolder, accountingType, user, floatPrecision=-2):
+def accounting(valueHolder, accountingType, user, displayFullUnit=False, floatPrecision=-2):
     if isinstance(valueHolder, float) or isinstance(valueHolder, Decimal) or isinstance(valueHolder, int):
         value = valueHolder
     else:
@@ -234,15 +234,31 @@ def accounting(valueHolder, accountingType, user, floatPrecision=-2):
         elif unit == 'km':
             value = float(value) / float(1000)
         value = intcomma(floatformat(value, floatPrecision))
+        if displayFullUnit:
+            unit = "miles" if unit == 'mi' else "kilometers"
 
     elif accountingType == 'calories':
         unit = ''
         value = intcomma(floatformat(value, 0))
+        if displayFullUnit:
+            unit = "calories"
     elif accountingType == 'duration':
         unit = ''
         value = duration(value)
 
     return '%s %s' % (value, unit)
+
+@register.simple_tag(takes_context=False)
+def accounting_team(team, accountingType, user, average=False, displayFullUnit=False, floatPrecision=-2):
+
+    if average:
+        value = team.average(accountingType)
+    else:
+        value = team.accounting(accountingType)
+
+    return accounting(value, accountingType, user, displayFullUnit=displayFullUnit, floatPrecision=floatPrecision)
+
+
 
 @register.filter
 def challengeType(challenge):

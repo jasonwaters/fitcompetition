@@ -345,7 +345,8 @@ class Challenge(models.Model):
     @property
     def rankedTeams(self):
         teams = self.teams.filter(challenge=self).select_related('captain').prefetch_related('members').annotate(num_members=Count('members'))
-        return ListUtil.multikeysort(teams, ['-averageDistance'], getter=operator.attrgetter)
+        sortKey = '-average%s' % self.accountingType.capitalize()
+        return ListUtil.multikeysort(teams, [sortKey], getter=operator.attrgetter)
 
     def getAchievedGoal(self, fituser):
         if not fituser.is_authenticated():
@@ -372,7 +373,7 @@ class Challenge(models.Model):
             if self.isStyleWinnerTakesAll:
                 try:
                     topTeam = list(teams[:1])[0]
-                    if topTeam.averageDistance > self.distance:
+                    if topTeam.average(self.accountingType) > getattr(self, self.accountingType):
                         return topTeam.members.all()
                 except IndexError:
                     # if there are no teams for the challenge
@@ -382,7 +383,7 @@ class Challenge(models.Model):
             elif self.isStyleAllCanWin:
                 winners = list()
                 for team in teams:
-                    if team.averageDistance > self.distance:
+                    if team.average(self.accountingType) > getattr(self, self.accountingType):
                         winners += list(team.members.all())
 
                 return winners
@@ -530,7 +531,7 @@ class Team(models.Model):
     objects = TeamManager()
 
     def __init__(self, *args, **kwargs):
-        self._distanceCache = None
+        self._cache = dict()
         super(Team, self).__init__(*args, **kwargs)
 
     def getMembersWithActivities(self):
@@ -545,9 +546,8 @@ class Team(models.Model):
     def removeChallenger(self, user):
         self.members.remove(user)
 
-    @property
-    def distance(self):
-        if self._distanceCache is None:
+    def accounting(self, accountingType):
+        if self._cache.get(accountingType) is None:
             filter = self.challenge.getActivitiesFilter(generic=True)
 
             userFilter = Q()
@@ -557,16 +557,38 @@ class Team(models.Model):
 
             filter = filter & userFilter
             # TODO: Fix this N+1 Select
-            result = FitnessActivity.objects.filter(filter).aggregate(Sum('distance'))
-            self._distanceCache = result.get('distance__sum') if result.get('distance__sum') is not None else 0
+            result = FitnessActivity.objects.filter(filter).aggregate(Sum(accountingType))
+            key = "%s__sum" % accountingType
+            self._cache[accountingType] = result.get(key) if result.get(key) is not None else 0
+        return self._cache[accountingType]
 
-        return self._distanceCache
+    @property
+    def distance(self):
+        return self.accounting('distance')
 
+    @property
+    def calories(self):
+        return self.accounting('calories')
+
+    @property
+    def duration(self):
+        return self.accounting('duration')
+
+    def average(self, accountingType):
+        num_players = attr(self, 'num_members') if attr(self, 'num_members') is not None else self.members.count()
+        return self.accounting(accountingType) / max(num_players, 1)
 
     @property
     def averageDistance(self):
-        num_players = attr(self, 'num_members') if attr(self, 'num_members') is not None else self.members.count()
-        return self.distance / max(num_players, 1)
+        return self.average('distance')
+
+    @property
+    def averageCalories(self):
+        return self.average('calories')
+
+    @property
+    def averageDuration(self):
+        return self.average('duration')
 
     def __unicode__(self):
         return self.name

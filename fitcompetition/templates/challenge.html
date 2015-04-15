@@ -48,7 +48,7 @@
 			<div class="row">
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">{{ challenge.get_accountingType_display }}</div>
-					<div class="challenge-value">{% accounting challenge challenge.accountingType user %}</div>
+					<div class="challenge-value">{% accounting challenge challenge.accountingType user True%}</div>
 				</div>
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">Activities</div>
@@ -215,10 +215,10 @@
 									</td>
 									<td><a href="#" class="popover-link team-total-link" data-toggle="popover" data-html="true" data-trigger="manual" data-placement="left" data-title="{{ team.name }}" data-container="body" data-content='{% spaceless %}
 									<table class="table table-condensed no-margin-bottom">
-										<tr><td>Total Miles</td><td>{{ team.distance|twoDecimals }}</td></tr>
-										<tr><td> Average Miles</td><td>{{ team.averageDistance|twoDecimals }}</td></tr>
+										<tr><td>Total {{ challenge.accountingType }}</td><td>{% accounting_team team challenge.accountingType user %}</td></tr>
+										<tr><td>Average {{ challenge.accountingType }}</td><td>{% accounting_team team challenge.accountingType user True %}</td></tr>
 									</table>
-									{% endspaceless %}'>{{ team.averageDistance|twoDecimals }}</a></td>
+									{% endspaceless %}'>{% accounting_team team challenge.accountingType user True %}</a></td>
 								</tr>
 								{% for player in team.getMembersWithActivities %}
 									{% player_row user player challenge forloop.counter %}
