@@ -24,7 +24,6 @@
     </td>
     <td>
         <a class="popover-link activities-link distance-enclave" data-url="{% url "useractivities" player.id challenge.id %}" data-userid="{{ player.id }}" data-toggle="popover" data-html='true' data-trigger="manual" data-placement="left" data-title='{{ player.fullname }}' data-container="body">
-            {#{{ player.total_accounting|twoDecimals }}#}
 			{% accounting player.total_accounting challenge.accountingType user %}
         </a>
     </td>

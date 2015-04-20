@@ -223,6 +223,8 @@ def userAchievedChallenge(challenge, user):
 def accounting(valueHolder, accountingType, user, displayFullUnit=False, floatPrecision=-2):
     if isinstance(valueHolder, float) or isinstance(valueHolder, Decimal) or isinstance(valueHolder, int):
         value = valueHolder
+    elif isinstance(valueHolder, str):
+        value = 0
     else:
         value = getattr(valueHolder, accountingType)
 

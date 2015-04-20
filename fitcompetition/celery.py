@@ -29,6 +29,11 @@ app.conf.update(
                 'pruneActivities': False
             }
         },
+        "sync-strava-activity-details-hourly": {
+            "task": "fitcompetition.tasks.syncStravaActivityDetails",
+            "schedule": crontab(minute=0, hour='*/1'),
+            "kwargs": {}
+        },
 
         "sync-profile-prune-external-activities-daily": {
             "task": "fitcompetition.tasks.syncExternalDataAllUsers",

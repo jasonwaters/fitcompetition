@@ -20,7 +20,7 @@
 							<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
 						</td>
 
-						<td class="hidden-xs">
+						<td>
 							<div class="challenge-label">{{ challenge.get_accountingType_display }}</div>
 							<div class="challenge-value">{% accounting challenge challenge.accountingType user %}</div>
 						</td>
@@ -30,7 +30,7 @@
 							<div class="challenge-value">{{ challenge.numDays }}</div>
 						</td>
 
-						<td>
+						<td class="hidden-xs">
 							<div class="challenge-label">In the pot</div>
 							<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
 						</td>

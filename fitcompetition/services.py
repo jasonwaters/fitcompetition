@@ -543,6 +543,21 @@ class StravaService(object):
     def hasTokens(self):
         return self.user.stravaToken is not None and len(self.user.stravaToken) > 0
 
+    def getFitnessActivity(self, activityID):
+        params = {
+            'access_token': self.user.stravaToken
+        }
+        headers = {}
+
+        url = "%s/activities/%s" % (self.API_URL, activityID)
+        r = requests.get(url, params=params, headers=headers)
+
+        if r.status_code != 200:
+            raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
+
+        return r.json()
+
+
     def getFitnessActivities(self, noEarlierThan=None, noLaterThan=None, modifiedSince=None, url=None):
         params = {
             'access_token': self.user.stravaToken,

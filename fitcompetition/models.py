@@ -244,7 +244,7 @@ CHALLENGE_STYLES = (
 ACCOUNTING_TYPES = (
     ('distance', 'Distance'),
     ('calories', 'Calories'),
-    ('duration', 'Time')
+    ('duration', 'Duration')
 )
 
 

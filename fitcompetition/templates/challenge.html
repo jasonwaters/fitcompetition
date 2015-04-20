@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load staticfiles %}
 
-{% block head_title %}{{ challenge.name }} : {{ challenge.distance|floatformat:"-1" }} mile exercise challenge: {{ approvedActivities|commaSeparated}}{% endblock %}
+{% block head_title %}{{ challenge.name }} : {% accounting challenge challenge.accountingType user True%} : Exercise Challenge{% endblock %}
 
 {% block ng_app %}challenge{% endblock %}
 
@@ -49,10 +49,6 @@
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">{{ challenge.get_accountingType_display }}</div>
 					<div class="challenge-value">{% accounting challenge challenge.accountingType user True%}</div>
-				</div>
-				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
-					<div class="challenge-label">Activities</div>
-					<div class="challenge-value">{{ approvedActivities|activityIcons }}</div>
 				</div>
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">Duration</div>
