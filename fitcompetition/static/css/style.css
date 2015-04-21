@@ -33,22 +33,40 @@ body {
 	width: 105px;
 }
 
+.challenge-title span{
+	position: relative;
+	top: -28px;
+}
+
+.challenge-title::before {
+	content: ' ';
+	width: 80px;
+	height: 75px;
+	min-width: 80px;
+	display: inline-block;
+	margin-right: 10px;
+}
+
 .challenge-icon {
 	width: 80px;
 	height: 75px;
 	min-width: 80px;
 }
 
-.challenge-icon.walking {
+.challenge-icon.walking, .challenge-title.walking::before {
 	background: url(/static/img/challenge_walking.svg) no-repeat center center;
 }
 
-.challenge-icon.running {
+.challenge-icon.running, .challenge-title.running::before{
 	background: url(/static/img/challenge_running.svg) no-repeat center center;
 }
 
-.challenge-icon.cycling {
+.challenge-icon.cycling, .challenge-title.cycling::before{
 	background: url(/static/img/challenge_riding.svg) no-repeat center center;
+}
+
+.challenge-icon.all, .challenge-title.all::before {
+	background: url(/static/img/challenge_all.svg) no-repeat center center;
 }
 
 

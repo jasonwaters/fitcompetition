@@ -23,10 +23,8 @@
 {% block content %}
 	<div ng-controller="challenge-controller">
 		<div class="page-header">
-			<h2>{{ challenge.name }}</h2>
+			<h2 class="challenge-title {{ challenge.coreActivity }}"><span>{{ challenge.name }}</span></h2>
 		</div>
-
-		<p class="lead">{{ challenge.description|safe }}</p>
 
 		<p class="lead">
 			{% if not challenge.hasStarted %}
@@ -102,10 +100,9 @@
 			</div>
 		</div>
 
-		{% include "inclusions/player_email.html" %}
+		<p class="lead">{{ challenge.description|safe }}</p>
 
-		<div class="fb-like" data-href="https://www.facebook.com/fitcrown" data-layout="standard" data-action="like" data-show-faces="true" data-share="false" data-width="300"></div>
-		<br /><br />
+		{% include "inclusions/player_email.html" %}
 
 		{% if canJoin %}
 			{% if user.is_authenticated %}
@@ -266,6 +263,11 @@
 			</div>
 		</div>
 	</div>
+
+	<br /><br />
+	<div class="fb-like" data-href="https://www.facebook.com/fitcrown" data-layout="standard" data-action="like" data-show-faces="true" data-share="false" data-width="300"></div>
+	<br /><br />
+
 
 	{% aggregate inline_javascript %}
 		<script type="text/javascript">

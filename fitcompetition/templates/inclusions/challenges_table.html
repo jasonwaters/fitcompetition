@@ -13,7 +13,7 @@
 			<tbody>
 				{% for challenge in challenges %}
 					<tr>
-						<td class="challenge-ornament"><div class="challenge-icon {{ challenge.coreActivity }}"></div></td>
+						<td class="challenge-ornament">{% challenge_icon challenge %}</td>
 						<td class="challenge-specifics">
 							<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
 							<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
@@ -47,7 +47,7 @@
 							{% endif %}
 
 							{% if challenge.canJoin and not challenge|isChallenger:user %}
-								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">Join Challenge</a>
+								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 							{% else %}
 								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 							{% endif %}

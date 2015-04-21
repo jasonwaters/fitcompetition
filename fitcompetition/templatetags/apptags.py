@@ -370,3 +370,7 @@ def player_row(user, player, challenge, rank, offset=0):
             'player': player,
             'challenge': challenge,
             'rank': rank + offset}
+
+@register.inclusion_tag('inclusions/challenge_icon.html', takes_context=False)
+def challenge_icon(challenge):
+    return {'challenge': challenge}

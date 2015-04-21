@@ -463,15 +463,18 @@ class Challenge(models.Model):
     def coreActivity(self):
         activityTypes = self.approvedActivities.all()
 
-        for activityType in activityTypes:
-            if activityType.name in ('Running',):
-                return 'running'
-            elif activityType.name in ('Walking',):
-                return 'walking'
-            elif activityType.name in ('Cycling', 'Mountain Biking',):
-                return "cycling"
+        types = [activityType.name for activityType in activityTypes]
 
-        return slugify(activityTypes[0].name)
+        if 'Running' in types and 'Walking' in types and 'Cycling' in types:
+            return 'all'
+        elif 'Running' in types:
+            return 'running'
+        elif 'Walking' in types:
+            return 'walking'
+        elif 'Cycling' in types or 'Mountain Biking' in types:
+            return 'cycling'
+
+        return slugify(types[0])
 
     @property
     def isFootRace(self):
