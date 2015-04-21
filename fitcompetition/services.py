@@ -331,7 +331,7 @@ class Activity(object):
             self.date = activity.get('start_date')
 
             #not available in activity summary form from strava :(
-            self.calories = 0
+            self.calories = None
 
             self.distance = activity.get('distance')
             self.hasGPS = not activity.get('manual')

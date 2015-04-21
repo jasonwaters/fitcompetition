@@ -676,7 +676,10 @@ class FitnessActivityManager(models.Manager):
                         dbo.type = type
                         dbo.duration = activity.get('duration')
                         dbo.date = activity.get('date')
-                        dbo.calories = activity.get('calories')
+
+                        if activity.get('calories') is not None:
+                            dbo.calories = activity.get('calories')
+
                         dbo.distance = activity.get('distance')
                         dbo.hasGPS = activity.get('hasGPS')
                         dbo.save()
