@@ -33,18 +33,18 @@ body {
 	width: 105px;
 }
 
-.challenge-title span{
-	position: relative;
-	top: -28px;
-}
-
 .challenge-title::before {
 	content: ' ';
 	width: 80px;
 	height: 75px;
 	min-width: 80px;
-	display: inline-block;
+	display: block;
+	float: left;
 	margin-right: 10px;
+}
+
+.challenge-title {
+	line-height: 75px;
 }
 
 .challenge-icon {
@@ -653,6 +653,10 @@ body.challenges {
 
 /* iPhone 5S < */
 @media (max-width: 360px) {
+	.challenge-title {
+		line-height: 25px;
+	}
+
 	.challenge-icon {
 		width: 20px;
 		height: 20px;
