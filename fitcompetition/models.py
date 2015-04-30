@@ -670,19 +670,17 @@ class FitnessActivityManager(models.Manager):
                     activity = Activity(activity, user.integrationName, user.timezone)
 
                     type, created = ActivityType.objects.get_or_create(name=activity.get('type'))
+                    dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
+                    dbo.type = type
+                    dbo.duration = activity.get('duration')
+                    dbo.date = activity.get('date')
 
-                    if activity.get('distance') is not None and activity.get('distance') > 0:
-                        dbo, created = FitnessActivity.objects.get_or_create(user=user, uri=activity.get('uri'))
-                        dbo.type = type
-                        dbo.duration = activity.get('duration')
-                        dbo.date = activity.get('date')
+                    if activity.get('calories') is not None:
+                        dbo.calories = activity.get('calories')
 
-                        if activity.get('calories') is not None:
-                            dbo.calories = activity.get('calories')
-
-                        dbo.distance = activity.get('distance')
-                        dbo.hasGPS = activity.get('hasGPS')
-                        dbo.save()
+                    dbo.distance = activity.get('distance')
+                    dbo.hasGPS = activity.get('hasGPS')
+                    dbo.save()
 
         except (ExternalIntegrationException, RequestException), e:
             successful = False
