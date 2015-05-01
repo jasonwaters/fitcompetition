@@ -85,11 +85,15 @@ def serialize(obj, serializer):
 
 @register.filter
 def toMiles(meters):
+    if meters is None:
+        meters = 0
     return float(meters) * float(0.00062137)
 
 
 @register.filter
 def toMeters(miles):
+    if miles is None:
+        miles = 0
     return float(miles) / float(0.00062137)
 
 @register.filter
