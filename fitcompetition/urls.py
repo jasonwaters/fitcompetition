@@ -30,6 +30,7 @@ urlpatterns = patterns('',
                        url(r'^login-error/$', 'fitcompetition.views.login_error'),
                        url(r'^useractivities/(?P<userID>\d+)/(?P<challengeID>\d+)/$', 'fitcompetition.views.user_activities', name="useractivities"),
                        url(r'^diagnostics/$', 'fitcompetition.views.diagnostics', name='diagnostics'),
+                       url(r'^weight/$', 'fitcompetition.views.weight', name='weight'),
 
                        #AJAX
                        url(r'^api/join-challenge$', 'fitcompetition.api.join_challenge', name="join_challenge"),

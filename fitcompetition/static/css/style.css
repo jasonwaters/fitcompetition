@@ -837,3 +837,9 @@ input[name=activity-image] {
 	position: relative;
 	top: 5px;
 }
+
+.weight-chart {
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}

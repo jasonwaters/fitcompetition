@@ -102,6 +102,9 @@ def toLBS(kg):
         return 0
     return kg * 2.2046
 
+@register.filter
+def gramsToLBS(g):
+    return g * 0.0022046
 
 @register.filter
 def twoDecimals(value):

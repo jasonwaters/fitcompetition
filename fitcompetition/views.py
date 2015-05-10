@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+
+from fitcompetition.withings import WithingsService
+from local_settings import WITHINGS_PASSWORD, WITHINGS_USER_NAME
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count, Sum
@@ -17,7 +20,8 @@ def challenges(request):
     upcomingChallenges = Challenge.objects.upcomingChallenges()
     pastChallenges = Challenge.objects.pastChallenges(daysAgo=60)
 
-    challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'), totalWinnerCount=Sum('numWinners'))
+    challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'),
+                                                                         totalWinnerCount=Sum('numWinners'))
 
     accountFilter = Q()
 
@@ -125,7 +129,6 @@ def challenge(request, id):
 
     isFootRace = len(challenge.approvedActivities.filter(footFilter)) > 0
 
-
     params = {
         'show_social': 'social-callout-%s' % challenge.id not in request.COOKIES.get('hidden_callouts', ''),
         'disqus_identifier': 'fc_challenge_%s' % challenge.id,
@@ -176,9 +179,9 @@ def user_activities(request, userID, challengeID):
         'challenge': challenge
     })
 
+
 @login_required
 def diagnostics(request):
-
     if request.GET.get('syncActivities') is not None:
         tasks.syncExternalActivities(request.user.id)
     elif request.GET.get('pruneActivities') is not None:
@@ -191,6 +194,18 @@ def diagnostics(request):
         user.save()
 
     return render(request, 'diagnostics.html', {})
+
+
+def weight(request):
+    JASON = 6130175
+    SHALAUNA = 6130387
+
+    service = WithingsService(WITHINGS_USER_NAME, WITHINGS_PASSWORD)
+
+    return render(request, 'weight.html', {
+        'jasonsMeasurements': service.getWeightMeasurements(JASON),
+        'shalaunasMeasurements': service.getWeightMeasurements(SHALAUNA)
+    })
 
 
 def login_error(request):

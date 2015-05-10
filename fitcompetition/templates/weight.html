@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load apptags %}
+{% load staticfiles %}
+
+{% block head_title %}Weight{% endblock %}
+
+{% block head_misc %}
+{% endblock %}
+
+{% block content %}
+	<div>
+		<div class="weight-chart" id='jason-chart'></div>
+		<br>
+		<div class="weight-chart" id='shalauna-chart'></div>
+	</div>
+{% endblock %}
+
+
+{% block javascript %}
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js' charset='utf-8'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.4.0/metricsgraphics.min.js' charset='utf-8'></script>
+	<link href='https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.4.0/metricsgraphics.min.css' rel='stylesheet' type='text/css'>
+
+	<script type="text/javascript">
+
+		function doChart(elementId, title, description, targetWeight, data) {
+			var YPADDING = 2;
+
+			var minValue = 999;
+			var maxValue = 0;
+
+			minValue = Math.min(minValue, targetWeight);
+			maxValue = Math.max(maxValue, targetWeight);
+
+			for(var i=0;i<data.length;i++) {
+				minValue = Math.min(minValue, data[i].value);
+				maxValue = Math.max(maxValue, data[i].value);
+			}
+
+			minValue -= YPADDING;
+			maxValue += YPADDING;
+
+			data = MG.convert.date(data, 'date');
+			MG.data_graphic({
+				title: title,
+				description: description,
+				data: data,
+				width: 800,
+				height: 350,
+				baselines: [{value: targetWeight, label: 'target: ' + targetWeight + ' lbs'}],
+				target: document.getElementById(elementId),
+				x_accessor: 'date',
+				y_accessor: 'value',
+				min_y: minValue,
+				max_y: maxValue
+			});
+		}
+
+		var jasonData = [];
+
+		{% for measurement in jasonsMeasurements reversed %}
+			jasonData.push({
+				'date': moment.unix({{ measurement.date }}).format('YYYY-MM-DD'),
+				'value': {{ measurement.measures.0.value|gramsToLBS|twoDecimals }}
+			});
+		{% endfor %}
+
+		var jasonChart = doChart('jason-chart', 'Jason', "Jason's weight over time.", 275, jasonData);
+
+		var shalaunaData = [];
+
+		{% for measurement in shalaunasMeasurements reversed %}
+			shalaunaData.push({
+				'date': moment.unix({{ measurement.date }}).format('YYYY-MM-DD'),
+				'value': {{ measurement.measures.0.value|gramsToLBS|twoDecimals }}
+			});
+		{% endfor %}
+
+		var shalaunaChart = doChart('shalauna-chart', 'Shalauna', "Shalauna's weight over time.", 220, shalaunaData);
+	</script>
+{% endblock %}
