@@ -316,7 +316,7 @@ def times(number):
 
 @register.filter
 def pastTense(value):
-    return {
+    words = {
         'Running': 'ran',
         'Cycling': 'rode',
         'Mountain Biking': 'rode',
@@ -331,7 +331,10 @@ def pastTense(value):
         'Rowing': 'rowed',
         'Elliptical': 'ellipticaled',
         'Other': '',
-    }[value]
+        'Strength Training': 'pumped iron'
+    }
+
+    return words.get(value, value)
 
 
 @register.tag(name='aggregate')
