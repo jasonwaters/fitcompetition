@@ -43,4 +43,7 @@ BROKER_URL = "amqp://guest:guest@localhost//"
 
 GOOGLE_ANALYTICS_TRACKING_ID = ''
 
+WITHINGS_USER_NAME = ''
+WITHINGS_PASSWORD = ''
+
 LOCALE = 'en_US.utf8'
