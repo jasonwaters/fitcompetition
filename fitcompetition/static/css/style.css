@@ -667,6 +667,11 @@ body.challenges {
 		width: 30px;
 		height: 30px;
 	}
+
+	td.challenge-specifics {
+    	max-width: 60px;
+    	word-wrap: break-word;
+	}
 }
 
 
