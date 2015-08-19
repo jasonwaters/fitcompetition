@@ -651,6 +651,16 @@ body.challenges {
 	margin-bottom: 20px;
 }
 
+/* iPhone 6 */
+@media only screen and (max-device-width: 667px) 
+    and (-webkit-device-pixel-ratio: 2) {
+
+	td.challenge-specifics {
+    	max-width: 92px;
+    	word-wrap: break-word;
+	}
+}
+
 /* iPhone 5S < */
 @media (max-width: 360px) {
 	.challenge-title {
