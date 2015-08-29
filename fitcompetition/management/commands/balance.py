@@ -8,4 +8,4 @@ class Command(BaseCommand):
 
         result = Transaction.objects.all().aggregate(balance=Sum('amount'))
 
-        return result.get('balance')
+        self.stdout.write(result.get('balance'))
