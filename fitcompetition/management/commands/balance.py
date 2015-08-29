@@ -8,4 +8,4 @@ class Command(BaseCommand):
 
         result = Transaction.objects.all().aggregate(balance=Sum('amount'))
 
-        return getattr(result, 'balance')
+        return result.get('balance')
