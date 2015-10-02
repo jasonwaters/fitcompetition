@@ -160,7 +160,7 @@
 			<ul>
 				{% for activity in recentActivitiesWithoutEvidence %}
 					<li data-id="{{ activity.id }}">
-						{{ activity.type.name }}, {{ activity.distance|twoDecimals }} miles, {{ activity.duration|duration }}
+						{{ activity.type.name }}, {% accounting activity.distance challenge.accountingType user True %}, {{ activity.duration|duration }}
 							<span>
 								<input name="activity-image" type="file">
 								<i title="Upload Image" class="fa fa-upload upload-activity-image"></i>
