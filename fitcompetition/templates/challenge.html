@@ -7,6 +7,8 @@
 
 {% block ng_app %}challenge{% endblock %}
 
+{% block body_class %}challenge{% endblock %}
+
 {% block head_misc %}
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
@@ -21,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-	<div ng-controller="challenge-controller">
+	<div class="challenge-details" ng-controller="challenge-controller">
 		<div class="page-header clearfix">
 			<h2 class="challenge-title {{ challenge.coreActivity }}">{{ challenge.name }}</h2>
 		</div>

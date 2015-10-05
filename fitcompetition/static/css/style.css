@@ -6,6 +6,12 @@ body {
     padding: 0 10px;
 }
 
+body.challenge .main-container {
+	padding: 0 50px;
+	margin-bottom: 20px;
+	background-color: rgba(255, 255, 255, 0.85);
+}
+
 .nav-tabs {
     margin-bottom: 15px;
 }
@@ -490,8 +496,8 @@ tr.team .team-total {
 	text-align: center;
 }
 
-body.challenges {
-	background: #535456 url('/static/img/challenges_bg.jpg') no-repeat top center;
+body.challenges, body.challenge {
+	background: #535456 url('/static/img/challenges_bg0.jpg') no-repeat top center;
 	background-size: cover;
 }
 
@@ -663,6 +669,11 @@ body.challenges {
 
 /* iPhone 5S < */
 @media (max-width: 360px) {
+	body.challenge .main-container {
+		padding: 0 10px;
+	}
+
+
 	.challenge-title {
 		line-height: 25px;
 	}
