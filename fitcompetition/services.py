@@ -481,7 +481,7 @@ class MapMyFitnessService:
             if modifiedSince is not None:
                 params['updated_after'] = modifiedSince
 
-            r = requests.get('%s/v7.0/workout/' % self.API_URL, auth=self.oauth, params=params)
+            r = requests.get('%s/v7.1/workout/' % self.API_URL, auth=self.oauth, params=params)
 
         if r.status_code != 200:
             raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
@@ -497,14 +497,14 @@ class MapMyFitnessService:
         return result.get('_embedded').get('workouts'), more
 
     def getUserProfile(self):
-        r = requests.get('%s/v7.0/user/self/' % self.API_URL, auth=self.oauth)
+        r = requests.get('%s/v7.1/user/self/' % self.API_URL, auth=self.oauth)
 
         if r.status_code != 200:
             raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
 
         profile = r.json()
 
-        r = requests.get('%s/v7.0/user_profile_photo/%s/' % (self.API_URL, profile.get('id')), auth=self.oauth)
+        r = requests.get('%s/v7.1/user_profile_photo/%s/' % (self.API_URL, profile.get('id')), auth=self.oauth)
 
         if r.status_code != 200:
             raise ExternalIntegrationException("Status Code: %s" % r.status_code, status_code=r.status_code)
@@ -513,7 +513,7 @@ class MapMyFitnessService:
 
         return Profile(profile, service=Integration.MAPMYFITNESS)
 
-    def getActivityTypes(self, url='/v7.0/activity_type/'):
+    def getActivityTypes(self, url='/v7.1/activity_type/'):
         r = requests.get('%s%s' % (self.API_URL, url), auth=self.oauth, params={
             'limit': 1000
         })

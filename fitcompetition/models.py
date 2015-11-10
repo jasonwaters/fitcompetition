@@ -634,20 +634,20 @@ class FitnessActivityManager(models.Manager):
                         pass
             elif user.integrationName == Integration.MAPMYFITNESS or user.integrationName == Integration.STRAVA:
                 next = {'hasMore': True, 'url': None}
+                uris = {}
 
                 while next.get('hasMore'):
                     apiActivities, next = service.getFitnessActivities(noEarlierThan=sixtyDaysAgo, url=next.get('url'))
-                    dbActivities = self.filter(user=user, date__gte=sixtyDaysAgo)
 
-                    uris = {}
                     for apiActivity in apiActivities:
                         activity = Activity(apiActivity, user.integrationName, user.timezone)
                         uris[activity.get('uri')] = True
 
-                    for dbActivity in dbActivities:
-                        if not uris.get(dbActivity.uri, False):
-                            # it was deleted from the external service, so we should follow suit
-                            dbActivity.delete()
+                dbActivities = self.filter(user=user, date__gte=sixtyDaysAgo)
+                for dbActivity in dbActivities:
+                    if not uris.get(dbActivity.uri, False):
+                        # it was deleted from the external service, so we should follow suit
+                        dbActivity.delete()
 
         except(ExternalIntegrationException, RequestException), e:
             successful = False
