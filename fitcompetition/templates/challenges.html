@@ -18,18 +18,20 @@
 	{% challenges_table user upcomingChallenges "Starting Soon" "fa fa-clock-o" %}
     {% challenges_table user currentChallenges "In Progress" "fa fa-location-arrow" %}
 	<div class="challenge-metrics clearfix">
-		<div class="metric">
-			<h3>${{ upForGrabs|floatformat:0|intcomma }}</h3>
-			<label>up for grabs</label>
-		</div>
-		<div class="metric">
-			<h3>{{ playingNow|intcomma }}</h3>
-			<label>participating now</label>
-		</div>
-		<div class="metric">
-			<h3>{{ unReconciledChallenges|intcomma }}</h3>
-			<label>current challenges</label>
-		</div>
+		{%  if upForGrabs > 0 %}
+			<div class="metric">
+				<h3>${{ upForGrabs|floatformat:0|intcomma }}</h3>
+				<label>up for grabs</label>
+			</div>
+			<div class="metric">
+				<h3>{{ playingNow|intcomma }}</h3>
+				<label>participating now</label>
+			</div>
+			<div class="metric">
+				<h3>{{ unReconciledChallenges|intcomma }}</h3>
+				<label>current challenges</label>
+			</div>
+		{% endif %}
 		<div class="metric">
 			<h3>${{ totalPaid|floatformat:0|intcomma }}</h3>
 			<label>paid out to winners</label>

@@ -27,10 +27,15 @@ def challenges(request):
 
     unReconciledChallenges = Challenge.objects.filter(reconciled=False)
 
-    for challenge in unReconciledChallenges:
-        accountFilter |= Q(account=challenge.account)
+    if len(unReconciledChallenges) > 0:
+        for challenge in unReconciledChallenges:
+            accountFilter |= Q(account=challenge.account)
 
-    transactionResult = Transaction.objects.filter(accountFilter).aggregate(upForGrabs=Sum('amount'))
+        transactionResult = Transaction.objects.filter(accountFilter).aggregate(upForGrabs=Sum('amount'))
+    else:
+        transactionResult = {
+            'upForGrabs': 0
+        }
 
     return render(request, 'challenges.html', {
         'currentChallenges': currentChallenges,
