@@ -3,6 +3,7 @@ from django.test import TestCase
 from fitcompetition.models import FitUser, Challenge, Transaction
 from fitcompetition.settings import TIME_ZONE
 import pytz
+import uuid
 
 
 class TransactionTests(TestCase):
@@ -15,6 +16,7 @@ class TransactionTests(TestCase):
                                            fullname="Alf")
 
         self.challenge = Challenge.objects.create(name="Marathon",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,

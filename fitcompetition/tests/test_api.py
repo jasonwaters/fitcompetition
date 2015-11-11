@@ -3,6 +3,7 @@ import datetime
 from django.test import TestCase, Client
 from fitcompetition.models import FitUser, Challenge, Transaction
 import pytz
+import uuid
 
 
 class APITests(TestCase):
@@ -10,6 +11,7 @@ class APITests(TestCase):
     def newChallenge(self, name, type="INDV", style="ALL", distance=100, ante=25):
         now = datetime.datetime.now(tz=pytz.utc)
         return Challenge.objects.create(name=name,
+                                        slug=uuid.uuid4(),
                                         type=type,
                                         style=style,
                                         distance=distance,

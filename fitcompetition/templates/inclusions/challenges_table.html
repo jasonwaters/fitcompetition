@@ -15,7 +15,7 @@
 					<tr>
 						<td class="challenge-ornament">{% challenge_icon challenge %}</td>
 						<td class="challenge-specifics">
-							<a href="{% url "challenge_details" challenge.id %}"><h4>{{ challenge.name }}</h4></a>
+							<a href="{% url "challenge_details" challenge.slug %}"><h4>{{ challenge.name }}</h4></a>
 							<div class="challenge-stats-other">${{ challenge.ante|floatformat:"-1" }} bet / {{ challenge.numPlayers }} Player{{ challenge.numPlayers|pluralize }}</div>
 							<div class="challenge-stats-other hidden-xs">{{ challenge|challengeType }}, {{ challenge|challengeStyle }}</div>
 						</td>
@@ -47,9 +47,9 @@
 							{% endif %}
 
 							{% if challenge.canJoin and not challenge|isChallenger:user %}
-								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
+								<a href="{% url "challenge_details" challenge.slug %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 							{% else %}
-								<a href="{% url "challenge_details" challenge.id %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
+								<a href="{% url "challenge_details" challenge.slug %}" class="btn {% if deemphasize %}btn-default{% else %}btn-primary{% endif %}">View Challenge</a>
 							{% endif %}
 						</td>
 					</tr>

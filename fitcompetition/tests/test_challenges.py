@@ -3,11 +3,13 @@ from django.test import TestCase
 from fitcompetition.models import Challenge
 from fitcompetition.settings import TIME_ZONE
 import pytz
+import uuid
 
 
 class ChallengeTests(TestCase):
     def setUp(self):
         self.c1 = Challenge.objects.create(name="aaa",
+                                           slug=uuid.uuid4(),
                                            type="INDV",
                                            style="ALL",
                                            distance=100,
@@ -16,6 +18,7 @@ class ChallengeTests(TestCase):
                                            ante=10)
 
         self.c2 = Challenge.objects.create(name="bbb",
+                                           slug=uuid.uuid4(),
                                            type="INDV",
                                            style="ONE",
                                            distance=100,
@@ -24,6 +27,7 @@ class ChallengeTests(TestCase):
                                            ante=20)
 
         self.c3 = Challenge.objects.create(name="ccc",
+                                           slug=uuid.uuid4(),
                                            type="TEAM",
                                            style="ALL",
                                            distance=100,
@@ -32,6 +36,7 @@ class ChallengeTests(TestCase):
                                            ante=30)
 
         self.c4 = Challenge.objects.create(name="ddd",
+                                           slug=uuid.uuid4(),
                                            type="TEAM",
                                            style="ONE",
                                            distance=100,

@@ -6,7 +6,7 @@ from django.test import TestCase
 from fitcompetition.models import FitUser, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
 import pytz
-
+import uuid
 
 accountingTypes = ('distance', 'calories', 'duration')
 
@@ -140,6 +140,7 @@ class ReconciliationTests(TestCase):
             end = now + datetime.timedelta(days=30)
 
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ALL",
                                                  distance=100,
@@ -187,6 +188,7 @@ class ReconciliationTests(TestCase):
             Transaction.objects.all().delete()
 
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ALL",
                                                  distance=100,
@@ -241,6 +243,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ALL",
                                                  distance=135,
@@ -287,6 +290,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ALL",
                                                  distance=235,
@@ -333,6 +337,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ONE",
                                                  distance=100,
@@ -371,6 +376,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ONE",
                                                  distance=180,
@@ -409,6 +415,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ALL",
                                                  distance=90,
@@ -456,6 +463,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ALL",
                                                  distance=110,
@@ -503,6 +511,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ALL",
                                                  distance=150,
@@ -550,6 +559,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ONE",
                                                  distance=100,
@@ -597,6 +607,7 @@ class ReconciliationTests(TestCase):
         for accountingType in accountingTypes:
             Transaction.objects.all().delete()
             challenge = Challenge.objects.create(name="Marathon",
+                                                 slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ONE",
                                                  distance=300,

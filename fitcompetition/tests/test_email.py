@@ -1,5 +1,6 @@
 import datetime
 import json
+import uuid
 
 from django.core import mail
 from django.test import Client, TestCase
@@ -45,6 +46,7 @@ class EmailTests(TestCase):
 
     def testJoinChallenge_distance(self):
         self.challenge = Challenge.objects.create(name="Marathon",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -68,6 +70,7 @@ class EmailTests(TestCase):
 
     def testJoinChallenge_calories(self):
         self.challenge = Challenge.objects.create(name="Marathon",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -91,6 +94,7 @@ class EmailTests(TestCase):
 
     def testJoinChallenge_duration(self):
         self.challenge = Challenge.objects.create(name="Marathon",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -145,6 +149,7 @@ class EmailTests(TestCase):
     def testChallengeStart(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -165,6 +170,7 @@ class EmailTests(TestCase):
     def testChallengeHalf(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -212,6 +218,7 @@ class EmailTests(TestCase):
     def testChallengeHalf_calories(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -261,6 +268,7 @@ class EmailTests(TestCase):
     def testChallengeHalf_duration(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -311,6 +319,7 @@ class EmailTests(TestCase):
     def testChallengeEnd(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -357,6 +366,7 @@ class EmailTests(TestCase):
     def testChallengeEnd_calories(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -406,6 +416,7 @@ class EmailTests(TestCase):
     def testChallengeEnd_duration(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="INDV",
                                                   style="ALL",
                                                   distance=100,
@@ -455,6 +466,7 @@ class EmailTests(TestCase):
     def testTeamChallengeEnd(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="TEAM",
                                                   style="ONE",
                                                   distance=100,
@@ -523,6 +535,7 @@ class EmailTests(TestCase):
     def testTeamChallengeEnd_calories(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="TEAM",
                                                   style="ONE",
                                                   distance=100,
@@ -611,6 +624,7 @@ class EmailTests(TestCase):
     def testTeamChallengeEnd_calories(self):
         now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
         self.challenge = Challenge.objects.create(name="aaa",
+                                                  slug=uuid.uuid4(),
                                                   type="TEAM",
                                                   style="ONE",
                                                   distance=100,

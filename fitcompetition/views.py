@@ -99,13 +99,24 @@ def faq(request):
     return render(request, 'faq.html', {})
 
 
-def challenge(request, id):
-    now = datetime.now(tz=pytz.utc)
-
+def challenge_slug(request, slug):
     try:
-        challenge = Challenge.objects.prefetch_related('approvedActivities', 'players', 'teams').get(id=id)
+        c = Challenge.objects.prefetch_related('approvedActivities', 'players', 'teams').get(slug=slug)
+        return challenge_view(request, c)
     except Challenge.DoesNotExist:
         return redirect('challenges')
+
+
+def challenge_id(request, id):
+    try:
+        c = Challenge.objects.prefetch_related('approvedActivities', 'players', 'teams').get(id=id)
+        return challenge_view(request, c)
+    except Challenge.DoesNotExist:
+        return redirect('challenges')
+
+
+def challenge_view(request, challenge):
+    now = datetime.now(tz=pytz.utc)
 
     isCompetitor = False
     recentActivitiesWithoutEvidence = []

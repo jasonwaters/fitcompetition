@@ -250,6 +250,7 @@ ACCOUNTING_TYPES = (
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
+    slug = models.SlugField(unique=True, max_length=150, verbose_name="Slug", help_text="A slug is a short label for something, containing only letters, numbers, underscores or hyphens.  This unique string is used in the URL.")
     type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='INDV')
     style = models.CharField(max_length=6, choices=CHALLENGE_STYLES, default='ALL')
     description = models.TextField(blank=True)
@@ -498,6 +499,17 @@ class Challenge(models.Model):
         self.enddate = enddate.replace(hour=23, minute=59, second=59)
 
         self.middate = self.startdate + ((self.enddate - self.startdate) / 2)
+
+        if self.slug is None:
+            slug = slugify(unicode(self.name))
+
+            try:
+                existing = Challenge.objects.get(slug=slug)
+                slug = slug + u'-' + unicode(enddate.strftime('%Y-%m-%d'))
+            except Challenge.DoesNotExist:
+                pass
+
+            self.slug = slug
 
         super(Challenge, self).save(force_insert, force_update, using, update_fields)
 

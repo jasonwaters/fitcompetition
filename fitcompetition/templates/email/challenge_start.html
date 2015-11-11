@@ -5,7 +5,7 @@
 {% block content %}
 	<p>Hey {{user.first_name}}!</p>
 
-	<p>It's the moment you've been waiting for.  The "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge has begun! So, grab your tennis shoes and start logging some miles!</p>
+	<p>It's the moment you've been waiting for.  The "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge has begun! So, grab your tennis shoes and start logging some miles!</p>
 	<p>There's {{ challenge.numPlayers }} players and ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot.  Here's the details:</p>
 	<ul>
 		<li>

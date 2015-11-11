@@ -5,7 +5,7 @@
 {% block content %}
 	<p>Hey {{user.first_name}}!</p>
 
-	<p>Welcome to the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge on Fit Crown!  Here's the details:</p>
+	<p>Welcome to the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge on Fit Crown!  Here's the details:</p>
 	<ul>
 		<li>
 			{% if challenge.isTypeIndividual %}

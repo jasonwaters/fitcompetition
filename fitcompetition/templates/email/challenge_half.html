@@ -5,7 +5,7 @@
 {% block content %}
 	<p>Hey {{user.first_name}}!</p>
 
-	<p>How's it going?  Can you believe the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge is already half over!?</p>
+	<p>How's it going?  Can you believe the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge is already half over!?</p>
 	<p>
 		{% if achievedGoal %}
 			Wow, you've logged {% accounting user.total_accounting challenge.accountingType user True%}!

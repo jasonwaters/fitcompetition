@@ -5,7 +5,7 @@
 {% block content %}
 	<p>Hey {{user.first_name}}!</p>
 
-	<p>Welp, that's a wrap.  The "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge has ended!</p>
+	<p>Welp, that's a wrap.  The "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge has ended!</p>
 	<p>
 		{% if challenge.isTypeIndividual %}
 			{% if achievedGoal %}
@@ -26,7 +26,7 @@
 		<p>Don't stop now, get in on one of our upcoming challenges today!  These challenges are starting soon:</p>
 		<ul>
 			{% for challenge in upcomingChallenges %}
-				<li>"<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.id %}">{{ challenge.name }}</a>" challenge &mdash; {% accounting challenge challenge.accountingType user %} &mdash; {{ challenge.numDays }} days</li>
+				<li>"<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge &mdash; {% accounting challenge challenge.accountingType user %} &mdash; {{ challenge.numDays }} days</li>
 			{% endfor %}
 		</ul>
 	{% else %}
