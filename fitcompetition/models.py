@@ -163,22 +163,40 @@ class ActivityType(models.Model):
 
 
 class ChallengeManager(models.Manager):
-    def upcomingChallenges(self):
+    def upcomingChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__gt=now).order_by(
+        filters = Q(startdate__gt=now)
+
+        if userid is not None:
+            filters &= Q(private=False) | Q(players__id=userid)
+        else:
+            filters &= Q(private=False)
+
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by(
             '-startdate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
-    def currentChallenges(self):
+    def currentChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(startdate__lte=now,
-                                                                                                                      enddate__gte=now).order_by(
+        filters = Q(startdate__lte=now) & Q(enddate__gte=now)
+
+        if userid is not None:
+            filters &= Q(private=False) | Q(players__id=userid)
+        else:
+            filters &= Q(private=False)
+
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by(
             '-enddate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
-    def pastChallenges(self, daysAgo=None):
+    def pastChallenges(self, userid=None, daysAgo=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         filters = Q(enddate__lt=now)
+
+        if userid is not None:
+            filters &= Q(private=False) | Q(players__id=userid)
+        else:
+            filters &= Q(private=False)
 
         if daysAgo is not None:
             filters &= Q(enddate__gt=now - timedelta(days=daysAgo))
@@ -187,7 +205,7 @@ class ChallengeManager(models.Manager):
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now).order_by('-startdate',
+        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now, private=False).order_by('-startdate',
                                                                                                                                      '-num_players')
 
     def userChallenges(self, userid):
@@ -251,6 +269,7 @@ ACCOUNTING_TYPES = (
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True, max_length=150, verbose_name="Slug", help_text="A slug is a short label for something, containing only letters, numbers, underscores or hyphens.  This unique string is used in the URL.")
+    private = models.BooleanField(default=False)
     type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='INDV')
     style = models.CharField(max_length=6, choices=CHALLENGE_STYLES, default='ALL')
     description = models.TextField(blank=True)

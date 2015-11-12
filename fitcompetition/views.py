@@ -16,9 +16,9 @@ import pytz
 
 def challenges(request):
     now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-    currentChallenges = Challenge.objects.currentChallenges()
-    upcomingChallenges = Challenge.objects.upcomingChallenges()
-    pastChallenges = Challenge.objects.pastChallenges(daysAgo=60)
+    currentChallenges = Challenge.objects.currentChallenges(userid=request.user.id)
+    upcomingChallenges = Challenge.objects.upcomingChallenges(userid=request.user.id)
+    pastChallenges = Challenge.objects.pastChallenges(userid=request.user.id, daysAgo=60)
 
     challengeStats = Challenge.objects.filter(reconciled=True).aggregate(grandTotalDisbursed=Sum('totalDisbursed'),
                                                                          totalWinnerCount=Sum('numWinners'))
