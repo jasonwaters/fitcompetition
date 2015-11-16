@@ -1,7 +1,9 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django.db.models.loading import get_model
 from fitcompetition.email import EmailFactory
+
+from django.apps import apps
+get_model = apps.get_model
 
 
 #this is to avoid cyclical dependencies, since this file is imported in models.py

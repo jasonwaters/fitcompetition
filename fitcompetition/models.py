@@ -19,19 +19,15 @@ import pytz
 from requests import RequestException
 
 
-
-# noinspection PyUnresolvedReferences
-import signals
-
-
 class CurrencyField(models.DecimalField):
-    __metaclass__ = models.SubfieldBase
-
     def to_python(self, value):
         try:
             return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
         except AttributeError:
             return None
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)
 
 
 class UniqueBooleanField(BooleanField):
@@ -44,12 +40,6 @@ class UniqueBooleanField(BooleanField):
         elif not objects.exclude(id=model_instance.id).filter(**{self.attname: True}):
             return True
         return getattr(model_instance, self.attname)
-
-# To use with South
-from south.modelsinspector import add_introspection_rules
-
-add_introspection_rules([], ["^fitcompetition\.models\.UniqueBooleanField"])
-add_introspection_rules([], ["^fitcompetition\.models\.CurrencyField"])
 
 
 class FitUserManager(UserManager):
@@ -285,7 +275,7 @@ class Challenge(models.Model):
     ante = CurrencyField(max_digits=16, decimal_places=2, verbose_name="Ante per player")
 
     approvedActivities = models.ManyToManyField(ActivityType, verbose_name="Approved Activity Types")
-    players = models.ManyToManyField(FitUser, through="Challenger", blank=True, null=True, default=None)
+    players = models.ManyToManyField(FitUser, through="Challenger", blank=True, default=None)
 
     reconciled = models.BooleanField(default=False)
     disbursementAmount = CurrencyField(max_digits=16, decimal_places=2, blank=True, null=True, default=0)
@@ -320,7 +310,7 @@ class Challenge(models.Model):
 
         achievers = self.getAchievers()
 
-        dollars = (self.moneyInThePot / max(1, len(achievers))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+        dollars = (Decimal(self.moneyInThePot) / max(1, len(achievers))).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
         for user in achievers:
             Transaction.objects.transact(self.account,
@@ -559,7 +549,7 @@ class TeamManager(models.Manager):
 class Team(models.Model):
     name = models.CharField(max_length=256)
     challenge = models.ForeignKey(Challenge, related_name="teams")
-    members = models.ManyToManyField(FitUser, blank=True, null=True, default=None, related_name='members')
+    members = models.ManyToManyField(FitUser, blank=True, default=None, related_name='members')
     captain = models.ForeignKey(FitUser, blank=True, null=True, default=None, related_name='captain')
 
     objects = TeamManager()
@@ -631,7 +621,7 @@ class Team(models.Model):
 class Challenger(models.Model):
     fituser = models.ForeignKey(FitUser)
     challenge = models.ForeignKey(Challenge)
-    date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, default=None, auto_now_add=True)
+    date_joined = models.DateTimeField(verbose_name="Date Joined", blank=True, null=True, auto_now_add=True)
 
     @property
     def user(self):
@@ -794,7 +784,7 @@ class TransactionManager(models.Manager):
         return self.create(date=now,
                            account=account,
                            description="Deposit",
-                           amount=amount,
+                           amount=Decimal(amount),
                            isCashflow=True,
                            stripeID=stripeID)
 
@@ -804,7 +794,7 @@ class TransactionManager(models.Manager):
         return self.create(date=now,
                            account=account,
                            description="Withdrawal",
-                           amount=math.fabs(amount) * -1,
+                           amount=Decimal(math.fabs(amount) * -1),
                            isCashflow=True)
 
 

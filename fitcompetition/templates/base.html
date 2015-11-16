@@ -1,5 +1,5 @@
 {% load apptags %}
-{% load compressed %}
+{% load pipeline %}
 {% load staticfiles %}
 
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% block head_misc %}{% endblock %}
 
-        {% compressed_css 'all-css' %}
+		{% stylesheet 'all-css' %}
         {% block css %}{% endblock %}
 		<link href='//fonts.googleapis.com/css?family=Titillium+Web:400,200,300,700' rel='stylesheet' type='text/css'>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -99,7 +99,7 @@
 			Stripe.setPublishableKey('{{ "STRIPE_PUBLISHABLE_KEY"|fromSettings }}');
 		</script>
 
-		{% compressed_js 'all-js' %}
+		{% javascript 'all-js' %}
 		{% block javascript %}{% endblock %}
 		{{ inline_javascript }}
 
