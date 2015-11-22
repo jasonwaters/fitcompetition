@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField, Sum, Q, Max, Count
+from django.db.models import BooleanField, Sum, Q, Max, Count, ExpressionWrapper, DecimalField
 from django.utils.text import slugify
 from fitcompetition.services import ExternalIntegrationException, getExternalIntegrationService, Activity, Integration
 from fitcompetition.settings import TIME_ZONE, TEAM_MEMBER_MAXIMUM
@@ -195,8 +195,9 @@ class ChallengeManager(models.Manager):
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now, private=False).order_by('-startdate',
-                                                                                                                                     '-num_players')
+        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now, private=False).order_by(
+            '-startdate',
+            '-num_players')
 
     def userChallenges(self, userid):
         activeUserChallenges = []
@@ -224,9 +225,19 @@ def getAnnotatedUserListWithActivityData(challenge, challengers, activitiesFilte
     users_with_activities = []
     activitySet = set()
 
+    total_accounting = Sum('activities__%s' % challenge.accountingType, distinct=True)
+    average_accounting = ExpressionWrapper(
+        Sum('activities__%s' % challenge.accountingType, distinct=True) / Count('activities__%s' % challenge.accountingType),
+        output_field=DecimalField())
+
     if challenge.startdate <= now:
+        if challenge.accountingType in ('distance', 'duration', 'calories'):
+            accounting = total_accounting
+        elif challenge.accountingType == 'pace':
+            accounting = average_accounting
+
         users_with_activities = challengers.filter(activitiesFilter).annotate(
-            total_accounting=Sum('activities__%s' % challenge.accountingType, distinct=True),
+            total_accounting=accounting,
             latest_activity_date=Max('activities__date')).order_by('-total_accounting')
 
         activitySet = set(user.id for user in users_with_activities)
@@ -252,22 +263,25 @@ CHALLENGE_STYLES = (
 ACCOUNTING_TYPES = (
     ('distance', 'Distance'),
     ('calories', 'Calories'),
-    ('duration', 'Duration')
+    ('duration', 'Duration'),
+    ('pace', 'Pace')
 )
 
 
 class Challenge(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True, max_length=150, verbose_name="Slug", help_text="A slug is a short label for something, containing only letters, numbers, underscores or hyphens.  This unique string is used in the URL.")
+    slug = models.SlugField(unique=True, max_length=150, verbose_name="Slug",
+                            help_text="A slug is a short label for something, containing only letters, numbers, underscores or hyphens.  This unique string is used in the URL.")
     private = models.BooleanField(default=False)
     type = models.CharField(max_length=6, choices=CHALLENGE_TYPES, default='INDV')
     style = models.CharField(max_length=6, choices=CHALLENGE_STYLES, default='ALL')
     description = models.TextField(blank=True)
 
     accountingType = models.CharField(max_length=20, choices=ACCOUNTING_TYPES, default='distance')
-    distance = models.DecimalField(max_digits=20, decimal_places=10, default=0)
-    calories = models.DecimalField(max_digits=20, decimal_places=10, default=0)
-    duration = models.DecimalField(max_digits=20, decimal_places=10, default=0)
+    distance = models.DecimalField(max_digits=20, decimal_places=10, default=0, help_text="In meters.  ( meters = miles / 0.00062137 )")
+    calories = models.DecimalField(max_digits=20, decimal_places=10, default=0, help_text="In calories. No conversion necessary.")
+    duration = models.DecimalField(max_digits=20, decimal_places=10, default=0, help_text="In seconds. ( seconds = hours * 60 * 60 )")
+    pace = models.DecimalField(max_digits=20, decimal_places=16, default=0, help_text="In meters per second. ( m/s = 26.8224 / minutes per mile )")
 
     startdate = models.DateTimeField(verbose_name='Start Date')
     middate = models.DateTimeField(verbose_name='Mid Date', blank=True, null=True, default=None)
@@ -351,7 +365,6 @@ class Challenge(models.Model):
         except Challenger.DoesNotExist:
             return False
 
-
     @property
     def rankedTeams(self):
         teams = self.teams.filter(challenge=self).select_related('captain').prefetch_related('members').annotate(num_members=Count('members'))
@@ -364,13 +377,29 @@ class Challenge(models.Model):
 
         activityFilter = Q(user=fituser) & self.getActivitiesFilter(generic=True)
 
-        dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_accounting=Sum(self.accountingType))
+        total_accounting = Sum(self.accountingType)
+        average_accounting = ExpressionWrapper(Sum(self.accountingType, distinct=True) / Count(self.accountingType), output_field=DecimalField())
+
+        if self.accountingType in ('distance', 'duration', 'calories'):
+            accounting = total_accounting
+        elif self.accountingType == 'pace':
+            accounting = average_accounting
+
+        dbo = FitnessActivity.objects.filter(activityFilter).aggregate(total_accounting=accounting)
         return dbo.get('total_accounting') >= getattr(self, self.accountingType)
 
     def getAchievers(self):
         if self.isTypeIndividual:
+            total_accounting = Sum('activities__%s' % self.accountingType, distinct=True)
+            average_accounting = ExpressionWrapper(Sum('activities__%s' % self.accountingType, distinct=True) / Count('activities__%s' % self.accountingType), output_field=DecimalField())
+
+            if self.accountingType in ('distance', 'duration', 'calories'):
+                accounting = total_accounting
+            elif self.accountingType == 'pace':
+                accounting = average_accounting
+
             winners = self.players.filter(self.getActivitiesFilter()).annotate(
-                total_accounting=Sum('activities__%s' % self.accountingType, distinct=True),
+                total_accounting=accounting,
                 latest_activity_date=Max('activities__date')).exclude(total_accounting__lt=getattr(self, self.accountingType))
 
             if self.isStyleWinnerTakesAll:
@@ -493,6 +522,9 @@ class Challenge(models.Model):
                 return True
         return False
 
+    def getAchievementLevel(self, value):
+        return float(value) / float(getattr(self, self.accountingType))
+
     def __unicode__(self):
         return self.name
 
@@ -580,10 +612,17 @@ class Team(models.Model):
                 userFilter |= Q(user=member)
 
             filter = filter & userFilter
-            # TODO: Fix this N+1 Select
-            result = FitnessActivity.objects.filter(filter).aggregate(Sum(accountingType))
-            key = "%s__sum" % accountingType
-            self._cache[accountingType] = result.get(key) if result.get(key) is not None else 0
+
+            total_accounting = Sum(accountingType, distinct=True)
+            average_accounting = ExpressionWrapper(Sum(accountingType, distinct=True) / Count(accountingType), output_field=DecimalField())
+
+            if accountingType in ('distance', 'duration', 'calories'):
+                accounting = total_accounting
+            elif accountingType == 'pace':
+                accounting = average_accounting
+
+            result = FitnessActivity.objects.filter(filter).aggregate(total_accounting=accounting)
+            self._cache[accountingType] = result.get('total_accounting') if result.get('total_accounting') is not None else 0
         return self._cache[accountingType]
 
     @property
@@ -599,6 +638,9 @@ class Team(models.Model):
         return self.accounting('duration')
 
     def average(self, accountingType):
+        if accountingType == 'pace':
+            return self.accounting(accountingType)
+
         num_players = attr(self, 'num_members') if attr(self, 'num_members') is not None else self.members.count()
         return self.accounting(accountingType) / max(num_players, 1)
 
@@ -609,6 +651,10 @@ class Team(models.Model):
     @property
     def averageCalories(self):
         return self.average('calories')
+
+    @property
+    def averagePace(self):
+        return self.average('pace')
 
     @property
     def averageDuration(self):
@@ -699,6 +745,11 @@ class FitnessActivityManager(models.Manager):
                     if activity.get('calories') is not None:
                         dbo.calories = activity.get('calories')
 
+                    try:
+                        dbo.pace = activity.get('distance') / activity.get('duration')
+                    except (TypeError, ZeroDivisionError) as err:
+                        dbo.pace = 0
+
                     dbo.distance = activity.get('distance')
                     dbo.hasGPS = activity.get('hasGPS')
                     dbo.save()
@@ -725,6 +776,7 @@ class FitnessActivity(models.Model):
     date = models.DateTimeField(blank=True, null=True, default=None)
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
+    pace = models.FloatField(blank=True, null=True, default=0)
     photo = models.ImageField(upload_to=get_file_path, blank=True, default=None, null=True)
     hasGPS = models.BooleanField(default=False)
     hasProof = models.BooleanField(default=False)

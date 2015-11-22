@@ -66,15 +66,20 @@
 						<div class="challenge-value">{{ challenge.enddate|date:"N j, y" }}</div>
 					{% endif %}
 				</div>
+
+				{% if challenge.ante > 0 %}
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">Bet</div>
 					<div class="challenge-value">${{ challenge.ante|floatformat:"-2"|intcomma }}</div>
 				</div>
+				{%  endif %}
 
+				{% if challenge.moneyInThePot > 0 %}
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">In the pot</div>
 					<div class="challenge-value">${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }}</div>
 				</div>
+				{% endif %}
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">Players</div>
 					<div class="challenge-value">{{ challenge.numPlayers }}</div>

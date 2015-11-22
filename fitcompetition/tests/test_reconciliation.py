@@ -8,7 +8,7 @@ from fitcompetition.settings import TIME_ZONE
 import pytz
 import uuid
 
-accountingTypes = ('distance', 'calories', 'duration')
+accountingTypes = ('distance', 'calories', 'duration', 'pace')
 
 
 class ReconciliationTests(TestCase):
@@ -50,6 +50,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=50,
                                        distance=50,
+                                       pace=1,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.elmo,
@@ -59,6 +60,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
                                        distance=70,
+                                       pace=1,
                                        hasGPS=True)
 
         #does not count since evidence is required
@@ -68,7 +70,8 @@ class ReconciliationTests(TestCase):
                                        duration=70,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
-                                       distance=70)
+                                       distance=70,
+                                       pace=1)
 
         FitnessActivity.objects.create(user=self.count,
                                        type=self.running,
@@ -77,7 +80,8 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
                                        distance=70,
-                                       hasGPS=True)
+                                       hasGPS=True,
+                                       pace=1.5)
 
         FitnessActivity.objects.create(user=self.count,
                                        type=self.running,
@@ -86,6 +90,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
                                        distance=70,
+                                       pace=1.5,
                                        photo="moo.gif")
 
         FitnessActivity.objects.create(user=self.bert,
@@ -95,6 +100,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=20,
                                        distance=20,
+                                       pace=1,
                                        hasGPS=True,
                                        photo="ack.png")
 
@@ -105,6 +111,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=90,
                                        distance=90,
+                                       pace=1,
                                        hasGPS=True)
 
         FitnessActivity.objects.create(user=self.ernie,
@@ -114,6 +121,7 @@ class ReconciliationTests(TestCase):
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=65,
                                        distance=65,
+                                       pace=.5,
                                        photo="meh.jpg")
 
         #does not count since evidence is required
@@ -123,7 +131,8 @@ class ReconciliationTests(TestCase):
                                        duration=65,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=65,
-                                       distance=65)
+                                       distance=65,
+                                       pace=.5)
 
 
         #elmo 120 miles
@@ -146,6 +155,7 @@ class ReconciliationTests(TestCase):
                                                  distance=100,
                                                  duration=100,
                                                  calories=100,
+                                                 pace=1,
                                                  accountingType=accountingType,
                                                  startdate=start,
                                                  enddate=end,
@@ -193,6 +203,7 @@ class ReconciliationTests(TestCase):
                                                  style="ALL",
                                                  distance=100,
                                                  calories=100,
+                                                 pace=1,
                                                  duration=100,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -248,6 +259,7 @@ class ReconciliationTests(TestCase):
                                                  style="ALL",
                                                  distance=135,
                                                  calories=135,
+                                                 pace=1.4,
                                                  duration=135,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -296,6 +308,7 @@ class ReconciliationTests(TestCase):
                                                  distance=235,
                                                  calories=235,
                                                  duration=235,
+                                                 pace=3,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -343,6 +356,7 @@ class ReconciliationTests(TestCase):
                                                  distance=100,
                                                  calories=100,
                                                  duration=100,
+                                                 pace=1,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -382,6 +396,7 @@ class ReconciliationTests(TestCase):
                                                  distance=180,
                                                  calories=180,
                                                  duration=180,
+                                                 pace=3,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -421,6 +436,7 @@ class ReconciliationTests(TestCase):
                                                  distance=90,
                                                  calories=90,
                                                  duration=90,
+                                                 pace=0.7,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -469,6 +485,7 @@ class ReconciliationTests(TestCase):
                                                  distance=110,
                                                  duration=110,
                                                  calories=110,
+                                                 pace=1.2,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -517,6 +534,7 @@ class ReconciliationTests(TestCase):
                                                  distance=150,
                                                  duration=150,
                                                  calories=150,
+                                                 pace=3,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -565,6 +583,7 @@ class ReconciliationTests(TestCase):
                                                  distance=100,
                                                  calories=100,
                                                  duration=100,
+                                                 pace=1,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -613,6 +632,7 @@ class ReconciliationTests(TestCase):
                                                  distance=300,
                                                  calories=300,
                                                  duration=300,
+                                                 pace=4,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
                                                  enddate=datetime.datetime(2013, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),

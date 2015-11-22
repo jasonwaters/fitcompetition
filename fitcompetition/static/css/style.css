@@ -661,6 +661,10 @@ body.challenges, body.challenge {
 @media only screen and (max-device-width: 667px) 
     and (-webkit-device-pixel-ratio: 2) {
 
+	body.challenge .main-container {
+		padding: 0 10px;
+	}
+
 	td.challenge-specifics {
     	max-width: 92px;
     	word-wrap: break-word;

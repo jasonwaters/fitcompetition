@@ -15,7 +15,6 @@ import pytz
 import locale
 from rest_framework.renderers import JSONRenderer
 
-
 MILLIS_PER_SECOND = 1000
 MINUTES_PER_HOUR = 60
 HOURS_PER_DAY = 24
@@ -34,29 +33,28 @@ def abs(value):
 def achievedGoal(value, challenge):
     if not value:
         return False
-
-    return value > float(getattr(challenge, challenge.accountingType))
-
-
-@register.filter
-def overAchiever(meters, challenge):
-    if not meters:
-        return False
-    return meters > float(getattr(challenge, challenge.accountingType)) * 1.5
+    return challenge.getAchievementLevel(value) >= 1
 
 
 @register.filter
-def doubledGoal(meters, challenge):
-    if not meters:
+def overAchiever(value, challenge):
+    if not value:
         return False
-    return meters > float(getattr(challenge, challenge.accountingType)) * 2
+    return challenge.getAchievementLevel(value) >= 1.5
 
 
 @register.filter
-def tripledGoal(meters, challenge):
-    if not meters:
+def doubledGoal(value, challenge):
+    if not value:
         return False
-    return meters > float(getattr(challenge, challenge.accountingType)) * 3
+    return challenge.getAchievementLevel(value) >= 2
+
+
+@register.filter
+def tripledGoal(value, challenge):
+    if not value:
+        return False
+    return challenge.getAchievementLevel(value) >= 3
 
 
 @register.filter
@@ -83,6 +81,7 @@ def serialize(obj, serializer):
     serializedObj = klass(obj)
     return mark_safe(JSONRenderer().render(serializedObj.data))
 
+
 @register.filter
 def toMiles(meters):
     if meters is None:
@@ -96,15 +95,18 @@ def toMeters(miles):
         miles = 0
     return float(miles) / float(0.00062137)
 
+
 @register.filter
 def toLBS(kg):
     if not isinstance(kg, float):
         return 0
     return kg * 2.2046
 
+
 @register.filter
 def gramsToLBS(g):
     return g * 0.0022046
+
 
 @register.filter
 def twoDecimals(value):
@@ -137,11 +139,13 @@ def daysSince(targetdate):
     delta = now - targetdate
     return "%s days" % delta.days
 
+
 @register.filter()
 def https(value):
     if value is not None:
         value = value.replace("http://", "https://", 1)
     return value
+
 
 @register.filter()
 def isChallenger(challenge, user):
@@ -149,6 +153,7 @@ def isChallenger(challenge, user):
         return False
 
     return user in challenge.players.all()
+
 
 @register.filter
 def deltaDate(targetDate, kind):
@@ -254,19 +259,33 @@ def accounting(valueHolder, accountingType, user, displayFullUnit=False, floatPr
     elif accountingType == 'duration':
         unit = ''
         value = duration(value)
+    elif accountingType == 'pace':
+        unit = user.distanceUnit if user.is_authenticated() else 'mi'
+
+        try:
+            if unit == 'mi':
+                value = duration((float(26.8224) / float(value)) * 60)
+            elif unit == 'km':
+                value = duration((float(16.666666667) / float(value)) * 60)
+        except ZeroDivisionError:
+            value = 0
+
+        if displayFullUnit:
+            unit = 'min/' + unit
+        else:
+            unit = ''
 
     return '%s %s' % (value, unit)
 
+
 @register.simple_tag(takes_context=False)
 def accounting_team(team, accountingType, user, average=False, displayFullUnit=False, floatPrecision=-2):
-
     if average:
         value = team.average(accountingType)
     else:
         value = team.accounting(accountingType)
 
     return accounting(value, accountingType, user, displayFullUnit=displayFullUnit, floatPrecision=floatPrecision)
-
 
 
 @register.filter
@@ -380,6 +399,7 @@ def player_row(user, player, challenge, rank, offset=0):
             'player': player,
             'challenge': challenge,
             'rank': rank + offset}
+
 
 @register.inclusion_tag('inclusions/challenge_icon.html', takes_context=False)
 def challenge_icon(challenge):

@@ -21,6 +21,7 @@
             <th>Distance</th>
             <th class="hidden-xs">Duration</th>
             <th class="hidden-xs">Calories</th>
+            <th class="hidden-xs">Average Pace</th>
 			<th>Evidence</th>
         </thead>
         <tbody>
@@ -31,6 +32,7 @@
                     <td>{% accounting activity 'distance' user %}</td>
                     <td class="hidden-xs">{{ activity.duration|duration }}</td>
                     <td class="hidden-xs">{{ activity.calories|floatformat:"0" }}</td>
+                    <td class="hidden-xs" title="Minutes per Mile">{% accounting activity 'pace' user %}</td>
 					<td class="evidence">
 						{% if activity.hasGPS %}<i class="fa fa-map-marker" title="Tracked via GPS"></i>{% endif %}
 						{% if activity.photo %}

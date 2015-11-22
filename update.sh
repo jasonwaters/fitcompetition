@@ -1,5 +1,4 @@
 source env/bin/activate
 pip install -r requirements.pip
 python manage.py collectstatic --noinput
-python manage.py syncdb --noinput
-python manage.py migrate --noinput
+python manage.py migrate --fake-initial --noinput
