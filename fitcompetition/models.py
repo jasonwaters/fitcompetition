@@ -162,7 +162,7 @@ class ChallengeManager(models.Manager):
         else:
             filters &= Q(private=False)
 
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by(
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(filters).order_by(
             '-startdate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
@@ -175,7 +175,7 @@ class ChallengeManager(models.Manager):
         else:
             filters &= Q(private=False)
 
-        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by(
+        result = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(filters).order_by(
             '-enddate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
@@ -191,11 +191,11 @@ class ChallengeManager(models.Manager):
         if daysAgo is not None:
             filters &= Q(enddate__gt=now - timedelta(days=daysAgo))
 
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(filters).order_by('-startdate')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(filters).order_by('-startdate')
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
-        return self.annotate(num_players=Count('players')).filter(players__id=userid, startdate__lte=now, enddate__gte=now, private=False).order_by(
+        return self.annotate(num_players=Count('players', distinct=True)).filter(players__id=userid, startdate__lte=now, enddate__gte=now, private=False).order_by(
             '-startdate',
             '-num_players')
 
@@ -205,7 +205,7 @@ class ChallengeManager(models.Manager):
         completedUserChallenges = []
 
         if userid is not None:
-            allUserChallenges = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players')).filter(
+            allUserChallenges = self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(
                 players__id=userid).order_by('startdate')
 
             for challenge in allUserChallenges:

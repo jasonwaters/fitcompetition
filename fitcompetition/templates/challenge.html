@@ -52,7 +52,7 @@
 				</div>
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					<div class="challenge-label">Duration</div>
-					<div class="challenge-value">{{ challenge.numDays }} Days</div>
+					<div class="challenge-value">{{ challenge.numDays }} Day{{ challenge.numDays|pluralize }}</div>
 				</div>
 				<div class="challenge-info col-lg-3 col-sm-3 col-xs-6">
 					{% if not challenge.hasStarted %}
