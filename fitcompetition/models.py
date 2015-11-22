@@ -747,7 +747,7 @@ class FitnessActivityManager(models.Manager):
 
                     try:
                         dbo.pace = activity.get('distance') / activity.get('duration')
-                    except (TypeError, ZeroDivisionError) as err:
+                    except Exception as err:
                         dbo.pace = 0
 
                     dbo.distance = activity.get('distance')
