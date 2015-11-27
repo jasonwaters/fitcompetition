@@ -745,11 +745,6 @@ class FitnessActivityManager(models.Manager):
                     if activity.get('calories') is not None:
                         dbo.calories = activity.get('calories')
 
-                    try:
-                        dbo.pace = activity.get('distance') / activity.get('duration')
-                    except Exception as err:
-                        dbo.pace = 0
-
                     dbo.distance = activity.get('distance')
                     dbo.hasGPS = activity.get('hasGPS')
                     dbo.save()
@@ -776,7 +771,7 @@ class FitnessActivity(models.Model):
     date = models.DateTimeField(blank=True, null=True, default=None)
     calories = models.FloatField(blank=True, null=True, default=0)
     distance = models.FloatField(blank=True, null=True, default=0)
-    pace = models.FloatField(blank=True, null=True, default=0)
+    pace = models.FloatField(default=0)
     photo = models.ImageField(upload_to=get_file_path, blank=True, default=None, null=True)
     hasGPS = models.BooleanField(default=False)
     hasProof = models.BooleanField(default=False)
@@ -786,7 +781,12 @@ class FitnessActivity(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.hasProof = self.hasGPS or self.photo
-        # print "%s %s %s %s" % (self.user.first_name, self.hasProof, self.hasGPS, self.photo != '')
+
+        try:
+            self.pace = float(self.distance) / float(self.duration)
+        except Exception as err:
+            self.pace = 0
+
         super(FitnessActivity, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:

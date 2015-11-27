@@ -79,7 +79,7 @@ class ReconciliationTests(TestCase):
                                        duration=70,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
-                                       distance=70,
+                                       distance=105,
                                        hasGPS=True,
                                        pace=1.5)
 
@@ -89,7 +89,7 @@ class ReconciliationTests(TestCase):
                                        duration=70,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=70,
-                                       distance=70,
+                                       distance=105,
                                        pace=1.5,
                                        photo="moo.gif")
 
@@ -120,7 +120,7 @@ class ReconciliationTests(TestCase):
                                        duration=65,
                                        date=datetime.datetime(2013, 1, 2).replace(tzinfo=pytz.utc),
                                        calories=65,
-                                       distance=65,
+                                       distance=32.5,
                                        pace=.5,
                                        photo="meh.jpg")
 
@@ -393,9 +393,9 @@ class ReconciliationTests(TestCase):
                                                  slug=uuid.uuid4(),
                                                  type="INDV",
                                                  style="ONE",
-                                                 distance=180,
-                                                 calories=180,
-                                                 duration=180,
+                                                 distance=250,
+                                                 calories=250,
+                                                 duration=250,
                                                  pace=3,
                                                  accountingType=accountingType,
                                                  startdate=datetime.datetime(2013, 1, 1).replace(tzinfo=pytz.timezone(TIME_ZONE)),
@@ -433,7 +433,7 @@ class ReconciliationTests(TestCase):
                                                  slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ALL",
-                                                 distance=90,
+                                                 distance=70,
                                                  calories=90,
                                                  duration=90,
                                                  pace=0.7,
@@ -531,7 +531,7 @@ class ReconciliationTests(TestCase):
                                                  slug=uuid.uuid4(),
                                                  type="TEAM",
                                                  style="ALL",
-                                                 distance=150,
+                                                 distance=170,
                                                  duration=150,
                                                  calories=150,
                                                  pace=3,
