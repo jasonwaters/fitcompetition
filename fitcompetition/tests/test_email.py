@@ -7,11 +7,13 @@ from django.test import Client, TestCase
 from fitcompetition import tasks
 from fitcompetition.models import FitUser, Challenge, ActivityType, Transaction, FitnessActivity, Team
 from fitcompetition.settings import TIME_ZONE
+from fitcompetition.templatetags.apptags import toMiles, accounting
 import pytz
 
 accountingTypes = (('distance', 'miles'),
                    ('calories', 'calories'),
-                   ('duration', ''))
+                   ('duration', ''),
+                   ('pace', ''))
 
 class EmailTests(TestCase):
     def setUp(self):
@@ -45,76 +47,36 @@ class EmailTests(TestCase):
         pass
 
     def testJoinChallenge_distance(self):
-        self.challenge = Challenge.objects.create(name="Marathon",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=100,
-                                                  accountingType='distance',
-                                                  startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  ante=25)
+        for accountingType, accountingText in accountingTypes:
+            self.challenge = Challenge.objects.create(name="Marathon",
+                                                      slug=uuid.uuid4(),
+                                                      type="INDV",
+                                                      style="ALL",
+                                                      distance=100,
+                                                      calories=100,
+                                                      duration=100,
+                                                      pace=1,
+                                                      accountingType=accountingType,
+                                                      startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                                      enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
+                                                      ante=25)
 
-        self.challenge.addChallenger(self.user1)
+            self.challenge.addChallenger(self.user1)
 
-        self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
-        self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
-        self.assertTrue("must log 0.06 miles" in mail.outbox[0].alternatives[0][0], 'accounting value and metric not shown')
-        mail.outbox = []
+            self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
+            self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
 
-        self.challenge.removeChallenger(self.user1, force=True)
+            text = "must log %s" % accounting(self.challenge, accountingType, self.user1, True)
 
-        self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
+            self.assertTrue(text.strip() in mail.outbox[0].alternatives[0][0], 'accounting value and metric not shown')
 
-    def testJoinChallenge_calories(self):
-        self.challenge = Challenge.objects.create(name="Marathon",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=100,
-                                                  accountingType='calories',
-                                                  startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  ante=25)
+            mail.outbox = []
 
-        self.challenge.addChallenger(self.user1)
+            self.challenge.removeChallenger(self.user1, force=True)
 
-        self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
-        self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
-        self.assertTrue("must log 100 calories" in mail.outbox[0].alternatives[0][0], 'accounting value and metric not shown')
-        mail.outbox = []
+            self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
 
-        self.challenge.removeChallenger(self.user1, force=True)
-
-        self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
-
-    def testJoinChallenge_duration(self):
-        self.challenge = Challenge.objects.create(name="Marathon",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=(60*60*2)+(20*60),
-                                                  accountingType='duration',
-                                                  startdate=datetime.datetime(2013, 11, 16).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  enddate=datetime.datetime(2014, 2, 14).replace(tzinfo=pytz.timezone(TIME_ZONE)),
-                                                  ante=25)
-
-        self.challenge.addChallenger(self.user1)
-
-        self.assertEqual(1, len(mail.outbox), "Joined Challenge Email Failed To Send")
-        self.assertEqual('You joined "%s"' % self.challenge.name, mail.outbox[0].subject, "Joined Challenge Email Failed To Send")
-        self.assertTrue("must log 02:20:00" in mail.outbox[0].alternatives[0][0], 'accounting value and metric not shown')
-        mail.outbox = []
-
-        self.challenge.removeChallenger(self.user1, force=True)
-
-        self.assertEqual(0, len(mail.outbox), "No transactional email should be sent when a user withdraws from a challenge.")
+            self.challenge.delete()
 
     def testCashOut(self):
         c = Client()
@@ -147,565 +109,233 @@ class EmailTests(TestCase):
         self.assertEqual(0, len(mail.outbox))
 
     def testChallengeStart(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  startdate=now,
-                                                  enddate=now + datetime.timedelta(days=10),
-                                                  ante=10)
+        for accountingType, accountingText in accountingTypes:
+            now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.challenge = Challenge.objects.create(name="aaa",
+                                                      slug=uuid.uuid4(),
+                                                      type="INDV",
+                                                      style="ALL",
+                                                      distance=100,
+                                                      calories=100,
+                                                      duration=100,
+                                                      pace=1,
+                                                      accountingType=accountingType,
+                                                      startdate=now,
+                                                      enddate=now + datetime.timedelta(days=10),
+                                                      ante=10)
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-        mail.outbox = []
+            self.challenge.addChallenger(self.user1)
+            self.challenge.addChallenger(self.user2)
+            mail.outbox = []
 
-        tasks.sendChallengeNotifications()
+            tasks.sendChallengeNotifications()
 
-        self.assertEqual(2, len(mail.outbox), '2 challenge kick-off emails should have been sent')
-        self.assertEqual("The challenge has begun!", mail.outbox[0].subject)
-        self.assertEqual("The challenge has begun!", mail.outbox[1].subject)
+            self.assertEqual(2, len(mail.outbox), '2 challenge kick-off emails should have been sent')
+            self.assertEqual("The challenge has begun!", mail.outbox[0].subject)
+            self.assertEqual("The challenge has begun!", mail.outbox[1].subject)
+
+            self.assertTrue("challenge has begun!" in mail.outbox[0].alternatives[0][0], msg="email body wrong for accountingType=%s" % accountingType)
+            self.assertTrue("challenge has begun!" in mail.outbox[1].alternatives[0][0], msg="email body wrong for accountingType=%s" % accountingType)
+
+            self.challenge.delete()
 
     def testChallengeHalf(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  startdate=now + datetime.timedelta(days=-4),
-                                                  enddate=now + datetime.timedelta(days=4),
-                                                  ante=100)
+        for accountingType, accountingText in accountingTypes:
+            now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.challenge = Challenge.objects.create(name="aaa",
+                                                      slug=uuid.uuid4(),
+                                                      type="INDV",
+                                                      style="ALL",
+                                                      distance=100,
+                                                      calories=100,
+                                                      duration=100,
+                                                      pace=1,
+                                                      accountingType=accountingType,
+                                                      startdate=now + datetime.timedelta(days=-4),
+                                                      enddate=now + datetime.timedelta(days=4),
+                                                      ante=100)
 
-        self.challenge.approvedActivities.add(self.running)
+            self.challenge.approvedActivities.add(self.running)
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
+            self.challenge.addChallenger(self.user1)
+            self.challenge.addChallenger(self.user2)
 
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now,
-                                       calories=0,
-                                       distance=120,
-                                       hasGPS=True)
+            FitnessActivity.objects.create(user=self.user1,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=100,
+                                           date=now,
+                                           calories=100,
+                                           distance=120,
+                                           hasGPS=True)
 
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now,
-                                       calories=0,
-                                       distance=50,
-                                       photo="meh.jpg")
+            FitnessActivity.objects.create(user=self.user2,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=50,
+                                           date=now,
+                                           calories=25,
+                                           distance=25,
+                                           photo="meh.jpg")
 
-        mail.outbox = []
+            mail.outbox = []
 
-        tasks.sendChallengeNotifications()
+            tasks.sendChallengeNotifications()
 
-        self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
+            self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
 
-        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
-        self.assertTrue("0.07 miles" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
+            challengers = self.challenge.getChallengersWithActivities()
 
-        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
-        self.assertTrue("0.03 miles" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
+            self.assertEqual(challengers[0].id, self.user1.id)
+            self.assertEqual(challengers[1].id, self.user2.id)
 
-    def testChallengeHalf_calories(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  accountingType='calories',
-                                                  startdate=now + datetime.timedelta(days=-4),
-                                                  enddate=now + datetime.timedelta(days=4),
-                                                  ante=100)
+            self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
+            self.assertTrue(accounting(challengers[0].total_accounting, accountingType, self.user1, True) in mail.outbox[0].alternatives[0][0])
+            self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
 
-        self.challenge.approvedActivities.add(self.running)
+            self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
+            self.assertTrue(accounting(challengers[1].total_accounting, accountingType, self.user1, True) in mail.outbox[1].alternatives[0][0])
+            self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now,
-                                       calories=100,
-                                       distance=120,
-                                       hasGPS=True)
-
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now,
-                                       calories=50,
-                                       distance=50,
-                                       photo="meh.jpg")
-
-        mail.outbox = []
-
-        tasks.sendChallengeNotifications()
-
-        self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
-
-        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
-        self.assertTrue("100 calories" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
-        self.assertTrue("50 calories" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
-
-    def testChallengeHalf_duration(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=60*60*2,
-                                                  accountingType='duration',
-                                                  startdate=now + datetime.timedelta(days=-4),
-                                                  enddate=now + datetime.timedelta(days=4),
-                                                  ante=100)
-
-        self.challenge.approvedActivities.add(self.running)
-
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60*2,
-                                       date=now,
-                                       calories=100,
-                                       distance=120,
-                                       hasGPS=True)
-
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now,
-                                       calories=50,
-                                       distance=50,
-                                       photo="meh.jpg")
-
-        mail.outbox = []
-
-        tasks.sendChallengeNotifications()
-
-        self.assertEqual(2, len(mail.outbox), '2 challenge half-over emails should have been sent')
-
-        self.assertEqual("The challenge is half over!", mail.outbox[0].subject)
-        self.assertTrue("02:00:00" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("dominate the leaderboard" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is half over!", mail.outbox[1].subject)
-        self.assertTrue("01:00:00" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("on your way to conquer" in mail.outbox[1].alternatives[0][0])
+            self.challenge.delete()
+            FitnessActivity.objects.all().delete()
 
     def testChallengeEnd(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
+        for accountingType, accountingText in accountingTypes:
 
-        self.challenge.approvedActivities.add(self.running)
+            now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.challenge = Challenge.objects.create(name="aaa",
+                                                      slug=uuid.uuid4(),
+                                                      type="INDV",
+                                                      style="ALL",
+                                                      distance=100,
+                                                      calories=100,
+                                                      duration=100,
+                                                      pace=1,
+                                                      accountingType=accountingType,
+                                                      startdate=now + datetime.timedelta(days=-20),
+                                                      enddate=now + datetime.timedelta(days=-2),
+                                                      ante=100)
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
+            self.challenge.approvedActivities.add(self.running)
 
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=0,
-                                       distance=120,
-                                       hasGPS=True)
+            self.challenge.addChallenger(self.user1)
+            self.challenge.addChallenger(self.user2)
 
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=0,
-                                       distance=50,
-                                       photo="bla.jpg")
+            FitnessActivity.objects.create(user=self.user1,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=100,
+                                           date=now + datetime.timedelta(days=-5),
+                                           calories=150,
+                                           distance=200,
+                                           hasGPS=True)
 
-        mail.outbox = []
+            FitnessActivity.objects.create(user=self.user2,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=50,
+                                           date=now + datetime.timedelta(days=-5),
+                                           calories=10,
+                                           distance=10,
+                                           photo="bla.jpg")
 
-        tasks.sendChallengeNotifications()
-        self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
+            mail.outbox = []
 
-        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("0.07 miles" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
+            tasks.sendChallengeNotifications()
+            self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
 
-        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("0.03 miles" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
+            challengers = self.challenge.getChallengersWithActivities()
 
-    def testChallengeEnd_calories(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  accountingType="calories",
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
+            self.assertEqual(challengers[0].id, self.user1.id)
+            self.assertEqual(challengers[1].id, self.user2.id)
 
-        self.challenge.approvedActivities.add(self.running)
+            self.assertEqual("The challenge is over!", mail.outbox[0].subject)
+            self.assertTrue(accounting(challengers[0].total_accounting, accountingType, self.user1, True) in mail.outbox[0].alternatives[0][0])
+            self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
+            self.assertEqual("The challenge is over!", mail.outbox[1].subject)
+            self.assertTrue(accounting(challengers[1].total_accounting, accountingType, self.user1, True) in mail.outbox[1].alternatives[0][0])
+            self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
 
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=120,
-                                       distance=120,
-                                       hasGPS=True)
-
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=100,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=50,
-                                       distance=50,
-                                       photo="bla.jpg")
-
-        mail.outbox = []
-
-        tasks.sendChallengeNotifications()
-        self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
-
-        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("120 calories" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("50 calories" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
-
-
-    def testChallengeEnd_duration(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="INDV",
-                                                  style="ALL",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=2*60*60,
-                                                  accountingType="duration",
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
-
-        self.challenge.approvedActivities.add(self.running)
-
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=2*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=120,
-                                       distance=120,
-                                       hasGPS=True)
-
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=50,
-                                       distance=50,
-                                       photo="bla.jpg")
-
-        mail.outbox = []
-
-        tasks.sendChallengeNotifications()
-        self.assertEqual(2, len(mail.outbox), '2 challenge ended emails should have been sent')
-
-        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("02:00:00" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("We've credited $200" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("01:00:00" in mail.outbox[1].alternatives[0][0])
-        self.assertTrue("sadly you did not complete the challenge" in mail.outbox[1].alternatives[0][0])
+            self.challenge.delete()
+            FitnessActivity.objects.all().delete()
 
     def testTeamChallengeEnd(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="TEAM",
-                                                  style="ONE",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=2*60*60,
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
+        for accountingType, accountingText in accountingTypes:
+            now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
+            self.challenge = Challenge.objects.create(name="aaa",
+                                                      slug=uuid.uuid4(),
+                                                      type="TEAM",
+                                                      style="ONE",
+                                                      distance=100,
+                                                      calories=100,
+                                                      duration=100,
+                                                      pace=1,
+                                                      accountingType=accountingType,
+                                                      startdate=now + datetime.timedelta(days=-20),
+                                                      enddate=now + datetime.timedelta(days=-2),
+                                                      ante=100)
 
-        self.challenge.approvedActivities.add(self.running)
+            self.challenge.approvedActivities.add(self.running)
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-        self.challenge.addChallenger(self.user3)
+            self.challenge.addChallenger(self.user1)
+            self.challenge.addChallenger(self.user2)
+            self.challenge.addChallenger(self.user3)
 
-        team1 = Team.objects.startTeam(self.challenge, self.user1)
-        team2 = Team.objects.startTeam(self.challenge, self.user2)
-        team3 = Team.objects.startTeam(self.challenge, self.user3)
+            team1 = Team.objects.startTeam(self.challenge, self.user1)
+            team2 = Team.objects.startTeam(self.challenge, self.user2)
+            team3 = Team.objects.startTeam(self.challenge, self.user3)
 
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60*3,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=120,
-                                       distance=120,
-                                       hasGPS=True)
+            FitnessActivity.objects.create(user=self.user1,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=1000,
+                                           date=now + datetime.timedelta(days=-5),
+                                           calories=1000,
+                                           distance=1500,
+                                           hasGPS=True)
 
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=9*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=5000,
-                                       distance=1200,)
+            FitnessActivity.objects.create(user=self.user2,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=200,
+                                           date=now + datetime.timedelta(days=-5),
+                                           calories=200,
+                                           distance=220,
+                                           photo="bleh.jpg")
 
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=1,
-                                       distance=101,
-                                       photo="bleh.jpg")
+            FitnessActivity.objects.create(user=self.user3,
+                                           type=self.running,
+                                           uri='blah',
+                                           duration=50,
+                                           date=now + datetime.timedelta(days=-5),
+                                           calories=50,
+                                           distance=25,
+                                           photo="omg.png",
+                                           hasGPS=True)
 
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=50,
-                                       distance=50,
-                                       photo="omg.png",
-                                       hasGPS=True)
+            mail.outbox = []
 
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=3*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=900,
-                                       distance=550)
+            # user 1 : winner
+            # user 2 : loser, but achieved goal
+            # user 3 : loser, failed to achieve goal
 
-    def testTeamChallengeEnd_calories(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="TEAM",
-                                                  style="ONE",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=2*60*60,
-                                                  accountingType='calories',
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
+            tasks.sendChallengeNotifications()
+            self.assertEqual(3, len(mail.outbox), '2 challenge ended emails should have been sent')
 
-        self.challenge.approvedActivities.add(self.running)
+            self.assertEqual("The challenge is over!", mail.outbox[0].subject)
+            self.assertTrue("Congratulations, your team won!" in mail.outbox[0].alternatives[0][0])
+            self.assertTrue("We've credited $300" in mail.outbox[0].alternatives[0][0])
 
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-        self.challenge.addChallenger(self.user3)
+            self.assertEqual("The challenge is over!", mail.outbox[1].subject)
+            self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[1].alternatives[0][0])
 
-        team1 = Team.objects.startTeam(self.challenge, self.user1)
-        team2 = Team.objects.startTeam(self.challenge, self.user2)
-        team3 = Team.objects.startTeam(self.challenge, self.user3)
+            self.assertEqual("The challenge is over!", mail.outbox[2].subject)
+            self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[2].alternatives[0][0])
 
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60*3,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=120,
-                                       distance=120,
-                                       hasGPS=True)
+            self.challenge.delete()
+            Team.objects.all().delete()
+            FitnessActivity.objects.all().delete()
 
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=9*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=5000,
-                                       distance=1200,)
 
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=1,
-                                       distance=101,
-                                       photo="bleh.jpg")
-
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=50,
-                                       distance=50,
-                                       photo="omg.png",
-                                       hasGPS=True)
-
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=3*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=900,
-                                       distance=550)
-
-        mail.outbox = []
-
-        # user 1 : winner
-        # user 2 : loser, but achieved distance
-        # user 3 : loser, failed to achieve distance
-
-        tasks.sendChallengeNotifications()
-        self.assertEqual(3, len(mail.outbox), '2 challenge ended emails should have been sent')
-
-        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("Congratulations, your team won!" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("We've credited $300" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[1].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[2].subject)
-        self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[2].alternatives[0][0])
-
-    def testTeamChallengeEnd_calories(self):
-        now = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-        self.challenge = Challenge.objects.create(name="aaa",
-                                                  slug=uuid.uuid4(),
-                                                  type="TEAM",
-                                                  style="ONE",
-                                                  distance=100,
-                                                  calories=100,
-                                                  duration=2*60*60,
-                                                  accountingType='duration',
-                                                  startdate=now + datetime.timedelta(days=-20),
-                                                  enddate=now + datetime.timedelta(days=-2),
-                                                  ante=100)
-
-        self.challenge.approvedActivities.add(self.running)
-
-        self.challenge.addChallenger(self.user1)
-        self.challenge.addChallenger(self.user2)
-        self.challenge.addChallenger(self.user3)
-
-        team1 = Team.objects.startTeam(self.challenge, self.user1)
-        team2 = Team.objects.startTeam(self.challenge, self.user2)
-        team3 = Team.objects.startTeam(self.challenge, self.user3)
-
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60*3,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=120,
-                                       distance=120,
-                                       hasGPS=True)
-
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user1,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=9*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=5000,
-                                       distance=1200,)
-
-        FitnessActivity.objects.create(user=self.user2,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=1,
-                                       distance=101,
-                                       photo="bleh.jpg")
-
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=50,
-                                       distance=50,
-                                       photo="omg.png",
-                                       hasGPS=True)
-
-        # does not count since evidence is required
-        FitnessActivity.objects.create(user=self.user3,
-                                       type=self.running,
-                                       uri='blah',
-                                       duration=3*60*60,
-                                       date=now + datetime.timedelta(days=-5),
-                                       calories=900,
-                                       distance=550)
-
-        mail.outbox = []
-
-        # user 1 : winner
-        # user 2 : loser, but achieved distance
-        # user 3 : loser, failed to achieve distance
-
-        tasks.sendChallengeNotifications()
-        self.assertEqual(3, len(mail.outbox), '2 challenge ended emails should have been sent')
-
-        self.assertEqual("The challenge is over!", mail.outbox[0].subject)
-        self.assertTrue("Congratulations, your team won!" in mail.outbox[0].alternatives[0][0])
-        self.assertTrue("We've credited $300" in mail.outbox[0].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[1].subject)
-        self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[1].alternatives[0][0])
-
-        self.assertEqual("The challenge is over!", mail.outbox[2].subject)
-        self.assertTrue("It was a valiant effort, but you've been beat." in mail.outbox[2].alternatives[0][0])
