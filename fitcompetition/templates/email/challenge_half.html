@@ -3,26 +3,44 @@
 {% load humanize %}
 
 {% block content %}
-	<p>Hey {{user.first_name}}!</p>
+	<table>
+		<tr>
+			<td>
+				<h1>You're half way there</h1>
 
-	<p>How's it going?  Can you believe the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge is already half over!?</p>
-	<p>
-		{% if achievedGoal %}
-			Wow, you've logged {% accounting user.total_accounting challenge.accountingType user True%}!
-			Way to go, you've already achieved the goal!!  That was easy.  Now it's time to dominate the leaderboard and shoot for the stars by doubling or tripling the goal.  You can do it!
-		{% elif user.total_accounting > 0 %}
-			You've already logged {% accounting user.total_accounting challenge.accountingType user True %}!
-			You're well on your way to conquer this thing.  And there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!
-		{% else %}
-			Looks like you haven't logged any activities yet! Eek!  Don't worry, there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!
-		{% endif %}
-	</p>
+				<p>Hey {{user.first_name}}!</p>
 
-	<p>The challenge ends on {{ challenge.enddate|date:"F j, Y" }}.</p>
+				<p>How's it going?  Can you believe the <a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a> challenge is already half over!?</p>
+				<p>
+					{% if achievedGoal %}
+						Wow, you've logged {% accounting user.total_accounting challenge.accountingType user True%}!
+						Way to go, you've already achieved the goal!!  That was easy.  Now it's time to dominate the leaderboard and shoot for the stars by doubling or tripling the goal.  You can do it!
+					{% elif user.total_accounting > 0 %}
+						You've already logged {% accounting user.total_accounting challenge.accountingType user True %}!
+						You're well on your way to conquer this thing.  And there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!
+					{% else %}
+						Looks like you haven't logged any activities yet! Eek!  Don't worry, there's still plenty of time to rock this challenge.  Remember, there's ${{ challenge.moneyInThePot|floatformat:"-2"|intcomma }} in the pot!  You can do it!
+					{% endif %}
+				</p>
 
-	<p>
-		{% if user.account.balance < 0 %}
-			BTW, you owe {{ user.account.balance|abs|currency }}.  <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a> soon or you won't be eligible to win!
-		{% endif %}
-	</p>
+				<h3>The challenge ends on {{ challenge.enddate|date:"F j, Y" }}.</h3>
+
+				<!-- button -->
+				<table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+							<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">View the challenge</a>
+						</td>
+					</tr>
+				</table>
+				<!-- /button -->
+
+				<p>
+					{% if user.account.balance < 0 %}
+						BTW, you owe {{ user.account.balance|abs|currency }}.  <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a> soon or you won't be eligible to win!
+					{% endif %}
+				</p>
+			</td>
+		</tr>
+	</table>
 {% endblock %}

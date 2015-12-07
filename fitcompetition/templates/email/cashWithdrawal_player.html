@@ -3,8 +3,26 @@
 {% load humanize %}
 
 {% block content %}
-	<p>Hey {{user.first_name}}!</p>
+	<table>
+		<tr>
+			<td>
+				<h1>You're Cashing Out</h1>
+				<p>Hey {{user.first_name}}!</p>
 
-	<p>We thought you might like to know that we've recieved your request to cash out <strong>{{ value|currency }}</strong> from your FitCrown account.</p>
-	<p>We're working on your request and you can expect to see a credit to your PayPal account soon.  The email address you specified for your PayPal account is <em>{{ email }}</em></p>
+				<p>We thought you might like to know that we've recieved your request to cash out <strong>{{ value|currency }}</strong> from your FitCrown account.</p>
+				<p>We're working on your request and you can expect to see a credit to your PayPal account soon.  The email address you specified for your PayPal account is <em>{{ email }}</em></p>
+
+
+				<!-- button -->
+				<table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+							<a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">View your account</a>
+						</td>
+					</tr>
+				</table>
+				<!-- /button -->
+			</td>
+		</tr>
+	</table>
 {% endblock %}

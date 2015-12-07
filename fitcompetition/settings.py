@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     'djcelery',
     'seacucumber',
     'debug_toolbar',
+    'django_premailer',
     'fitcompetition',
 )
 

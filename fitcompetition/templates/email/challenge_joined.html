@@ -3,32 +3,50 @@
 {% load humanize %}
 
 {% block content %}
-	<p>Hey {{user.first_name}}!</p>
+	<table>
+		<tr>
+			<td>
+				<h1>Welcome to the challenge!</h1>
+				<p>Hi {{user.first_name}},</p>
+				<p>You joined the <a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a> challenge on Fit Crown!  We're glad to have you.</p>
+				<h3>Here's the details</h3>
+				<ul>
+					<li>
+						{% if challenge.isTypeIndividual %}
+							It's an Individual Challenge
+						{% elif challenge.isTypeTeam %}
+							It's a Team Challenge
+						{% endif %}
+					</li>
+					<li>
+						{% if challenge.isStyleAllCanWin %}
+							All Can Win &mdash; you are guaranteed (at least) your money back if you complete the challenge.
+						{% elif challenge.isStyleWinnerTakesAll %}
+							Winner Takes All
+						{% endif %}
+					</li>
+					<li>{% if challenge.isTypeTeam %}Your team{% else %}You{% endif %} must log {% accounting challenge challenge.accountingType user True%}</li>
+					<li>Approved Activities: {{ approvedActivities|commaSeparated }}</li>
+					<li>Start Date: {{ challenge.startdate|date:"F j, Y" }}</li>
+					<li>End Date: {{ challenge.enddate|date:"F j, Y" }}</li>
+				</ul>
 
-	<p>Welcome to the "<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">{{ challenge.name }}</a>" challenge on Fit Crown!  Here's the details:</p>
-	<ul>
-		<li>
-			{% if challenge.isTypeIndividual %}
-				It's an Individual Challenge
-			{% elif challenge.isTypeTeam %}
-				It's a Team Challenge
-			{% endif %}
-		</li>
-		<li>
-			{% if challenge.isStyleAllCanWin %}
-				All Can Win &mdash; you are guaranteed (at least) your money back if you complete the challenge.
-			{% elif challenge.isStyleWinnerTakesAll %}
-				Winner Takes All
-			{% endif %}
-		</li>
-		<li>{% if challenge.isTypeTeam %}Your team{% else %}You{% endif %} must log {% accounting challenge challenge.accountingType user True%}</li>
-		<li>Approved Activities: {{ approvedActivities|commaSeparated }}</li>
-		<li>Start Date: {{ challenge.startdate|date:"F j, Y" }}</li>
-		<li>End Date: {{ challenge.enddate|date:"F j, Y" }}</li>
-	</ul>
-	<p>
-		{% if user.account.balance < 0 %}
-			You owe {{ user.account.balance|abs|currency }}.  It's easy to <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a>.
-		{% endif %}
-	</p>
+				<!-- button -->
+				<table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+							<a href="{{ "BASE_URL"|fromSettings }}{% url "challenge_details" challenge.slug %}">View the challenge</a>
+						</td>
+					</tr>
+				</table>
+				<!-- /button -->
+
+				<p>
+					{% if user.account.balance < 0 %}
+						You owe {{ user.account.balance|abs|currency }}.  It's easy to <a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">Settle up</a>.
+					{% endif %}
+				</p>
+			</td>
+		</tr>
+	</table>
 {% endblock %}

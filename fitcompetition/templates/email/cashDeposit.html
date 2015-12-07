@@ -3,11 +3,30 @@
 {% load humanize %}
 
 {% block content %}
-	<p>Hey {{user.first_name}}!</p>
+	<table>
+		<tr>
+			<td>
+				<h1>Your account has been credited</h1>
+				<p>Hey {{user.first_name}}!</p>
 
-	<p>We're letting you know that we've credited <strong>{{ transaction.amount|currency }}</strong> to your FitCrown account.</p>
-	<p>That brings <a href="{{ "BASE_URL"|fromSettings }}{% url 'account' %}">your account</a> balance to {{ account.balance|currency }}.</p>
-	{% if transaction.stripeID %}
-	<p>For reference, your transaction ID is <strong>{{ transaction.stripeID }}</strong></p>
-	{% endif %}
+				<p>We're letting you know that we've credited <strong>{{ transaction.amount|currency }}</strong> to your FitCrown account.</p>
+				<p>That brings <a href="{{ "BASE_URL"|fromSettings }}{% url 'account' %}">your account</a> balance to {{ account.balance|currency }}.</p>
+				{% if transaction.stripeID %}
+					<p>For reference, your transaction ID is <strong>{{ transaction.stripeID }}</strong></p>
+				{% endif %}
+
+				<!-- button -->
+				<table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+							<a href="{{ "BASE_URL"|fromSettings }}{% url "account" %}">View your account</a>
+						</td>
+					</tr>
+				</table>
+				<!-- /button -->
+			</td>
+		</tr>
+	</table>
+
+
 {% endblock %}

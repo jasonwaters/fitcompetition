@@ -3,8 +3,26 @@
 {% load humanize %}
 
 {% block content %}
-	<p>{{user.fullname}} is cashing out!</p>
+	<table>
+		<tr>
+			<td>
+				<h1>{{user.fullname}} is cashing out!</h1>
 
-	<p>Please initiate a PayPal transfer for <strong>{{ value|currency }}</strong> to {{ email }} ASAP.</p>
-	<p>Don't forget to <a href="{{ "BASE_URL"|fromSettings }}{% url 'admin:fitcompetition_account_change' user.account.id %}">record the transaction in the FitCrown Admin</a>.</p>
+				<p>Please initiate a PayPal transfer for <strong>{{ value|currency }}</strong> to {{ email }} ASAP.</p>
+				<p>Don't forget to <a href="{{ "BASE_URL"|fromSettings }}{% url 'admin:fitcompetition_account_change' user.account.id %}">record the transaction in the FitCrown Admin</a>.</p>
+
+
+
+				<!-- button -->
+				<table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td>
+							<a href="{{ "BASE_URL"|fromSettings }}{% url 'admin:fitcompetition_account_change' user.account.id %}">Record the transaction</a>
+						</td>
+					</tr>
+				</table>
+				<!-- /button -->
+			</td>
+		</tr>
+	</table>
 {% endblock %}

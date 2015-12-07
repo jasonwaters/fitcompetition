@@ -6,6 +6,7 @@ django-debug-toolbar==1.4
 django-filter==0.11.0
 django-grappelli==2.7.2
 django-pipeline==1.5.4
+django-premailer==0.1.0
 django-storages==1.1.8
 Django==1.8.6
 djangorestframework==2.4.8

@@ -46,7 +46,7 @@ class EmailTests(TestCase):
     def testEmailConfirm(self):
         pass
 
-    def testJoinChallenge_distance(self):
+    def testJoinChallenge(self):
         for accountingType, accountingText in accountingTypes:
             self.challenge = Challenge.objects.create(name="Marathon",
                                                       slug=uuid.uuid4(),
