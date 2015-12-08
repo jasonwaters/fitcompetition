@@ -385,7 +385,7 @@ tr.team .team-total {
 }
 
 .btn-sign-in .logo {
-	display: inline-block;
+	margin-top: 3px;
 }
 
 .btn-sign-in.runkeeper .logo {
