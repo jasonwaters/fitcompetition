@@ -50,6 +50,7 @@ class APITests(TestCase):
         response = self.client.get('/api/join-challenge', {
             'challengeID': -1
         })
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
@@ -60,6 +61,7 @@ class APITests(TestCase):
         response = self.client.get('/api/join-challenge', {
             'challengeID': challenge.id
         })
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
@@ -72,6 +74,7 @@ class APITests(TestCase):
         response = self.client.get('/api/join-challenge', {
             'challengeID': challenge.id
         })
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertTrue(content.get('success'))
@@ -85,6 +88,7 @@ class APITests(TestCase):
         response = self.client.get('/api/withdraw-challenge', {
             'challengeID': challenge.id
         })
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertTrue(content.get('success'))
@@ -93,22 +97,26 @@ class APITests(TestCase):
         response = self.client.post('/api/update-user-details', {
             'emailAddress': 'not@valid.net'
         })
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertTrue(content.get('success'))
 
     def test_charge_card(self):
         response = self.client.get('/api/charge-card')
+        self.assertEqual(200, response.status_code)
 
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
 
     def test_stripe_customer(self):
         response = self.client.get('/api/stripe-customer')
+        self.assertEqual(200, response.status_code)
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
 
     def test_stripe_card(self):
         response = self.client.get('/api/del-stripe-card')
+        self.assertEqual(200, response.status_code)
         content = self.getContent(response)
         self.assertFalse(content.get('success'))
