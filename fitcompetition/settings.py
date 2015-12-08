@@ -98,7 +98,6 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
     'fitcompetition.middleware.SocialAuthExceptionMiddleware',
-    'fitcompetition.middleware.SSLRedirect',
     'dealer.contrib.django.Middleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
