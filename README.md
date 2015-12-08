@@ -15,6 +15,10 @@ Project Setup
   ```bash
   virtualenv env -p /usr/local/bin/python --no-site-packages
   ```  
+  or
+  ```bash  
+  /usr/local/lib/python2.7.10/bin/virtualenv env -p /usr/local/lib/python2.7.10/bin/python --no-site-packages
+  ```  
 3. Install node and lessc dependency for compiling .less files
 
   ```bash
@@ -28,7 +32,8 @@ Project Setup
 3. Install dependencies
   ```bash
   pip install -r requirements.pip
-  ```  
+  ```
+  NOTE: When installing on linode, with limited RAM, I had to follow (these directions)[http://stackoverflow.com/questions/18334366/out-of-memory-issue-in-installing-packages-on-ubuntu-server] so a temporary swap could be used to install lxml.
 
 4. Copy the local_settings.py.template file to local_settings.py and modify it accordingly.
 

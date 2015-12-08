@@ -1,5 +1,7 @@
 # Django settings for fitcompetition project.
 from __future__ import absolute_import
+import cssutils
+import logging
 import manage
 import os
 
@@ -134,6 +136,8 @@ INSTALLED_APPS = (
     'django_premailer',
     'fitcompetition',
 )
+
+cssutils.log.setLevel(logging.CRITICAL)
 
 API_PAGE_SIZE = 50
 

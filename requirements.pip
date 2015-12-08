@@ -19,6 +19,6 @@ python-dateutil==2.4.2
 python-social-auth==0.2.13
 pytz==2015.7
 requests-oauthlib==0.5.0
-requests==2.8.1
+requests==2.5.3
 seacucumber==1.5.2
 stripe==1.27.1
