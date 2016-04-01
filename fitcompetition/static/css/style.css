@@ -497,7 +497,10 @@ tr.team .team-total {
 }
 
 body.challenges, body.challenge {
-	background: #535456 url('/static/img/challenges_bg3.jpg') no-repeat top center;
+	background: #535456 url('/static/img/challenges_bg3.jpg') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
 	background-size: cover;
 }
 
