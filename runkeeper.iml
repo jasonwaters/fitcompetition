@@ -7,15 +7,15 @@
         <option name="settingsModule" value="fitcompetition/settings.py" />
         <option name="manageScript" value="manage.py" />
         <option name="environment" value="&lt;map/&gt;" />
+        <option name="commandsToSkip" value="" />
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
+  <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/static" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 2.7.5 virtualenv at ~/Development/runkeeper/env" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 2.7.13 virtualenv at ~/Development/fitcompetition/env" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">

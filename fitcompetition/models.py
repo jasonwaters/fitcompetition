@@ -179,7 +179,7 @@ class ChallengeManager(models.Manager):
             '-enddate')
         return ListUtil.multikeysort(result, ['-isFootRace'], getter=operator.attrgetter)
 
-    def pastChallenges(self, userid=None, daysAgo=None):
+    def pastChallenges(self, userid=None, daysAgo=None, max=6):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
         filters = Q(enddate__lt=now)
 
@@ -191,7 +191,7 @@ class ChallengeManager(models.Manager):
         if daysAgo is not None:
             filters &= Q(enddate__gt=now - timedelta(days=daysAgo))
 
-        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(filters).order_by('-startdate')
+        return self.prefetch_related('approvedActivities', 'players').annotate(num_players=Count('players', distinct=True)).filter(filters).order_by('-startdate')[:max]
 
     def activeChallenges(self, userid=None):
         now = datetime.now(tz=pytz.timezone(TIME_ZONE))
