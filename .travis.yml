@@ -5,7 +5,7 @@ services:
   - mysql
   - rabbitmq
 install:
-  - pip install -r requirements.pip --use-mirrors
+  - pip install -r requirements.pip
 before_script:
   - mysql -e 'create database fc_test_db;'
   - mv local_settings_travis.py local_settings.py
