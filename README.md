@@ -1,5 +1,6 @@
 Fit Crown
 =========
+[![Build Status](https://travis-ci.com/jasonwaters/fitcompetition.svg?token=WUnf2hqy7s8cBD12ti6Y&branch=master)](https://travis-ci.com/jasonwaters/fitcompetition)
 
 A django based web application used to track exercise challenges and display a leaderboard based on workout activities entered in [Runkeeper](http://runkeeper.com), [MapMyFitness](http://www.mapmyfitness.com) or [Strava](http://strava.com).
 
